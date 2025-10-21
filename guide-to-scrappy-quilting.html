@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Ultimate Guide to Scrappy Quilting: Turn Your Stash into a Masterpiece</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Source+Sans+Pro:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        /* Lovely Quilt Theme Colors */
+        :root {
+            --primary-color: #A0522D; /* Sienna/Quilt Brown */
+            --secondary-color: #556B2F; /* Olive/Green */
+            --background-color: #F8F4E3; /* Light Cream */
+            --content-bg: #ffffff;
+            --button-color: #D2B48C; /* Tan/Button Color */
+            --accent-color: #8B4513; /* Darker Brown */
+            --light-accent: #F5F0E6;
+        }
+        
+        /* Global Styles */
+        body {
+            font-family: 'Source Sans Pro', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--background-color);
+            color: #333333;
+            line-height: 1.6;
+            background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%23d2b48c' fill-opacity='0.1' fill-rule='evenodd'/%3E%3C/svg%3E");
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 40px auto;
+            background-color: var(--content-bg);
+            box-shadow: 0 5px 25px rgba(0, 0, 0, 0.08);
+            border-radius: 12px;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .content {
+            padding: 50px;
+        }
+        
+        /* Typography */
+        h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 42px;
+            color: var(--primary-color);
+            text-align: center;
+            margin-bottom: 20px;
+            line-height: 1.2;
+            position: relative;
+            padding-bottom: 20px;
+        }
+        
+        h1:after {
+            content: "";
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 3px;
+            background: linear-gradient(to right, var(--button-color), var(--primary-color));
+        }
+        
+        h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 28px;
+            color: var(--secondary-color);
+            padding-bottom: 8px;
+            margin-top: 40px;
+            margin-bottom: 20px;
+            position: relative;
+            padding-left: 15px;
+        }
+        
+        h2:before {
+            content: "";
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 5px;
+            background-color: var(--button-color);
+            border-radius: 3px;
+        }
+        
+        h3 {
+            font-size: 20px;
+            color: var(--primary-color);
+            margin-top: 30px;
+            margin-bottom: 15px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+        }
+        
+        h3:before {
+            content: "✂️";
+            margin-right: 10px;
+            font-size: 24px;
+        }
+        
+        p {
+            margin-bottom: 20px;
+            font-size: 17px;
+        }
+        
+        /* Banner */
+        .banner {
+            position: relative;
+            overflow: hidden;
+            height: 300px;
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--accent-color) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .banner:before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        }
+        
+        .banner-text {
+            position: relative;
+            z-index: 1;
+            text-align: center;
+            color: white;
+            padding: 20px;
+        }
+        
+        .banner-text h1 {
+            color: white;
+            font-size: 48px;
+            margin-bottom: 10px;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.3);
+        }
+        
+        .banner-text p {
+            font-size: 20px;
+            font-style: italic;
+            opacity: 0.9;
+        }
+        
+        /* Tables (Tips and Patterns) */
+        .data-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            margin-bottom: 30px;
+            font-size: 16px;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+        
+        .data-table th, .data-table td {
+            border: none;
+            padding: 16px;
+            text-align: left;
+        }
+        
+        .data-table th {
+            background-color: var(--primary-color);
+            color: white;
+            font-weight: 600;
+            font-family: 'Playfair Display', serif;
+        }
+        
+        .data-table tr:nth-child(even) {
+            background-color: var(--light-accent);
+        }
+        
+        .data-table tr:nth-child(odd) {
+            background-color: white;
+        }
+        
+        .data-table tr:hover {
+            background-color: #f9f5eb;
+        }
+        
+        /* Call to Action Button */
+        .cta-button {
+            display: block;
+            width: fit-content;
+            margin: 40px auto 20px auto;
+            background: linear-gradient(to right, var(--button-color), var(--primary-color));
+            color: white;
+            padding: 16px 35px;
+            text-align: center;
+            text-decoration: none;
+            font-weight: 600;
+            border-radius: 50px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(160, 82, 45, 0.3);
+            font-size: 18px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .cta-button:before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: 0.5s;
+        }
+        
+        .cta-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(160, 82, 45, 0.4);
+        }
+        
+        .cta-button:hover:before {
+            left: 100%;
+        }
+        
+        /* Footer */
+        .page-footer {
+            text-align: center;
+            padding: 30px;
+            background-color: var(--primary-color);
+            color: white;
+            font-size: 15px;
+            position: relative;
+        }
+        
+        .page-footer:before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(to right, var(--button-color), var(--secondary-color), var(--button-color));
+        }
+        
+        .page-footer a {
+            color: white;
+            text-decoration: underline;
+            transition: color 0.3s;
+        }
+        
+        .page-footer a:hover {
+            color: var(--button-color);
+        }
+        
+        /* Quote Box */
+        .quote-box {
+            background-color: var(--light-accent);
+            border-left: 5px solid var(--button-color);
+            padding: 25px;
+            margin: 30px 0;
+            border-radius: 0 8px 8px 0;
+            font-style: italic;
+            position: relative;
+        }
+        
+        .quote-box:before {
+            content: """;
+            position: absolute;
+            top: 10px;
+            left: 15px;
+            font-size: 60px;
+            color: var(--button-color);
+            opacity: 0.3;
+            font-family: Georgia, serif;
+        }
+        
+        .quote-box p {
+            margin: 0;
+            padding-left: 20px;
+            font-size: 18px;
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .container {
+                margin: 20px;
+                border-radius: 8px;
+            }
+            
+            .content {
+                padding: 30px;
+            }
+            
+            h1 {
+                font-size: 32px;
+            }
+            
+            .banner {
+                height: 200px;
+            }
+            
+            .banner-text h1 {
+                font-size: 32px;
+            }
+            
+            .banner-text p {
+                font-size: 16px;
+            }
+            
+            .data-table {
+                font-size: 14px;
+            }
+            
+            .data-table th, .data-table td {
+                padding: 12px 8px;
+            }
+        }
+        
+        /* Decorative Elements */
+        .fabric-swatch {
+            position: absolute;
+            width: 120px;
+            height: 120px;
+            opacity: 0.1;
+            z-index: 0;
+        }
+        
+        .swatch-1 {
+            top: 50px;
+            right: 50px;
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
+        }
+        
+        .swatch-2 {
+            bottom: 100px;
+            left: 50px;
+            background: linear-gradient(45deg, var(--button-color), var(--secondary-color));
+            border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;
+        }
+        
+        .content {
+            position: relative;
+            z-index: 1;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="fabric-swatch swatch-1"></div>
+        <div class="fabric-swatch swatch-2"></div>
+        
+        <div class="banner">
+            <div class="banner-text">
+                <h1>The Ultimate Guide to Scrappy Quilting</h1>
+                <p>Turn Your Stash into a Masterpiece</p>
+            </div>
+        </div>
+
+        <div class="content">
+            <p>Hello Lovely Quilters,</p>
+
+            <p>If you're like us, you have a bin (or five) filled with beautiful leftover fabrics from past projects—too lovely to throw away, but seemingly too small to use. Welcome to the world of <strong>scrappy quilting</strong>!</p>
+
+            <div class="quote-box">
+                <p>Scrappy quilting is a resourceful, sustainable, and wonderfully creative way to transform those textile treasures into a unique, one-of-a-kind piece of art. It's time to stop stashing and start stitching.</p>
+            </div>
+
+            <h2>Part 1: Preparation – What Exactly is a Scrap?</h2>
+
+            <p>The first step in any scrappy project is organization. Before you start cutting, define your scraps and sort them into usable categories.</p>
+
+            <h3>Our Top 3 Sorting Tips</h3>
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th style="width: 25%;">Tip</th>
+                        <th>Action Plan</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Define Your Minimum</strong></td>
+                        <td>Decide what your minimum keeper size is. Anything smaller than <strong>1.5" x 5"</strong> might be better suited for stuffing or recycling.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Cut for Future Use</strong></td>
+                        <td>Don't just toss scraps in a bin—cut them into common usable sizes immediately! We recommend cutting scraps into: <strong>2.5-inch strips</strong>, <strong>5-inch squares</strong>, or <strong>1.5-inch squares</strong>.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Sort by Value, Not Color</strong></td>
+                        <td>Separate scraps into containers based on <strong>fabric value</strong> (light, medium, dark). This is crucial for successful design contrast later on.</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h2>Part 2: Design Secrets for a Cohesive Scrappy Quilt</h2>
+
+            <p>The biggest fear in scrappy quilting is creating a quilt that looks messy or chaotic. The secret to a successful scrappy quilt is using <strong>unifying elements</strong>.</p>
+
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th style="width: 25%;">Design Tip</th>
+                        <th style="width: 40%;">Action Plan</th>
+                        <th style="width: 35%;">Why It Works</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Check Your Contrast</strong></td>
+                        <td>Use a <strong>black and white filter on your phone</strong> to photograph your block layout. If the pieces blur together, swap out a light fabric for a darker one.</td>
+                        <td><strong>Contrast</strong> is what makes a design pop. You need light next to dark for the pattern's structure to be visible.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Unify with a Background</strong></td>
+                        <td>Use a single, consistent <strong>low-volume fabric</strong> (like cream, solid white, or a very faint print) for the background in all your blocks.</td>
+                        <td>This creates "negative space" and gives the eye a place to rest, making the entire quilt feel calm despite the busy scraps.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Stick to a Color Family</strong></td>
+                        <td>Choose <strong>one dominant color family</strong> (e.g., blues and greens) and only introduce tiny pops of contrast. This is known as <strong>"Controlled Scrappy."</strong></td>
+                        <td>This approach offers a beautiful, harmonious final look that feels less random and more planned.</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h2>Part 3: Our Favorite Scrappy-Friendly Patterns</h2>
+
+            <p>The best patterns for scraps are typically simple, repetitive, and rely on straight lines or squares. The complexity comes from the mix of prints, not the piecing itself!</p>
+
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th style="width: 30%;">Pattern Name</th>
+                        <th style="width: 70%;">Why It's Scrappy-Friendly</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>The Jelly Roll Jumble</strong></td>
+                        <td>Designed specifically for using <strong>strips and small pieces</strong> (like those 2.5" cuts). This is a fast, satisfying use of your stash.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Little Village Block</strong></td>
+                        <td>This block uses a high amount of <strong>background fabric</strong> to unify the design, making it ideal for those tiny, treasured squares and rectangles in the foreground.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Chain Link Throw</strong></td>
+                        <td>The repetitive nature of the piecing makes quick work of your <strong>larger scrap cuts</strong>. You can chain-piece these blocks in an afternoon!</td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <a href="https://lovelyquilt.com/collections/scrappy-patterns" class="cta-button">
+                ➡️ Shop All Scrappy Patterns Here!
+            </a>
+            
+            <p style="text-align: center; margin-top: 30px; font-size: 18px;">We hope this guide inspires you to dig into that forgotten bin and start creating something extraordinary. Happy Scrappy Stitching!</p>
+
+        </div>
+    </div>
+
+    <div class="page-footer">
+        <p>&copy; 2025 Lovely Quilt | <a href="https://lovelyquilt.com/">lovelyquilt.com</a> | All Rights Reserved.</p>
+    </div>
+
+</body>
+</html>
