@@ -187,6 +187,84 @@
             background-color: #f9f5eb;
         }
         
+        /* Pattern Cards */
+        .pattern-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            margin: 30px 0;
+        }
+        
+        .pattern-card {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .pattern-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.12);
+        }
+        
+        .pattern-image {
+            height: 200px;
+            background-size: cover;
+            background-position: center;
+        }
+        
+        .pattern-info {
+            padding: 20px;
+        }
+        
+        .pattern-name {
+            font-family: 'Playfair Display', serif;
+            font-size: 22px;
+            color: var(--primary-color);
+            margin: 0 0 10px 0;
+        }
+        
+        .pattern-description {
+            color: #555;
+            margin-bottom: 15px;
+            font-size: 15px;
+        }
+        
+        .pattern-features {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .pattern-features li {
+            padding: 5px 0;
+            position: relative;
+            padding-left: 20px;
+        }
+        
+        .pattern-features li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: var(--secondary-color);
+            font-weight: bold;
+        }
+        
+        .pattern-link {
+            display: inline-block;
+            margin-top: 15px;
+            color: var(--primary-color);
+            font-weight: 600;
+            text-decoration: none;
+            border-bottom: 1px solid transparent;
+            transition: border-color 0.3s;
+        }
+        
+        .pattern-link:hover {
+            border-bottom: 1px solid var(--primary-color);
+        }
+        
         /* Call to Action Button */
         .cta-button {
             display: block;
@@ -318,6 +396,10 @@
             .data-table th, .data-table td {
                 padding: 12px 8px;
             }
+            
+            .pattern-cards {
+                grid-template-columns: 1fr;
+            }
         }
         
         /* Decorative Elements */
@@ -434,31 +516,55 @@
 
             <p>The best patterns for scraps are typically simple, repetitive, and rely on straight lines or squares. The complexity comes from the mix of prints, not the piecing itself!</p>
 
-            <table class="data-table">
-                <thead>
-                    <tr>
-                        <th style="width: 30%;">Pattern Name</th>
-                        <th style="width: 70%;">Why It's Scrappy-Friendly</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td><strong>The Jelly Roll Jumble</strong></td>
-                        <td>Designed specifically for using <strong>strips and small pieces</strong> (like those 2.5" cuts). This is a fast, satisfying use of your stash.</td>
-                    </tr>
-                    <tr>
-                        <td><strong>Little Village Block</strong></td>
-                        <td>This block uses a high amount of <strong>background fabric</strong> to unify the design, making it ideal for those tiny, treasured squares and rectangles in the foreground.</td>
-                    </tr>
-                    <tr>
-                        <td><strong>Chain Link Throw</strong></td>
-                        <td>The repetitive nature of the piecing makes quick work of your <strong>larger scrap cuts</strong>. You can chain-piece these blocks in an afternoon!</td>
-                    </tr>
-                </tbody>
-            </table>
+            <div class="pattern-cards">
+                <div class="pattern-card">
+                    <div class="pattern-image" style="background-image: url('https://lovelyquilt.com/cdn/shop/files/cr4.jpg?v=1741836528&width=533')"></div>
+                    <div class="pattern-info">
+                        <h3 class="pattern-name">Enchanted Garden Quilt Pattern</h3>
+                        <p class="pattern-description">Perfect for showcasing floral and nature-themed scraps in a beautiful garden-inspired design.</p>
+                        <ul class="pattern-features">
+                            <li>Uses various sized scraps effectively</li>
+                            <li>Great for showcasing floral prints</li>
+                            <li>Works well with controlled color schemes</li>
+                            <li>Perfect for 2.5" strips and squares</li>
+                        </ul>
+                        <a href="https://lovelyquilt.com/products/enchanted-garden" class="pattern-link">View Pattern Details →</a>
+                    </div>
+                </div>
+                
+                <div class="pattern-card">
+                    <div class="pattern-image" style="background-image: url('https://lovelyquilt.com/cdn/shop/files/celestial-harmony-1.png?v=1738527388&width=533')"></div>
+                    <div class="pattern-info">
+                        <h3 class="pattern-name">Celestial Harmony Quilt Pattern</h3>
+                        <p class="pattern-description">Create stunning night sky effects with your blue, purple, and star-themed fabric scraps.</p>
+                        <ul class="pattern-features">
+                            <li>Ideal for coordinating color families</li>
+                            <li>Works with both large and small scraps</li>
+                            <li>Creates beautiful gradient effects</li>
+                            <li>Perfect for celestial-themed fabrics</li>
+                        </ul>
+                        <a href="https://lovelyquilt.com/products/celestial-harmony" class="pattern-link">View Pattern Details →</a>
+                    </div>
+                </div>
+                
+                <div class="pattern-card">
+                    <div class="pattern-image" style="background-image: url('https://lovelyquilt.com/cdn/shop/files/triumphant-constellation-1.png?v=1738527560&width=533')"></div>
+                    <div class="pattern-info">
+                        <h3 class="pattern-name">Triumphant Constellation Quilt Pattern</h3>
+                        <p class="pattern-description">Transform your scraps into a stunning starry night sky with this geometric pattern.</p>
+                        <ul class="pattern-features">
+                            <li>Excellent for contrast play</li>
+                            <li>Uses both light and dark scraps effectively</li>
+                            <li>Geometric design highlights fabric variety</li>
+                            <li>Perfect for creating visual movement</li>
+                        </ul>
+                        <a href="https://lovelyquilt.com/products/triumphant-constellation" class="pattern-link">View Pattern Details →</a>
+                    </div>
+                </div>
+            </div>
             
-            <a href="https://lovelyquilt.com/collections/scrappy-patterns" class="cta-button">
-                ➡️ Shop All Scrappy Patterns Here!
+            <a href="https://lovelyquilt.com/collections/patterns" class="cta-button">
+                ➡️ Explore All Our Patterns!
             </a>
             
             <p style="text-align: center; margin-top: 30px; font-size: 18px;">We hope this guide inspires you to dig into that forgotten bin and start creating something extraordinary. Happy Scrappy Stitching!</p>
