@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fast-Finish Quilted Mug Rug Tutorial</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #A52A2A;
+            --primary-dark: #8B1A1A;
+            --accent: #5F9EA0;
+            --accent-light: #7FBFC2;
+            --light-bg: #f7f7f7;
+            --white: #ffffff;
+            --text: #333333;
+            --text-light: #666666;
+            --border: #e0e0e0;
+            --highlight: #fffbe6;
+            --shadow: rgba(0, 0, 0, 0.08);
+        }
+        
+        * {
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', Arial, sans-serif;
+            line-height: 1.6;
+            color: var(--text);
+            background-color: var(--light-bg);
+            margin: 0;
+            padding: 0;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+        
+        .card {
+            background-color: var(--white);
+            border-radius: 16px;
+            box-shadow: 0 8px 25px var(--shadow);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: var(--white);
+            padding: 40px 30px;
+            text-align: center;
+        }
+        
+        h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.5rem;
+            margin: 0 0 10px;
+            font-weight: 700;
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            margin: 0;
+        }
+        
+        .content {
+            padding: 40px;
+        }
+        
+        .intro {
+            text-align: center;
+            font-size: 1.1rem;
+            margin-bottom: 40px;
+            color: var(--text-light);
+            line-height: 1.7;
+        }
+        
+        .divider {
+            height: 1px;
+            background: linear-gradient(to right, transparent, var(--border), transparent);
+            margin: 40px 0;
+        }
+        
+        h2 {
+            color: var(--primary);
+            font-family: 'Playfair Display', serif;
+            font-size: 1.8rem;
+            margin-top: 40px;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--accent);
+            display: flex;
+            align-items: center;
+        }
+        
+        h2::before {
+            content: "";
+            display: inline-block;
+            width: 8px;
+            height: 30px;
+            background-color: var(--accent);
+            margin-right: 12px;
+            border-radius: 4px;
+        }
+        
+        h3 {
+            color: var(--text);
+            font-size: 1.3rem;
+            margin-top: 30px;
+            margin-bottom: 15px;
+        }
+        
+        .materials-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 25px 0;
+        }
+        
+        .material-card {
+            background-color: var(--white);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 20px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .material-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .material-icon {
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+            color: var(--accent);
+        }
+        
+        .material-title {
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--primary);
+        }
+        
+        .steps-container {
+            margin: 40px 0;
+        }
+        
+        .step {
+            display: flex;
+            margin-bottom: 40px;
+            background-color: var(--white);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            border-left: 4px solid var(--accent);
+        }
+        
+        .step-number {
+            background-color: var(--primary);
+            color: var(--white);
+            font-weight: 700;
+            font-size: 1.5rem;
+            padding: 20px;
+            min-width: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .step-content {
+            padding: 25px;
+            flex: 1;
+        }
+        
+        .step-title {
+            font-weight: 600;
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            color: var(--primary);
+        }
+        
+        .step-image {
+            width: 100%;
+            height: 200px;
+            background-color: #f0f0f0;
+            border-radius: 8px;
+            margin: 15px 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-light);
+            font-style: italic;
+        }
+        
+        .note {
+            background-color: var(--highlight);
+            border-left: 4px solid #ffd700;
+            padding: 20px;
+            margin: 25px 0;
+            border-radius: 8px;
+            position: relative;
+        }
+        
+        .note::before {
+            content: "💡";
+            position: absolute;
+            left: -15px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: var(--white);
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .conclusion {
+            text-align: center;
+            padding: 40px 0 20px;
+        }
+        
+        .cta-button {
+            display: inline-block;
+            padding: 16px 32px;
+            background-color: var(--primary);
+            color: var(--white);
+            text-decoration: none;
+            font-weight: 600;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            margin: 20px 0;
+            box-shadow: 0 4px 12px rgba(165, 42, 42, 0.3);
+        }
+        
+        .cta-button:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(165, 42, 42, 0.4);
+        }
+        
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 30px;
+            border-top: 1px solid var(--border);
+            color: var(--text-light);
+        }
+        
+        .footer-logo {
+            font-family: 'Playfair Display', serif;
+            font-weight: 700;
+            color: var(--primary);
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                margin: 20px auto;
+            }
+            
+            .header {
+                padding: 30px 20px;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .content {
+                padding: 25px;
+            }
+            
+            .step {
+                flex-direction: column;
+            }
+            
+            .step-number {
+                min-width: 100%;
+                padding: 15px;
+            }
+            
+            .materials-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <div class="header">
+                <h1>Fast-Finish Quilted Mug Rug</h1>
+                <p class="subtitle">The Perfect Handmade Holiday Gift</p>
+            </div>
+            
+            <div class="content">
+                <p class="intro">
+                    The holiday season is here, and the best gifts are always the ones you make yourself! This <strong>Fast-Finish Quilted Mug Rug</strong> is a quick, satisfying project you can complete in an afternoon. It's perfect for using up scraps and making thoughtful, personalized gifts for teachers, neighbors, or colleagues. Follow this step-by-step guide to sew a whole set this weekend!
+                </p>
+                
+                <div class="divider"></div>
+                
+                <h2>✂️ Materials You'll Need</h2>
+                <p>This project is designed for scrap-busting, so feel free to mix and match your favorite cotton prints!</p>
+                
+                <div class="materials-grid">
+                    <div class="material-card">
+                        <div class="material-icon">🧵</div>
+                        <div class="material-title">Fabric 1 (Top)</div>
+                        <p>One piece, 9 inches x 6 inches</p>
+                    </div>
+                    
+                    <div class="material-card">
+                        <div class="material-icon">🧵</div>
+                        <div class="material-title">Fabric 2 (Backing)</div>
+                        <p>One piece, 10 inches x 7 inches</p>
+                    </div>
+                    
+                    <div class="material-card">
+                        <div class="material-icon">🛏️</div>
+                        <div class="material-title">Batting</div>
+                        <p>One piece, 10 inches x 7 inches</p>
+                    </div>
+                    
+                    <div class="material-card">
+                        <div class="material-icon">📏</div>
+                        <div class="material-title">Binding</div>
+                        <p>One strip, 2.5 inches x 36 inches</p>
+                    </div>
+                </div>
+                
+                <div class="note">
+                    <strong>Tip:</strong> Use a cotton batting scrap for a nice, flat mug rug. This size is small enough that any quality scrap will work perfectly!
+                </div>
+                
+                <div class="divider"></div>
+                
+                <h2>🧵 Step-by-Step Instructions</h2>
+                
+                <div class="steps-container">
+                    <!-- Step 1 -->
+                    <div class="step">
+                        <div class="step-number">1</div>
+                        <div class="step-content">
+                            <div class="step-title">Prep and Baste the Quilt Sandwich</div>
+                            <p>Ensure all layers are pressed smooth before you begin.</p>
+                            <ol>
+                                <li><strong>Lay Out:</strong> Place your backing fabric (Fabric 2) <strong>face down</strong> on your work surface.</li>
+                                <li><strong>Add Batting:</strong> Center the batting piece directly on top of the backing fabric.</li>
+                                <li><strong>Add Top:</strong> Center the mug rug top (Fabric 1) <strong>face up</strong> on top of the batting.</li>
+                                <li><strong>Baste:</strong> Secure all three layers together using safety pins (spaced every few inches) or temporary basting spray. This prevents shifting during quilting.</li>
+                            </ol>
+                            <div class="step-image">[Image: Quilt layers properly arranged]</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Step 2 -->
+                    <div class="step">
+                        <div class="step-number">2</div>
+                        <div class="step-content">
+                            <div class="step-title">Quilt the Layers</div>
+                            <p>The quilting adds necessary texture and structure, binding the three layers permanently.</p>
+                            <ol>
+                                <li><strong>Choose a Design:</strong> For a simple and fast finish, we recommend <strong>straight-line quilting</strong> using your walking foot.</li>
+                                <li><strong>Stitching:</strong> Start in the center and quilt straight lines every 1/2 inch, moving outward to the edges. You can quilt vertically, horizontally, or diagonally—or get fancy and do a simple grid!</li>
+                            </ol>
+                            <div class="step-image">[Image: Quilting lines on fabric]</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Step 3 -->
+                    <div class="step">
+                        <div class="step-number">3</div>
+                        <div class="step-content">
+                            <div class="step-title">Square Up and Trim</div>
+                            <p>This step ensures clean, professional edges for attaching the binding.</p>
+                            <ol>
+                                <li><strong>Find Your True Edges:</strong> Place your ruler on the quilted piece and align it with your quilting lines. Trim one edge to establish a straight line.</li>
+                                <li><strong>Square Corners:</strong> Rotate the piece and use the newly trimmed edge to ensure the next cut is perfectly square (90 degrees). Trim all four sides.</li>
+                                <li><strong>Final Size:</strong> Your final mug rug should measure exactly <strong>8.5 inches x 5.5 inches</strong>.</li>
+                            </ol>
+                            <div class="step-image">[Image: Trimming the edges with a rotary cutter]</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Step 4 -->
+                    <div class="step">
+                        <div class="step-number">4</div>
+                        <div class="step-content">
+                            <div class="step-title">Attach the Binding</div>
+                            <p>The binding finishes the raw edges and provides a clean frame for your work.</p>
+                            <ol>
+                                <li><strong>Prepare Binding:</strong> Take your 2.5-inch strip of binding fabric and press it in half lengthwise.</li>
+                                <li><strong>Attach to Front:</strong> Starting along the center of one edge, align the raw edge of the binding strip with the raw edge of the mug rug top. Use a <strong>1/4-inch seam allowance</strong> to sew the binding to the front of the mug rug, mitering the corners as you reach each turn.</li>
+                                <li><strong>Finish to Back:</strong> Fold the binding over the raw edge to the back of the mug rug. Secure it by hand stitching (for a classic look) or by machine stitching (for a quick finish).</li>
+                            </ol>
+                            <div class="step-image">[Image: Binding attached to mug rug]</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="divider"></div>
+                
+                <div class="conclusion">
+                    <h2>🎉 You're Done!</h2>
+                    <p>Congratulations! You've created a beautiful, handmade gift in no time. Place a fun ribbon around it, attach a tag with a tea bag or coffee packet, and you have a thoughtful present ready to go.</p>
+                    
+                    <h3>Want to make a matching set?</h3>
+                    <p>We have a whole collection of quick-finish patterns, including the <strong>Five-Minute Pouch</strong> and the <strong>Quilted Hot Pad</strong> pattern, that perfectly coordinate with this Mug Rug for an impressive gift set.</p>
+                    
+                    <a href="[PLACEHOLDER: Link to Giftable Patterns Collection]" class="cta-button" target="_blank">
+                        Shop Coordinating Gift Patterns
+                    </a>
+                </div>
+                
+                <div class="footer">
+                    <div class="footer-logo">Lovely Quilt</div>
+                    <p>Happy Quilting from The Lovely Quilt Team!</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
