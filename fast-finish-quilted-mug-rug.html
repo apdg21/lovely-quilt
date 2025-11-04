@@ -187,14 +187,37 @@
         .step-image {
             width: 100%;
             height: 200px;
-            background-color: #f0f0f0;
             border-radius: 8px;
             margin: 15px 0;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: var(--text-light);
-            font-style: italic;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .step-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+        
+        .step-image:hover img {
+            transform: scale(1.05);
+        }
+        
+        .image-label {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background-color: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 8px 15px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            text-align: center;
         }
         
         .note {
@@ -359,7 +382,10 @@
                                 <li><strong>Add Top:</strong> Center the mug rug top (Fabric 1) <strong>face up</strong> on top of the batting.</li>
                                 <li><strong>Baste:</strong> Secure all three layers together using safety pins (spaced every few inches) or temporary basting spray. This prevents shifting during quilting.</li>
                             </ol>
-                            <div class="step-image">[Image: Quilt layers properly arranged]</div>
+                            <div class="step-image">
+                                <img src="https://weallsew.com/wp-content/uploads/sites/4/2011/11/Patchwork-Mug-Rug-1-step-2.jpg" alt="Preparing quilt layers">
+                                <div class="image-label">Step 1: Arrange backing, batting, and top fabric</div>
+                            </div>
                         </div>
                     </div>
                     
@@ -373,7 +399,10 @@
                                 <li><strong>Choose a Design:</strong> For a simple and fast finish, we recommend <strong>straight-line quilting</strong> using your walking foot.</li>
                                 <li><strong>Stitching:</strong> Start in the center and quilt straight lines every 1/2 inch, moving outward to the edges. You can quilt vertically, horizontally, or diagonally—or get fancy and do a simple grid!</li>
                             </ol>
-                            <div class="step-image">[Image: Quilting lines on fabric]</div>
+                            <div class="step-image">
+                                <img src="https://weallsew.com/wp-content/uploads/sites/4/2011/11/Patchwork-Mug-Rug-1-step-3-stitch-in-the-ditch-.jpg" alt="Quilting the layers">
+                                <div class="image-label">Step 2: Quilting lines on fabric</div>
+                            </div>
                         </div>
                     </div>
                     
@@ -388,7 +417,10 @@
                                 <li><strong>Square Corners:</strong> Rotate the piece and use the newly trimmed edge to ensure the next cut is perfectly square (90 degrees). Trim all four sides.</li>
                                 <li><strong>Final Size:</strong> Your final mug rug should measure exactly <strong>8.5 inches x 5.5 inches</strong>.</li>
                             </ol>
-                            <div class="step-image">[Image: Trimming the edges with a rotary cutter]</div>
+                            <div class="step-image">
+                                <img src="https://weallsew.com/wp-content/uploads/sites/4/2011/11/Patchwork-Mug-Rug-1-step-4.jpg" alt="Trimming the edges">
+                                <div class="image-label">Step 3: Trimming the edges with a rotary cutter</div>
+                            </div>
                         </div>
                     </div>
                     
@@ -403,7 +435,10 @@
                                 <li><strong>Attach to Front:</strong> Starting along the center of one edge, align the raw edge of the binding strip with the raw edge of the mug rug top. Use a <strong>1/4-inch seam allowance</strong> to sew the binding to the front of the mug rug, mitering the corners as you reach each turn.</li>
                                 <li><strong>Finish to Back:</strong> Fold the binding over the raw edge to the back of the mug rug. Secure it by hand stitching (for a classic look) or by machine stitching (for a quick finish).</li>
                             </ol>
-                            <div class="step-image">[Image: Binding attached to mug rug]</div>
+                            <div class="step-image">
+                                <img src="https://weallsew.com/wp-content/uploads/sites/4/2011/11/Patchwork-Mug-Rug-1-step-3-binding.jpg" alt="Attaching binding">
+                                <div class="image-label">Step 4: Binding attached to mug rug</div>
+                            </div>
                         </div>
                     </div>
                 </div>
