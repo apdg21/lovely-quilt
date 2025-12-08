@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>✂️ 3-in-1 Festive Quilt Borders Guide | Lovely Quilt</title>
+    <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            line-height: 1.7;
+            color: #4a4a4a;
+            background: linear-gradient(135deg, #f9f7f3 0%, #f0ede6 100%);
+            background-attachment: fixed;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        /* Header Styles */
+        .header {
+            background: linear-gradient(135deg, #a34a60 0%, #8b3b4e 100%);
+            padding: 50px 40px;
+            border-radius: 20px 20px 0 0;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 0;
+        }
+
+        .header::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 100%;
+            background-image: url("data:image/svg+xml,%3Csvg width='200' height='200' viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23ffffff' fill-opacity='0.1' fill-rule='evenodd'%3E%3Cpath d='M100 0C44.8 0 0 44.8 0 100c0 55.2 44.8 100 100 100s100-44.8 100-100C200 44.8 155.2 0 100 0zm0 20c44.2 0 80 35.8 80 80s-35.8 80-80 80-80-35.8-80-80 35.8-80 80-80z'/%3E%3C/g%3E%3C/svg%3E");
+        }
+
+        .header h1 {
+            font-family: 'Crimson Pro', serif;
+            font-size: 3.2rem;
+            color: white;
+            margin-bottom: 15px;
+            position: relative;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+            letter-spacing: 0.5px;
+        }
+
+        .header p {
+            font-size: 1.3rem;
+            color: rgba(255, 255, 255, 0.9);
+            max-width: 700px;
+            margin: 0 auto;
+            position: relative;
+            font-weight: 300;
+        }
+
+        .header-decoration {
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            font-size: 2.5rem;
+            opacity: 0.7;
+        }
+
+        /* Main Content */
+        .main-content {
+            background: white;
+            border-radius: 0 0 20px 20px;
+            padding: 50px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.08);
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Tutorial Introduction */
+        .intro {
+            text-align: center;
+            margin-bottom: 50px;
+            padding-bottom: 40px;
+            border-bottom: 2px dashed #e8d7c1;
+        }
+
+        .intro-icon {
+            font-size: 3.5rem;
+            margin-bottom: 20px;
+            display: block;
+        }
+
+        .intro p {
+            font-size: 1.15rem;
+            color: #666;
+            max-width: 800px;
+            margin: 0 auto 25px;
+        }
+
+        .intro-quote {
+            font-family: 'Crimson Pro', serif;
+            font-size: 1.4rem;
+            color: #a34a60;
+            font-style: italic;
+            padding: 20px;
+            background: #fef9f5;
+            border-radius: 12px;
+            max-width: 600px;
+            margin: 30px auto;
+            position: relative;
+        }
+
+        .intro-quote::before {
+            content: '"';
+            font-size: 4rem;
+            color: #e8d7c1;
+            position: absolute;
+            top: -20px;
+            left: 20px;
+            font-family: Georgia, serif;
+        }
+
+        /* Tutorial Cards */
+        .tutorial-card {
+            margin-bottom: 60px;
+            padding: 40px;
+            border-radius: 16px;
+            position: relative;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .tutorial-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .tutorial-card-1 {
+            background: linear-gradient(to right, #fff0f0 0%, #fff 30%, #fff 100%);
+            border-left: 6px solid #d64545;
+            box-shadow: 0 10px 30px rgba(214, 69, 69, 0.1);
+        }
+
+        .tutorial-card-2 {
+            background: linear-gradient(to right, #f0fff4 0%, #fff 30%, #fff 100%);
+            border-left: 6px solid #059669;
+            box-shadow: 0 10px 30px rgba(5, 150, 105, 0.1);
+        }
+
+        .tutorial-card-3 {
+            background: linear-gradient(to right, #fffbeb 0%, #fff 30%, #fff 100%);
+            border-left: 6px solid #fbbf24;
+            box-shadow: 0 10px 30px rgba(251, 191, 36, 0.1);
+        }
+
+        .tutorial-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .tutorial-number {
+            font-family: 'Crimson Pro', serif;
+            font-size: 3rem;
+            font-weight: 700;
+            color: #a34a60;
+            margin-right: 20px;
+            min-width: 60px;
+            opacity: 0.8;
+        }
+
+        .tutorial-title {
+            font-family: 'Crimson Pro', serif;
+            font-size: 2.2rem;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .tutorial-subtitle {
+            font-size: 1rem;
+            color: #777;
+            font-weight: 500;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .tutorial-description {
+            font-size: 1.1rem;
+            color: #555;
+            margin-bottom: 35px;
+            line-height: 1.8;
+        }
+
+        /* Steps */
+        .steps-container {
+            background: rgba(255, 255, 255, 0.7);
+            border-radius: 12px;
+            padding: 30px;
+        }
+
+        .step {
+            display: flex;
+            margin-bottom: 25px;
+            align-items: flex-start;
+        }
+
+        .step:last-child {
+            margin-bottom: 0;
+        }
+
+        .step-number {
+            background: #a34a60;
+            color: white;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            margin-right: 20px;
+            flex-shrink: 0;
+            font-size: 1.1rem;
+            box-shadow: 0 4px 8px rgba(163, 74, 96, 0.3);
+        }
+
+        .step-content {
+            flex: 1;
+        }
+
+        .step-title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+            font-size: 1.15rem;
+        }
+
+        .step-description {
+            color: #666;
+        }
+
+        /* Materials Section */
+        .materials {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 25px;
+            margin-top: 30px;
+            border-left: 4px solid #a34a60;
+        }
+
+        .materials h4 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+        }
+
+        .materials h4:before {
+            content: "🧵";
+            margin-right: 10px;
+        }
+
+        .materials ul {
+            list-style-type: none;
+            padding-left: 0;
+        }
+
+        .materials li {
+            padding: 8px 0;
+            padding-left: 25px;
+            position: relative;
+        }
+
+        .materials li:before {
+            content: "✓";
+            color: #a34a60;
+            font-weight: bold;
+            position: absolute;
+            left: 0;
+        }
+
+        /* Tip Box */
+        .tip-box {
+            background: #e8f4ff;
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 25px;
+            border-left: 4px solid #4299e1;
+        }
+
+        .tip-box h4 {
+            color: #2c5282;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+        }
+
+        .tip-box h4:before {
+            content: "💡";
+            margin-right: 10px;
+        }
+
+        /* CTA Section */
+        .cta-section {
+            text-align: center;
+            background: linear-gradient(135deg, #fef9f5 0%, #f9f7f3 100%);
+            padding: 50px;
+            border-radius: 16px;
+            margin: 60px 0 40px;
+            border: 2px dashed #e8d7c1;
+        }
+
+        .cta-section h3 {
+            font-family: 'Crimson Pro', serif;
+            font-size: 2.2rem;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .cta-section p {
+            font-size: 1.1rem;
+            color: #666;
+            max-width: 700px;
+            margin: 0 auto 30px;
+        }
+
+        .cta-button {
+            display: inline-block;
+            background: linear-gradient(to right, #a34a60 0%, #8b3b4e 100%);
+            color: white;
+            padding: 18px 50px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1.1rem;
+            letter-spacing: 0.5px;
+            box-shadow: 0 10px 25px rgba(163, 74, 96, 0.3);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cta-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 30px rgba(163, 74, 96, 0.4);
+        }
+
+        .cta-button:after {
+            content: "→";
+            margin-left: 10px;
+            transition: transform 0.3s ease;
+        }
+
+        .cta-button:hover:after {
+            transform: translateX(5px);
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 30px;
+            color: #888;
+            font-size: 0.9rem;
+            border-top: 1px solid #eee;
+            margin-top: 30px;
+        }
+
+        .footer-logo {
+            font-family: 'Crimson Pro', serif;
+            font-size: 1.8rem;
+            color: #a34a60;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2.5rem;
+            }
+            
+            .header p {
+                font-size: 1.1rem;
+            }
+            
+            .main-content {
+                padding: 30px 20px;
+            }
+            
+            .tutorial-card {
+                padding: 25px 20px;
+            }
+            
+            .tutorial-title {
+                font-size: 1.8rem;
+            }
+            
+            .tutorial-number {
+                font-size: 2.5rem;
+                min-width: 50px;
+            }
+            
+            .cta-section {
+                padding: 30px 20px;
+            }
+            
+            .cta-button {
+                padding: 15px 35px;
+                font-size: 1rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header {
+                padding: 40px 20px;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .tutorial-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .tutorial-number {
+                margin-bottom: 10px;
+            }
+            
+            .step {
+                flex-direction: column;
+            }
+            
+            .step-number {
+                margin-bottom: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-decoration">✂️</div>
+            <h1>The 3-in-1 Festive Borders Guide</h1>
+            <p>Simple Upgrades to Transform Any Quilt for the Holidays</p>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Introduction -->
+            <section class="intro">
+                <span class="intro-icon">🎄</span>
+                <p>Welcome to our festive borders guide! The perfect border can turn an everyday quilt into a holiday masterpiece. These three techniques are designed to work with any quilt pattern, requiring minimal extra fabric while delivering maximum festive impact.</p>
+                
+                <div class="intro-quote">
+                    "Borders are the frame that showcases your quilt's story. For the holidays, let that frame sparkle with festive charm."
+                </div>
+                
+                <p>Each tutorial includes step-by-step instructions, material lists, and pro tips to ensure your success. Let's create something beautiful together!</p>
+            </section>
+
+            <!-- Tutorial 1: Candy Cane Stripe -->
+            <section class="tutorial-card tutorial-card-1">
+                <div class="tutorial-header">
+                    <div class="tutorial-number">01</div>
+                    <div>
+                        <h2 class="tutorial-title">The Candy Cane Stripe Border</h2>
+                        <div class="tutorial-subtitle">Classic • Festive • Beginner-Friendly</div>
+                    </div>
+                </div>
+                
+                <p class="tutorial-description">Create the illusion of twisted candy canes with alternating strips of high-contrast fabric. This technique adds movement and holiday spirit to any quilt block.</p>
+                
+                <div class="steps-container">
+                    <div class="step">
+                        <div class="step-number">1</div>
+                        <div class="step-content">
+                            <h3 class="step-title">Cut Your Strips</h3>
+                            <p class="step-description">Cut two contrasting fabrics (e.g., red and white) into long strips of equal width (1.5-2.5 inches works well). The length should match the side measurement of your quilt center plus extra for seam allowances.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-number">2</div>
+                        <div class="step-content">
+                            <h3 class="step-title">Assemble the Striped Panel</h3>
+                            <p class="step-description">Sew alternating strips together along their long edges to create a wide striped panel. For a balanced look, use an odd number of strips (5 or 7) so your border starts and ends with the same color.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-number">3</div>
+                        <div class="step-content">
+                            <h3 class="step-title">Attach to Quilt</h3>
+                            <p class="step-description">Cut the required lengths from your striped panel. Attach to the quilt center using a ¼" seam allowance, starting with the longer sides first, then the top and bottom. Press seams outward toward the border.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="materials">
+                    <h4>Materials Needed:</h4>
+                    <ul>
+                        <li>Two contrasting holiday fabrics (½ yard each)</li>
+                        <li>Rotary cutter, ruler, and cutting mat</li>
+                        <li>Coordinating thread</li>
+                        <li>Basic sewing supplies</li>
+                    </ul>
+                </div>
+                
+                <div class="tip-box">
+                    <h4>Pro Tip:</h4>
+                    <p>For a true candy cane effect, cut your strips on the bias. While this uses more fabric, it creates a beautiful drape and allows the stripes to appear twisted when viewed from different angles.</p>
+                </div>
+            </section>
+
+            <!-- Tutorial 2: Fussy-Cut Focus -->
+            <section class="tutorial-card tutorial-card-2">
+                <div class="tutorial-header">
+                    <div class="tutorial-number">02</div>
+                    <div>
+                        <h2 class="tutorial-title">Fussy-Cut Focus Border</h2>
+                        <div class="tutorial-subtitle">Showcase Prints • Framed Effect • Intermediate</div>
+                    </div>
+                </div>
+                
+                <p class="tutorial-description">Highlight beautiful holiday prints by strategically cutting and arranging motifs to create a gallery-like frame around your quilt. Perfect for feature fabrics with repeating patterns.</p>
+                
+                <div class="steps-container">
+                    <div class="step">
+                        <div class="step-number">1</div>
+                        <div class="step-content">
+                            <h3 class="step-title">Select and Mark Motifs</h3>
+                            <p class="step-description">Lay out your feature fabric and identify the repeating motifs you want to showcase. Use a clear acrylic ruler to mark perfect squares around each motif, ensuring consistent spacing.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-number">2</div>
+                        <div class="step-content">
+                            <h3 class="step-title">Cut and Alternate</h3>
+                            <p class="step-description">Cut your marked squares. From a coordinating solid fabric, cut an equal number of squares in the same size. Arrange them in alternating pattern: fussy-cut, solid, fussy-cut, solid.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-number">3</div>
+                        <div class="step-content">
+                            <h3 class="step-title">Construct the Border</h3>
+                            <p class="step-description">Sew squares together into long strips. You may need to adjust the number of squares to fit your quilt's dimensions. Attach these strips as your outer border to create a beautiful framed effect.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="materials">
+                    <h4>Materials Needed:</h4>
+                    <ul>
+                        <li>Feature holiday print fabric (¾ yard)</li>
+                        <li>Coordinating solid fabric (½ yard)</li>
+                        <li>Clear acrylic ruler with ¼" markings</li>
+                        <li>Fabric marking pen or chalk</li>
+                    </ul>
+                </div>
+                
+                <div class="tip-box">
+                    <h4>Pro Tip:</h4>
+                    <p>When fussy-cutting, add an extra ¼" beyond your marked lines to ensure you have enough seam allowance. You can always trim to exact size after cutting, but you can't add fabric back!</p>
+                </div>
+            </section>
+
+            <!-- Tutorial 3: Corner Stones -->
+            <section class="tutorial-card tutorial-card-3">
+                <div class="tutorial-header">
+                    <div class="tutorial-number">03</div>
+                    <div>
+                        <h2 class="tutorial-title">Corner Stone Accents</h2>
+                        <div class="tutorial-subtitle">Sophisticated • Sparkle • All Skill Levels</div>
+                    </div>
+                </div>
+                
+                <p class="tutorial-description">Add instant elegance with decorative corner squares. This technique elevates simple borders and provides the perfect opportunity to incorporate metallic or specialty fabrics.</p>
+                
+                <div class="steps-container">
+                    <div class="step">
+                        <div class="step-number">1</div>
+                        <div class="step-content">
+                            <h3 class="step-title">Measure and Cut</h3>
+                            <p class="step-description">Determine your main border width (e.g., 4"). Cut four corner stone squares from your accent fabric to match this width (4" x 4"). Cut your main border strips to the length of your quilt sides.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-number">2</div>
+                        <div class="step-content">
+                            <h3 class="step-title">Trim Border Ends</h3>
+                            <p class="step-description">For each border strip, measure and trim the ends, leaving a space equal to the width of your corner stone (e.g., 4"). This creates a "notch" where the corner stone will fit perfectly.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-number">3</div>
+                        <div class="step-content">
+                            <h3 class="step-title">Assemble and Attach</h3>
+                            <p class="step-description">Sew a corner stone square to each trimmed border end. When you attach these border units to your quilt, the corner stones will meet seamlessly at each corner, creating a polished framed look.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="materials">
+                    <h4>Materials Needed:</h4>
+                    <ul>
+                        <li>Main border fabric (as needed for your quilt)</li>
+                        <li>Accent fabric for corner stones (fat quarter)</li>
+                        <li>Metallic or sparkle fabric (optional, for special touch)</li>
+                        <li>Precision cutting tools</li>
+                    </ul>
+                </div>
+                
+                <div class="tip-box">
+                    <h4>Pro Tip:</h4>
+                    <p>For extra holiday sparkle, use metallic thread to top-stitch around your corner stones after attaching them. This adds subtle shine and emphasizes these special accent points.</p>
+                </div>
+            </section>
+
+            <!-- CTA Section -->
+            <section class="cta-section">
+                <h3>Find the Perfect Pattern to Frame!</h3>
+                <p>Now that you've mastered these festive border techniques, you need the perfect quilt center to showcase them! Browse our collection of holiday and geometric patterns designed specifically to complement beautiful borders.</p>
+                <a href="https://lovelyquilt.com/collections/all" class="cta-button">Shop All Patterns</a>
+            </section>
+        </main>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <div class="footer-logo">Lovely Quilt</div>
+            <p>Bringing creativity to quilters worldwide • Happy Stitching!</p>
+            <p>&copy; 2025 Lovely Quilt. All rights reserved.</p>
+        </footer>
+    </div>
+</body>
+</html>
