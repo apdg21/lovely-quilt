@@ -40,7 +40,7 @@
             text-align: center;
             padding: 30px;
             background-color: #fefcf8;
-            display: flex;
+            display: block;
             justify-content: center;
             gap: 15px;
             flex-wrap: wrap;
@@ -1125,11 +1125,11 @@
             
             // Options for PDF generation
             const options = {
-                margin: 0.4,
+                margin: [0.5, 0, 0.5, 0.4],
                 filename: '2026-Quilt-Project-Tracker.pdf',
                 image: { type: 'jpeg', quality: 0.98 },
                 html2canvas: { 
-                    scale: 2,
+                    scale: 1.5,
                     useCORS: true,
                     logging: false
                 },
