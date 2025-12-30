@@ -41,9 +41,6 @@
             padding: 30px;
             background-color: #fefcf8;
             display: block;
-            justify-content: center;
-            gap: 15px;
-            flex-wrap: wrap;
         }
         
         .action-btn {
@@ -60,6 +57,7 @@
             transition: all 0.3s ease;
             min-width: 180px;
             justify-content: center;
+            margin: 5px;
         }
         
         .pdf-btn {
@@ -122,6 +120,7 @@
             font-size: 12px;
             min-width: auto;
             background-color: #7a6b5a;
+            margin: 2px;
         }
         
         .small-btn:hover {
@@ -357,7 +356,7 @@
             margin-bottom: 15px;
         }
         
-        /* Monthly Goals */
+        /* Monthly Goals - View Mode */
         .monthly-goals { 
             font-size: 13px; 
             display: grid; 
@@ -371,6 +370,7 @@
             border-radius: 4px; 
             background-color: #f9f5f0;
             border-left: 3px solid #d4c5ad;
+            min-height: 60px;
         }
         
         .month-item strong { 
@@ -378,6 +378,67 @@
             margin-bottom: 5px; 
             color: #4a3c31;
             font-family: 'Helvetica Neue', sans-serif;
+        }
+        
+        .month-goal-text {
+            font-family: 'Georgia', serif;
+            color: #5d4a36;
+            line-height: 1.4;
+        }
+        
+        /* Monthly Goals - Edit Mode */
+        .monthly-goals-edit { 
+            font-size: 13px; 
+            display: grid; 
+            grid-template-columns: 1fr 1fr 1fr; 
+            gap: 15px; 
+            margin-top: 10px; 
+        }
+        
+        .month-item-edit { 
+            padding: 12px; 
+            border-radius: 4px; 
+            background-color: #f9f5f0;
+            border-left: 3px solid #d4c5ad;
+            min-height: 60px;
+        }
+        
+        .month-goal-input {
+            width: 100%;
+            border: 1px solid #d4c5ad;
+            background: white;
+            font-family: 'Georgia', serif;
+            font-size: 13px;
+            color: #5d4a36;
+            padding: 8px;
+            margin-top: 5px;
+            resize: none;
+            min-height: 40px;
+            border-radius: 3px;
+            box-sizing: border-box;
+        }
+        
+        .month-goal-input:focus {
+            outline: none;
+            border-color: #b5a48b;
+            box-shadow: 0 0 0 2px rgba(181, 164, 139, 0.2);
+        }
+        
+        .edit-toggle-btn {
+            background-color: #e0d5c0;
+            color: #7a6b5a;
+            border: none;
+            padding: 6px 12px;
+            font-size: 11px;
+            border-radius: 3px;
+            cursor: pointer;
+            margin-left: 10px;
+            font-family: 'Helvetica Neue', sans-serif;
+            vertical-align: middle;
+        }
+        
+        .edit-toggle-btn:hover {
+            background-color: #d4c5ad;
         }
         
         /* Footer */
@@ -766,20 +827,64 @@
             </div>
         </div>
 
-        <h2 class="section-decorated">2026 Monthly Mini-Goals</h2>
-        <div class="monthly-goals">
-            <div class="month-item"><strong>JAN:</strong> Organize Stash</div>
-            <div class="month-item"><strong>FEB:</strong> Small Project</div>
-            <div class="month-item"><strong>MAR:</strong> Skill Builder</div>
-            <div class="month-item"><strong>APR:</strong> Finish a WIP</div>
-            <div class="month-item"><strong>MAY:</strong> Sew a Gift</div>
-            <div class="month-item"><strong>JUN:</strong> Mid-Year Review</div>
-            <div class="month-item"><strong>JUL:</strong> Holiday Prep</div>
-            <div class="month-item"><strong>AUG:</strong> Charity Quilt</div>
-            <div class="month-item"><strong>SEP:</strong> Fall Palette</div>
-            <div class="month-item"><strong>OCT:</strong> Mastery Project</div>
-            <div class="month-item"><strong>NOV:</strong> Fast Finishes</div>
-            <div class="month-item"><strong>DEC:</strong> Reflect & Rest</div>
+        <h2 class="section-decorated">2026 Monthly Mini-Goals 
+            <button class="edit-toggle-btn" onclick="toggleMonthlyGoalsEdit()" id="editGoalsBtn">Edit Goals</button>
+        </h2>
+        
+        <!-- View Mode (default) -->
+        <div class="monthly-goals" id="monthlyGoalsView">
+            <div class="month-item"><strong>JAN:</strong> <span class="month-goal-text" id="goal-jan">Organize Stash</span></div>
+            <div class="month-item"><strong>FEB:</strong> <span class="month-goal-text" id="goal-feb">Small Project</span></div>
+            <div class="month-item"><strong>MAR:</strong> <span class="month-goal-text" id="goal-mar">Skill Builder</span></div>
+            <div class="month-item"><strong>APR:</strong> <span class="month-goal-text" id="goal-apr">Finish a WIP</span></div>
+            <div class="month-item"><strong>MAY:</strong> <span class="month-goal-text" id="goal-may">Sew a Gift</span></div>
+            <div class="month-item"><strong>JUN:</strong> <span class="month-goal-text" id="goal-jun">Mid-Year Review</span></div>
+            <div class="month-item"><strong>JUL:</strong> <span class="month-goal-text" id="goal-jul">Holiday Prep</span></div>
+            <div class="month-item"><strong>AUG:</strong> <span class="month-goal-text" id="goal-aug">Charity Quilt</span></div>
+            <div class="month-item"><strong>SEP:</strong> <span class="month-goal-text" id="goal-sep">Fall Palette</span></div>
+            <div class="month-item"><strong>OCT:</strong> <span class="month-goal-text" id="goal-oct">Mastery Project</span></div>
+            <div class="month-item"><strong>NOV:</strong> <span class="month-goal-text" id="goal-nov">Fast Finishes</span></div>
+            <div class="month-item"><strong>DEC:</strong> <span class="month-goal-text" id="goal-dec">Reflect & Rest</span></div>
+        </div>
+        
+        <!-- Edit Mode (hidden by default) -->
+        <div class="monthly-goals-edit" id="monthlyGoalsEdit" style="display: none;">
+            <div class="month-item-edit"><strong>JAN:</strong> 
+                <textarea class="month-goal-input" id="edit-goal-jan" placeholder="Enter your goal for January...">Organize Stash</textarea>
+            </div>
+            <div class="month-item-edit"><strong>FEB:</strong> 
+                <textarea class="month-goal-input" id="edit-goal-feb" placeholder="Enter your goal for February...">Small Project</textarea>
+            </div>
+            <div class="month-item-edit"><strong>MAR:</strong> 
+                <textarea class="month-goal-input" id="edit-goal-mar" placeholder="Enter your goal for March...">Skill Builder</textarea>
+            </div>
+            <div class="month-item-edit"><strong>APR:</strong> 
+                <textarea class="month-goal-input" id="edit-goal-apr" placeholder="Enter your goal for April...">Finish a WIP</textarea>
+            </div>
+            <div class="month-item-edit"><strong>MAY:</strong> 
+                <textarea class="month-goal-input" id="edit-goal-may" placeholder="Enter your goal for May...">Sew a Gift</textarea>
+            </div>
+            <div class="month-item-edit"><strong>JUN:</strong> 
+                <textarea class="month-goal-input" id="edit-goal-jun" placeholder="Enter your goal for June...">Mid-Year Review</textarea>
+            </div>
+            <div class="month-item-edit"><strong>JUL:</strong> 
+                <textarea class="month-goal-input" id="edit-goal-jul" placeholder="Enter your goal for July...">Holiday Prep</textarea>
+            </div>
+            <div class="month-item-edit"><strong>AUG:</strong> 
+                <textarea class="month-goal-input" id="edit-goal-aug" placeholder="Enter your goal for August...">Charity Quilt</textarea>
+            </div>
+            <div class="month-item-edit"><strong>SEP:</strong> 
+                <textarea class="month-goal-input" id="edit-goal-sep" placeholder="Enter your goal for September...">Fall Palette</textarea>
+            </div>
+            <div class="month-item-edit"><strong>OCT:</strong> 
+                <textarea class="month-goal-input" id="edit-goal-oct" placeholder="Enter your goal for October...">Mastery Project</textarea>
+            </div>
+            <div class="month-item-edit"><strong>NOV:</strong> 
+                <textarea class="month-goal-input" id="edit-goal-nov" placeholder="Enter your goal for November...">Fast Finishes</textarea>
+            </div>
+            <div class="month-item-edit"><strong>DEC:</strong> 
+                <textarea class="month-goal-input" id="edit-goal-dec" placeholder="Enter your goal for December...">Reflect & Rest</textarea>
+            </div>
         </div>
         
         <div class="notes-section">
@@ -794,6 +899,90 @@
     </div>
 
     <script>
+        // ======================
+        // MONTHLY GOALS FUNCTIONS
+        // ======================
+        
+        // Toggle between view and edit modes
+        function toggleMonthlyGoalsEdit() {
+            const viewDiv = document.getElementById('monthlyGoalsView');
+            const editDiv = document.getElementById('monthlyGoalsEdit');
+            const editBtn = document.getElementById('editGoalsBtn');
+            
+            if (editDiv.style.display === 'none') {
+                // Switch to edit mode
+                viewDiv.style.display = 'none';
+                editDiv.style.display = 'grid';
+                editBtn.textContent = 'Save Goals';
+                editBtn.style.backgroundColor = '#7a9c7a';
+                editBtn.style.color = 'white';
+                
+                // Copy current values to editable fields
+                copyGoalsToEditMode();
+            } else {
+                // Switch to view mode and save
+                editDiv.style.display = 'none';
+                viewDiv.style.display = 'grid';
+                editBtn.textContent = 'Edit Goals';
+                editBtn.style.backgroundColor = '#e0d5c0';
+                editBtn.style.color = '#7a6b5a';
+                
+                // Save the edited goals
+                saveMonthlyGoals();
+            }
+        }
+        
+        // Copy current goals to edit mode
+        function copyGoalsToEditMode() {
+            const months = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'];
+            
+            months.forEach(month => {
+                const viewEl = document.getElementById(`goal-${month}`);
+                const editEl = document.getElementById(`edit-goal-${month}`);
+                
+                if (viewEl && editEl) {
+                    editEl.value = viewEl.textContent;
+                }
+            });
+        }
+        
+        // Save monthly goals from edit mode to view mode
+        function saveMonthlyGoals() {
+            const months = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'];
+            
+            months.forEach(month => {
+                const viewEl = document.getElementById(`goal-${month}`);
+                const editEl = document.getElementById(`edit-goal-${month}`);
+                
+                if (viewEl && editEl) {
+                    viewEl.textContent = editEl.value.trim() || getDefaultGoal(month);
+                }
+            });
+            
+            // Auto-save after updating goals
+            setTimeout(saveAllData, 500);
+            showSaveIndicator('Monthly goals updated');
+        }
+        
+        // Get default goal if empty
+        function getDefaultGoal(month) {
+            const defaults = {
+                'jan': 'Organize Stash',
+                'feb': 'Small Project',
+                'mar': 'Skill Builder',
+                'apr': 'Finish a WIP',
+                'may': 'Sew a Gift',
+                'jun': 'Mid-Year Review',
+                'jul': 'Holiday Prep',
+                'aug': 'Charity Quilt',
+                'sep': 'Fall Palette',
+                'oct': 'Mastery Project',
+                'nov': 'Fast Finishes',
+                'dec': 'Reflect & Rest'
+            };
+            return defaults[month] || 'Set your goal';
+        }
+        
         // ======================
         // DATA SAVING FUNCTIONS
         // ======================
@@ -867,6 +1056,16 @@
                     });
                 }
                 
+                // Restore monthly goals
+                if (data.monthlyGoals) {
+                    Object.keys(data.monthlyGoals).forEach(month => {
+                        const goalEl = document.getElementById(`goal-${month}`);
+                        if (goalEl && data.monthlyGoals[month]) {
+                            goalEl.textContent = data.monthlyGoals[month];
+                        }
+                    });
+                }
+                
                 // Restore notes
                 const notesElement = document.getElementById('notes');
                 if (notesElement && data.notes) {
@@ -925,11 +1124,26 @@
                 el.addEventListener('blur', debouncedSave);
             });
             
-            // Save on textarea change
+            // Save on textarea change (notes)
             const textarea = document.getElementById('notes');
             if (textarea) {
                 textarea.addEventListener('input', debouncedSave);
             }
+            
+            // Save on monthly goals textarea change
+            const monthInputs = document.querySelectorAll('.month-goal-input');
+            monthInputs.forEach(input => {
+                input.addEventListener('input', function() {
+                    // Update the view mode while still in edit mode
+                    const monthId = this.id.replace('edit-goal-', '');
+                    const viewEl = document.getElementById(`goal-${monthId}`);
+                    if (viewEl) {
+                        viewEl.textContent = this.value.trim() || getDefaultGoal(monthId);
+                    }
+                    // Trigger auto-save
+                    debouncedSave();
+                });
+            });
         }
         
         // Show save indicator
@@ -980,6 +1194,27 @@
             // Clear textarea
             const notes = document.getElementById('notes');
             if (notes) notes.value = '';
+            
+            // Reset monthly goals to defaults
+            const months = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'];
+            months.forEach(month => {
+                const goalEl = document.getElementById(`goal-${month}`);
+                if (goalEl) {
+                    goalEl.textContent = getDefaultGoal(month);
+                }
+                const editEl = document.getElementById(`edit-goal-${month}`);
+                if (editEl) {
+                    editEl.value = getDefaultGoal(month);
+                }
+            });
+            
+            // Make sure we're in view mode
+            document.getElementById('monthlyGoalsView').style.display = 'grid';
+            document.getElementById('monthlyGoalsEdit').style.display = 'none';
+            const editBtn = document.getElementById('editGoalsBtn');
+            editBtn.textContent = 'Edit Goals';
+            editBtn.style.backgroundColor = '#e0d5c0';
+            editBtn.style.color = '#7a6b5a';
             
             closeClearModal();
             showSaveIndicator('All data cleared');
@@ -1042,6 +1277,14 @@
                     // Reload the data
                     loadAllData();
                     
+                    // Make sure we're in view mode
+                    document.getElementById('monthlyGoalsView').style.display = 'grid';
+                    document.getElementById('monthlyGoalsEdit').style.display = 'none';
+                    const editBtn = document.getElementById('editGoalsBtn');
+                    editBtn.textContent = 'Edit Goals';
+                    editBtn.style.backgroundColor = '#e0d5c0';
+                    editBtn.style.color = '#7a6b5a';
+                    
                     closeImportModal();
                     showSaveIndicator('Backup imported successfully!');
                 } catch (error) {
@@ -1053,7 +1296,7 @@
         }
         
         // ======================
-        // EXISTING FUNCTIONS
+        // DATA COLLECTION FUNCTIONS
         // ======================
         
         // Function to collect all tracker data
@@ -1091,6 +1334,17 @@
                 });
             }
             
+            // Monthly Goals
+            const monthlyGoals = {};
+            const months = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'];
+            
+            months.forEach(month => {
+                const goalEl = document.getElementById(`goal-${month}`);
+                if (goalEl) {
+                    monthlyGoals[month] = goalEl.textContent.trim();
+                }
+            });
+            
             // Notes
             const notes = document.getElementById('notes').value || '';
             
@@ -1100,6 +1354,7 @@
                 projects,
                 wipAudit,
                 checklist,
+                monthlyGoals,
                 notes
             };
         }
@@ -1208,12 +1463,10 @@
             // Monthly Goals
             csvContent += "MONTHLY MINI-GOALS\n";
             const months = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
-            const goals = ['Organize Stash', 'Small Project', 'Skill Builder', 'Finish a WIP', 'Sew a Gift', 
-                          'Mid-Year Review', 'Holiday Prep', 'Charity Quilt', 'Fall Palette', 
-                          'Mastery Project', 'Fast Finishes', 'Reflect & Rest'];
-            
-            months.forEach((month, index) => {
-                csvContent += `"${month}","${goals[index]}"\n`;
+            months.forEach(month => {
+                const monthLower = month.toLowerCase();
+                const goal = data.monthlyGoals && data.monthlyGoals[monthLower] ? data.monthlyGoals[monthLower] : getDefaultGoal(monthLower);
+                csvContent += `"${month}","${goal}"\n`;
             });
             csvContent += "\n";
             
@@ -1285,14 +1538,14 @@
             // Monthly Goals
             csvContent += "MONTHLY GOALS\n";
             csvContent += "Month,Goal\n";
-            const months = ['January', 'February', 'March', 'April', 'May', 'June', 
-                          'July', 'August', 'September', 'October', 'November', 'December'];
-            const goals = ['Organize Stash', 'Small Project', 'Skill Builder', 'Finish a WIP', 'Sew a Gift', 
-                          'Mid-Year Review', 'Holiday Prep', 'Charity Quilt', 'Fall Palette', 
-                          'Mastery Project', 'Fast Finishes', 'Reflect & Rest'];
+            const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 
+                              'July', 'August', 'September', 'October', 'November', 'December'];
+            const monthCodes = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'];
             
-            months.forEach((month, index) => {
-                csvContent += `${month},${goals[index]}\n`;
+            monthNames.forEach((monthName, index) => {
+                const monthCode = monthCodes[index];
+                const goal = data.monthlyGoals && data.monthlyGoals[monthCode] ? data.monthlyGoals[monthCode] : getDefaultGoal(monthCode);
+                csvContent += `${monthName},${goal}\n`;
             });
             csvContent += "\n";
             
@@ -1389,16 +1642,6 @@
                 if ((e.ctrlKey || e.metaKey) && e.key === 'p') {
                     e.preventDefault();
                     downloadPDF();
-                }
-            });
-            
-            // Add beforeunload warning for unsaved changes
-            window.addEventListener('beforeunload', function(e) {
-                // Check if there's unsaved data (simplified check)
-                const saved = localStorage.getItem('quiltTracker2026');
-                if (saved) {
-                    // Don't show warning since we auto-save
-                    return;
                 }
             });
         });
