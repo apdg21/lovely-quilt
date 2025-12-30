@@ -40,25 +40,25 @@
             text-align: center;
             padding: 30px;
             background-color: #fefcf8;
-            display: block;
+            display: flex;
             justify-content: center;
-            gap: 20px;
+            gap: 15px;
             flex-wrap: wrap;
         }
         
         .action-btn {
             color: white;
             border: none;
-            padding: 15px 30px;
-            font-size: 15px;
+            padding: 14px 25px;
+            font-size: 14px;
             font-family: 'Georgia', serif;
             border-radius: 4px;
             cursor: pointer;
             display: inline-flex;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
             transition: all 0.3s ease;
-            min-width: 200px;
+            min-width: 180px;
             justify-content: center;
         }
         
@@ -68,6 +68,10 @@
         
         .sheet-btn {
             background-color: #5a7a5a;
+        }
+        
+        .save-btn {
+            background-color: #8a7b62;
         }
         
         .action-btn:hover {
@@ -83,13 +87,17 @@
             background-color: #4a6a4a;
         }
         
+        .save-btn:hover {
+            background-color: #756a56;
+        }
+        
         .action-btn:active {
             transform: translateY(0);
         }
         
         /* Instructions */
         .instructions {
-            max-width: 800px;
+            max-width: 900px;
             margin: 0 auto 30px;
             padding: 20px;
             background-color: #fffbf5;
@@ -99,6 +107,54 @@
             line-height: 1.6;
             color: #7a6b5a;
             text-align: center;
+        }
+        
+        .save-load-container {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .small-btn {
+            padding: 8px 15px;
+            font-size: 12px;
+            min-width: auto;
+            background-color: #7a6b5a;
+        }
+        
+        .small-btn:hover {
+            background-color: #695b4a;
+        }
+        
+        .auto-save-status {
+            font-size: 12px;
+            color: #7a6b5a;
+            margin-top: 10px;
+            font-style: italic;
+        }
+        
+        .save-indicator {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background-color: #b5a48b;
+            margin-right: 5px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        
+        .save-indicator.saving {
+            opacity: 1;
+            animation: pulse 1s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 0.3; }
+            50% { opacity: 1; }
+            100% { opacity: 0.3; }
         }
         
         /* Page Layout */
@@ -439,6 +495,11 @@
             color: #7a6b5a;
         }
         
+        .danger-btn {
+            background-color: #c44;
+            color: white;
+        }
+        
         .modal-btn:hover {
             transform: translateY(-2px);
             box-shadow: 0 4px 8px rgba(0,0,0,0.1);
@@ -452,6 +513,21 @@
             font-size: 14px;
             text-align: left;
             line-height: 1.5;
+        }
+        
+        /* File Input */
+        .file-input {
+            margin: 20px 0;
+            padding: 10px;
+            width: 100%;
+            border: 2px dashed #d4c5ad;
+            border-radius: 4px;
+            background-color: #fffbf5;
+            cursor: pointer;
+        }
+        
+        .file-input:hover {
+            background-color: #f9f5f0;
         }
     </style>
     
@@ -480,8 +556,46 @@
             Export to Spreadsheet
         </button>
         
+        <button class="action-btn save-btn" onclick="manualSave()">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+                <polyline points="17 21 17 13 7 13 7 21"></polyline>
+                <polyline points="7 3 7 8 15 8"></polyline>
+            </svg>
+            Save Progress
+        </button>
+        
         <div class="instructions">
-            <p><strong>How to use this tracker:</strong> Fill out your quilting goals for 2026. Click "Download as PDF" to save a printable version, or "Export to Spreadsheet" to create a Google Sheets/Excel file for easy tracking.</p>
+            <p><strong>How to use this tracker:</strong> Fill out your quilting goals for 2026. Your progress is automatically saved in your browser! You can also export as PDF or spreadsheet.</p>
+            <div class="save-load-container">
+                <button class="action-btn small-btn" onclick="exportBackup()" style="background-color: #7a9c7a;">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                        <polyline points="7 10 12 15 17 10"></polyline>
+                        <line x1="12" y1="15" x2="12" y2="3"></line>
+                    </svg>
+                    Export Backup
+                </button>
+                <button class="action-btn small-btn" onclick="importBackup()" style="background-color: #7a8a9c;">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                        <polyline points="7 10 12 15 17 10"></polyline>
+                        <line x1="12" y1="15" x2="12" y2="3"></line>
+                    </svg>
+                    Import Backup
+                </button>
+                <button class="action-btn small-btn" onclick="clearAllData()" style="background-color: #c9a9a9;">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="3 6 5 6 21 6"></polyline>
+                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                    </svg>
+                    Clear All Data
+                </button>
+            </div>
+            <div class="auto-save-status">
+                <span class="save-indicator" id="saveIndicator"></span>
+                <span id="saveMessage">Auto-save enabled</span>
+            </div>
         </div>
     </div>
 
@@ -513,9 +627,8 @@
                         <line x1="17" y1="2" x2="17" y2="22"></line>
                         <line x1="2" y1="12" x2="22" y2="12"></line>
                         <line x1="2" y1="7" x2="7" y2="7"></line>
-                        <line x1="2" y1="17" x2="7" y2="17"></line>
-                        <line x1="17" y1="17" x2="22" y2="17"></line>
                         <line x1="17" y1="7" x2="22" y2="7"></line>
+                        <line x1="17" y1="17" x2="22" y2="17"></line>
                     </svg>
                     Excel Format
                 </button>
@@ -526,6 +639,67 @@
             
             <div style="margin-top: 20px; font-size: 12px; color: #7a6b5a;">
                 <strong>Tip:</strong> CSV files can be opened in Google Sheets, Excel, and other spreadsheet programs
+            </div>
+        </div>
+    </div>
+
+    <!-- Import Backup Modal -->
+    <div id="importModal" class="modal">
+        <div class="modal-content">
+            <h3>Import Backup</h3>
+            <p>Select a previously exported backup file (.json) to restore your data:</p>
+            
+            <div class="modal-instructions">
+                <strong>Instructions:</strong>
+                <ol style="margin: 10px 0; padding-left: 20px;">
+                    <li>Click "Choose File" below</li>
+                    <li>Select your backup .json file</li>
+                    <li>Data will be restored automatically</li>
+                </ol>
+                <p style="margin-top: 10px; color: #a34; font-size: 13px;">
+                    <strong>Warning:</strong> This will replace all current data!
+                </p>
+            </div>
+            
+            <input type="file" id="backupFileInput" accept=".json" class="file-input">
+            
+            <div class="modal-buttons">
+                <button class="modal-btn csv-btn" onclick="processBackupFile()">
+                    Import Selected File
+                </button>
+                <button class="modal-btn close-btn" onclick="closeImportModal()">
+                    Cancel
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Clear Data Confirmation Modal -->
+    <div id="clearModal" class="modal">
+        <div class="modal-content">
+            <h3>Clear All Data</h3>
+            
+            <div class="modal-instructions">
+                <p style="color: #a34; font-weight: bold; text-align: center;">
+                    ⚠️ This action cannot be undone!
+                </p>
+                <p>Are you sure you want to clear all data from your quilt project tracker?</p>
+                <p>This will:</p>
+                <ul style="margin: 10px 0; padding-left: 20px;">
+                    <li>Delete all entered project information</li>
+                    <li>Clear all checkboxes and notes</li>
+                    <li>Remove data from browser storage</li>
+                </ul>
+                <p><strong>Tip:</strong> Export a backup first if you want to save your data.</p>
+            </div>
+            
+            <div class="modal-buttons">
+                <button class="modal-btn danger-btn" onclick="confirmClearData()">
+                    Yes, Clear Everything
+                </button>
+                <button class="modal-btn close-btn" onclick="closeClearModal()">
+                    Cancel
+                </button>
             </div>
         </div>
     </div>
@@ -559,11 +733,11 @@
                 </tr>
             </thead>
             <tbody>
-                <tr><td contenteditable="true" class="project-name"></td><td contenteditable="true" class="project-pattern"></td><td contenteditable="true" class="project-fabric"></td><td contenteditable="true" class="project-date"></td></tr>
-                <tr><td contenteditable="true" class="project-name"></td><td contenteditable="true" class="project-pattern"></td><td contenteditable="true" class="project-fabric"></td><td contenteditable="true" class="project-date"></td></tr>
-                <tr><td contenteditable="true" class="project-name"></td><td contenteditable="true" class="project-pattern"></td><td contenteditable="true" class="project-fabric"></td><td contenteditable="true" class="project-date"></td></tr>
-                <tr><td contenteditable="true" class="project-name"></td><td contenteditable="true" class="project-pattern"></td><td contenteditable="true" class="project-fabric"></td><td contenteditable="true" class="project-date"></td></tr>
-                <tr><td contenteditable="true" class="project-name"></td><td contenteditable="true" class="project-pattern"></td><td contenteditable="true" class="project-fabric"></td><td contenteditable="true" class="project-date"></td></tr>
+                <tr><td contenteditable="true" class="project-name" id="project-1-name"></td><td contenteditable="true" class="project-pattern" id="project-1-pattern"></td><td contenteditable="true" class="project-fabric" id="project-1-fabric"></td><td contenteditable="true" class="project-date" id="project-1-date"></td></tr>
+                <tr><td contenteditable="true" class="project-name" id="project-2-name"></td><td contenteditable="true" class="project-pattern" id="project-2-pattern"></td><td contenteditable="true" class="project-fabric" id="project-2-fabric"></td><td contenteditable="true" class="project-date" id="project-2-date"></td></tr>
+                <tr><td contenteditable="true" class="project-name" id="project-3-name"></td><td contenteditable="true" class="project-pattern" id="project-3-pattern"></td><td contenteditable="true" class="project-fabric" id="project-3-fabric"></td><td contenteditable="true" class="project-date" id="project-3-date"></td></tr>
+                <tr><td contenteditable="true" class="project-name" id="project-4-name"></td><td contenteditable="true" class="project-pattern" id="project-4-pattern"></td><td contenteditable="true" class="project-fabric" id="project-4-fabric"></td><td contenteditable="true" class="project-date" id="project-4-date"></td></tr>
+                <tr><td contenteditable="true" class="project-name" id="project-5-name"></td><td contenteditable="true" class="project-pattern" id="project-5-pattern"></td><td contenteditable="true" class="project-fabric" id="project-5-fabric"></td><td contenteditable="true" class="project-date" id="project-5-date"></td></tr>
             </tbody>
         </table>
 
@@ -571,14 +745,14 @@
             <div style="flex: 1;">
                 <h2 class="section-decorated">The Progress Checklist</h2>
                 <div class="checklist" id="progress-checklist">
-                    <div class="check-item"><div class="box" onclick="toggleCheck(this)"></div> Choose Pattern</div>
-                    <div class="check-item"><div class="box" onclick="toggleCheck(this)"></div> Fabric Pull</div>
-                    <div class="check-item"><div class="box" onclick="toggleCheck(this)"></div> Cut Pieces</div>
-                    <div class="check-item"><div class="box" onclick="toggleCheck(this)"></div> Prep & Starch</div>
-                    <div class="check-item"><div class="box" onclick="toggleCheck(this)"></div> Piece Quilt Top</div>
-                    <div class="check-item"><div class="box" onclick="toggleCheck(this)"></div> Quilting Design</div>
-                    <div class="check-item"><div class="box" onclick="toggleCheck(this)"></div> Quilt & Bind</div>
-                    <div class="check-item"><div class="box" onclick="toggleCheck(this)"></div> Label & Gift</div>
+                    <div class="check-item"><div class="box" onclick="toggleCheck(this)" id="check-1"></div> Choose Pattern</div>
+                    <div class="check-item"><div class="box" onclick="toggleCheck(this)" id="check-2"></div> Fabric Pull</div>
+                    <div class="check-item"><div class="box" onclick="toggleCheck(this)" id="check-3"></div> Cut Pieces</div>
+                    <div class="check-item"><div class="box" onclick="toggleCheck(this)" id="check-4"></div> Prep & Starch</div>
+                    <div class="check-item"><div class="box" onclick="toggleCheck(this)" id="check-5"></div> Piece Quilt Top</div>
+                    <div class="check-item"><div class="box" onclick="toggleCheck(this)" id="check-6"></div> Quilting Design</div>
+                    <div class="check-item"><div class="box" onclick="toggleCheck(this)" id="check-7"></div> Quilt & Bind</div>
+                    <div class="check-item"><div class="box" onclick="toggleCheck(this)" id="check-8"></div> Label & Gift</div>
                 </div>
             </div>
             <div style="flex: 1;">
@@ -620,18 +794,338 @@
     </div>
 
     <script>
+        // ======================
+        // DATA SAVING FUNCTIONS
+        // ======================
+        
+        // Save all data to localStorage
+        function saveAllData() {
+            try {
+                const data = collectTrackerData();
+                
+                // Add metadata
+                data.metadata = {
+                    savedAt: new Date().toISOString(),
+                    version: '1.0',
+                    device: navigator.userAgent.substring(0, 50)
+                };
+                
+                // Save to localStorage
+                localStorage.setItem('quiltTracker2026', JSON.stringify(data));
+                
+                // Show save indicator
+                showSaveIndicator('Data saved locally');
+                
+                return true;
+            } catch (error) {
+                console.error('Save error:', error);
+                showSaveIndicator('Error saving data', true);
+                return false;
+            }
+        }
+        
+        // Load all data from localStorage
+        function loadAllData() {
+            try {
+                const saved = localStorage.getItem('quiltTracker2026');
+                if (!saved) {
+                    showSaveIndicator('No saved data found');
+                    return false;
+                }
+                
+                const data = JSON.parse(saved);
+                
+                // Restore basic info
+                restoreElementContent('word-2026', data.word2026);
+                restoreElementContent('skill-master', data.skillMaster);
+                
+                // Restore projects
+                if (data.projects && data.projects.length > 0) {
+                    data.projects.forEach((project, index) => {
+                        const projectNum = index + 1;
+                        restoreElementContent(`project-${projectNum}-name`, project.name);
+                        restoreElementContent(`project-${projectNum}-pattern`, project.pattern);
+                        restoreElementContent(`project-${projectNum}-fabric`, project.fabric);
+                        restoreElementContent(`project-${projectNum}-date`, project.date);
+                    });
+                }
+                
+                // Restore WIP Audit
+                for (let i = 1; i <= 4; i++) {
+                    const wipValue = data.wipAudit && data.wipAudit[i-1] ? data.wipAudit[i-1] : '';
+                    restoreElementContent(`wip-${i}`, wipValue);
+                }
+                
+                // Restore checklist
+                if (data.checklist && data.checklist.length > 0) {
+                    data.checklist.forEach((item, index) => {
+                        const checkId = `check-${index + 1}`;
+                        const box = document.getElementById(checkId);
+                        if (box && item.checked) {
+                            box.classList.add('checked');
+                        }
+                    });
+                }
+                
+                // Restore notes
+                const notesElement = document.getElementById('notes');
+                if (notesElement && data.notes) {
+                    notesElement.value = data.notes;
+                }
+                
+                showSaveIndicator('Data loaded successfully');
+                return true;
+            } catch (error) {
+                console.error('Load error:', error);
+                showSaveIndicator('Error loading saved data', true);
+                return false;
+            }
+        }
+        
+        // Helper function to restore element content
+        function restoreElementContent(elementId, content) {
+            const element = document.getElementById(elementId);
+            if (element) {
+                if (content && content.trim() !== '' && content !== 'Click to edit') {
+                    element.innerHTML = escapeHTML(content);
+                    element.style.color = '#4a3c31';
+                } else {
+                    element.innerHTML = '<span style="color: #b5a48b; font-style: italic;">Click to edit</span>';
+                }
+            }
+        }
+        
+        // Escape HTML to prevent XSS
+        function escapeHTML(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+        
+        // Auto-save on changes
+        function setupAutoSave() {
+            // Debounce function to prevent too many saves
+            let saveTimeout;
+            function debouncedSave() {
+                clearTimeout(saveTimeout);
+                saveTimeout = setTimeout(saveAllData, 1000);
+            }
+            
+            // Listen to all editable changes
+            document.addEventListener('input', debouncedSave);
+            document.addEventListener('click', function(e) {
+                if (e.target.classList.contains('box')) {
+                    debouncedSave();
+                }
+            });
+            
+            // Also save on blur for contenteditable
+            const editables = document.querySelectorAll('[contenteditable="true"]');
+            editables.forEach(el => {
+                el.addEventListener('blur', debouncedSave);
+            });
+            
+            // Save on textarea change
+            const textarea = document.getElementById('notes');
+            if (textarea) {
+                textarea.addEventListener('input', debouncedSave);
+            }
+        }
+        
+        // Show save indicator
+        function showSaveIndicator(message, isError = false) {
+            const indicator = document.getElementById('saveIndicator');
+            const messageEl = document.getElementById('saveMessage');
+            
+            // Show pulsing indicator
+            indicator.classList.add('saving');
+            messageEl.textContent = message;
+            messageEl.style.color = isError ? '#d44' : '#7a6b5a';
+            
+            // Hide indicator after 2 seconds
+            setTimeout(() => {
+                indicator.classList.remove('saving');
+            }, 2000);
+        }
+        
+        // Manual save function
+        function manualSave() {
+            if (saveAllData()) {
+                showSaveIndicator('Manually saved!');
+            }
+        }
+        
+        // Clear all data
+        function clearAllData() {
+            document.getElementById('clearModal').style.display = 'flex';
+        }
+        
+        function closeClearModal() {
+            document.getElementById('clearModal').style.display = 'none';
+        }
+        
+        function confirmClearData() {
+            localStorage.removeItem('quiltTracker2026');
+            
+            // Clear all fields
+            const editables = document.querySelectorAll('[contenteditable="true"]');
+            editables.forEach(el => {
+                el.innerHTML = '<span style="color: #b5a48b; font-style: italic;">Click to edit</span>';
+            });
+            
+            // Clear checkboxes
+            const checkboxes = document.querySelectorAll('.box');
+            checkboxes.forEach(box => box.classList.remove('checked'));
+            
+            // Clear textarea
+            const notes = document.getElementById('notes');
+            if (notes) notes.value = '';
+            
+            closeClearModal();
+            showSaveIndicator('All data cleared');
+        }
+        
+        // Export backup as JSON file
+        function exportBackup() {
+            const data = collectTrackerData();
+            data.metadata = {
+                exportedAt: new Date().toISOString(),
+                version: '1.0',
+                type: 'Quilt Tracker Backup',
+                note: 'Import this file to restore your quilt project data'
+            };
+            
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `quilt-tracker-backup-${new Date().toISOString().split('T')[0]}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            
+            showSaveIndicator('Backup exported');
+        }
+        
+        // Import backup
+        function importBackup() {
+            document.getElementById('importModal').style.display = 'flex';
+        }
+        
+        function closeImportModal() {
+            document.getElementById('importModal').style.display = 'none';
+            document.getElementById('backupFileInput').value = '';
+        }
+        
+        function processBackupFile() {
+            const fileInput = document.getElementById('backupFileInput');
+            const file = fileInput.files[0];
+            
+            if (!file) {
+                alert('Please select a backup file first.');
+                return;
+            }
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const backupData = JSON.parse(e.target.result);
+                    
+                    // Validate backup format
+                    if (!backupData.word2026 && !backupData.projects) {
+                        throw new Error('Invalid backup file format');
+                    }
+                    
+                    // Save to localStorage
+                    localStorage.setItem('quiltTracker2026', JSON.stringify(backupData));
+                    
+                    // Reload the data
+                    loadAllData();
+                    
+                    closeImportModal();
+                    showSaveIndicator('Backup imported successfully!');
+                } catch (error) {
+                    alert('Error: Invalid backup file. Please make sure you selected the correct file.');
+                    console.error('Backup import error:', error);
+                }
+            };
+            reader.readAsText(file);
+        }
+        
+        // ======================
+        // EXISTING FUNCTIONS
+        // ======================
+        
+        // Function to collect all tracker data
+        function collectTrackerData() {
+            // Basic info
+            const word2026 = getCleanText(document.getElementById('word-2026'));
+            const skillMaster = getCleanText(document.getElementById('skill-master'));
+            
+            // Projects
+            const projects = [];
+            for (let i = 1; i <= 5; i++) {
+                projects.push({
+                    name: getCleanText(document.getElementById(`project-${i}-name`)),
+                    pattern: getCleanText(document.getElementById(`project-${i}-pattern`)),
+                    fabric: getCleanText(document.getElementById(`project-${i}-fabric`)),
+                    date: getCleanText(document.getElementById(`project-${i}-date`))
+                });
+            }
+            
+            // WIP Audit
+            const wipAudit = [];
+            for (let i = 1; i <= 4; i++) {
+                const wip = getCleanText(document.getElementById(`wip-${i}`));
+                wipAudit.push(wip);
+            }
+            
+            // Checklist
+            const checklist = [];
+            for (let i = 1; i <= 8; i++) {
+                const box = document.getElementById(`check-${i}`);
+                const task = box ? box.parentElement.textContent.replace('✓', '').trim() : '';
+                checklist.push({
+                    task: task,
+                    checked: box ? box.classList.contains('checked') : false
+                });
+            }
+            
+            // Notes
+            const notes = document.getElementById('notes').value || '';
+            
+            return {
+                word2026,
+                skillMaster,
+                projects,
+                wipAudit,
+                checklist,
+                notes
+            };
+        }
+        
+        // Function to get clean text from contenteditable elements
+        function getCleanText(element) {
+            if (!element) return '';
+            const text = element.innerText || element.textContent || '';
+            const cleanText = text.replace('Click to edit', '').trim();
+            return cleanText || '';
+        }
+        
         // Function to toggle checkbox state
         function toggleCheck(box) {
             box.classList.toggle('checked');
+            // Auto-save after toggle
+            setTimeout(saveAllData, 500);
         }
         
-        // Function to download as PDF (original version)
+        // Function to download as PDF
         function downloadPDF() {
             const element = document.getElementById('tracker-content');
             
             // Options for PDF generation
             const options = {
-                margin: 0.5,
+                margin: 0.4,
                 filename: '2026-Quilt-Project-Tracker.pdf',
                 image: { type: 'jpeg', quality: 0.98 },
                 html2canvas: { 
@@ -661,21 +1155,13 @@
             }, 2000);
         }
         
-        // Modal functions
+        // Modal functions for spreadsheet export
         function showExportModal() {
             document.getElementById('exportModal').style.display = 'flex';
         }
         
         function closeExportModal() {
             document.getElementById('exportModal').style.display = 'none';
-        }
-        
-        // Function to get clean text from contenteditable elements
-        function getCleanText(element) {
-            if (!element) return '';
-            const text = element.innerText || element.textContent || '';
-            const cleanText = text.replace('Click to edit', '').trim();
-            return cleanText || '';
         }
         
         // Function to export to CSV (Google Sheets compatible)
@@ -696,14 +1182,18 @@
             csvContent += "PROJECT QUEUE\n";
             csvContent += '"Project Name","Pattern","Fabric Palette","Goal Finish Date"\n';
             data.projects.forEach(project => {
-                csvContent += `"${project.name}","${project.pattern}","${project.fabric}","${project.date}"\n`;
+                if (project.name || project.pattern || project.fabric || project.date) {
+                    csvContent += `"${project.name}","${project.pattern}","${project.fabric}","${project.date}"\n`;
+                }
             });
             csvContent += "\n";
             
             // WIP Audit
             csvContent += "WIP AUDIT (Unfinished Projects)\n";
             data.wipAudit.forEach((wip, index) => {
-                csvContent += `"WIP ${index + 1}","${wip}"\n`;
+                if (wip) {
+                    csvContent += `"WIP ${index + 1}","${wip}"\n`;
+                }
             });
             csvContent += "\n";
             
@@ -744,7 +1234,7 @@
             
             // Close modal and show feedback
             closeExportModal();
-            showFeedback('Sheet exported successfully!', 'sheet-btn');
+            showSaveIndicator('Spreadsheet exported!', false);
         }
         
         // Function to export to Excel format (actually CSV with Excel extension)
@@ -767,7 +1257,9 @@
             csvContent += "PROJECT QUEUE\n";
             csvContent += "Project Name,Pattern,Fabric Palette,Goal Finish Date\n";
             data.projects.forEach(project => {
-                csvContent += `${project.name},${project.pattern},${project.fabric},${project.date}\n`;
+                if (project.name || project.pattern || project.fabric || project.date) {
+                    csvContent += `${project.name},${project.pattern},${project.fabric},${project.date}\n`;
+                }
             });
             csvContent += "\n";
             
@@ -775,7 +1267,9 @@
             csvContent += "WIP AUDIT\n";
             csvContent += "Item,Description\n";
             data.wipAudit.forEach((wip, index) => {
-                csvContent += `WIP ${index + 1},${wip}\n`;
+                if (wip) {
+                    csvContent += `WIP ${index + 1},${wip}\n`;
+                }
             });
             csvContent += "\n";
             
@@ -819,75 +1313,15 @@
             
             // Close modal and show feedback
             closeExportModal();
-            showFeedback('Excel file downloaded!', 'sheet-btn');
+            showSaveIndicator('Excel file downloaded!', false);
         }
         
-        // Function to collect all tracker data
-        function collectTrackerData() {
-            // Basic info
-            const word2026 = getCleanText(document.getElementById('word-2026'));
-            const skillMaster = getCleanText(document.getElementById('skill-master'));
-            
-            // Projects
-            const projects = [];
-            const projectRows = document.querySelectorAll('#project-table tbody tr');
-            projectRows.forEach(row => {
-                const cells = row.querySelectorAll('td');
-                if (cells.length >= 4) {
-                    projects.push({
-                        name: getCleanText(cells[0]),
-                        pattern: getCleanText(cells[1]),
-                        fabric: getCleanText(cells[2]),
-                        date: getCleanText(cells[3])
-                    });
-                }
-            });
-            
-            // WIP Audit
-            const wipAudit = [];
-            for (let i = 1; i <= 4; i++) {
-                const wip = getCleanText(document.getElementById(`wip-${i}`));
-                wipAudit.push(wip);
-            }
-            
-            // Checklist
-            const checklist = [];
-            const checklistItems = document.querySelectorAll('#progress-checklist .check-item');
-            checklistItems.forEach(item => {
-                const box = item.querySelector('.box');
-                const task = item.textContent.replace('✓', '').trim();
-                checklist.push({
-                    task: task,
-                    checked: box.classList.contains('checked')
-                });
-            });
-            
-            // Notes
-            const notes = document.getElementById('notes').value || '';
-            
-            return {
-                word2026,
-                skillMaster,
-                projects,
-                wipAudit,
-                checklist,
-                notes
-            };
-        }
+        // ======================
+        // INITIALIZATION
+        // ======================
         
-        // Function to show feedback
-        function showFeedback(message, buttonClass) {
-            const btn = document.querySelector(`.${buttonClass}`);
-            const originalText = btn.innerHTML;
-            btn.innerHTML = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg> ${message}`;
-            
-            setTimeout(() => {
-                btn.innerHTML = originalText;
-            }, 2000);
-        }
-        
-        // Initialize editable fields
         document.addEventListener('DOMContentLoaded', function() {
+            // Initialize editable fields
             const editableCells = document.querySelectorAll('[contenteditable="true"]');
             
             editableCells.forEach(cell => {
@@ -912,31 +1346,59 @@
                 });
             });
             
-            // Handle notes textarea
-            const notesArea = document.getElementById('notes');
-            notesArea.addEventListener('focus', function() {
-                if (this.value === '') {
-                    this.style.color = '#4a3c31';
-                }
-            });
+            // Load saved data on startup
+            setTimeout(loadAllData, 100);
             
-            // Close modal when clicking outside
-            document.getElementById('exportModal').addEventListener('click', function(e) {
-                if (e.target === this) {
-                    closeExportModal();
+            // Setup auto-save
+            setTimeout(setupAutoSave, 500);
+            
+            // Show welcome message
+            setTimeout(() => {
+                const saved = localStorage.getItem('quiltTracker2026');
+                if (saved) {
+                    showSaveIndicator('Welcome back! Your data has been loaded.');
+                } else {
+                    showSaveIndicator('New tracker created. Start planning your 2026 projects!');
                 }
+            }, 1000);
+            
+            // Close modals when clicking outside
+            const modals = document.querySelectorAll('.modal');
+            modals.forEach(modal => {
+                modal.addEventListener('click', function(e) {
+                    if (e.target === this) {
+                        this.style.display = 'none';
+                    }
+                });
             });
             
             // Add keyboard shortcuts
             document.addEventListener('keydown', function(e) {
-                // Ctrl+S or Cmd+S to save as PDF
+                // Ctrl+S or Cmd+S to save
                 if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+                    e.preventDefault();
+                    manualSave();
+                }
+                // Escape to close modals
+                if (e.key === 'Escape') {
+                    closeExportModal();
+                    closeImportModal();
+                    closeClearModal();
+                }
+                // Ctrl+P for PDF
+                if ((e.ctrlKey || e.metaKey) && e.key === 'p') {
                     e.preventDefault();
                     downloadPDF();
                 }
-                // Escape to close modal
-                if (e.key === 'Escape') {
-                    closeExportModal();
+            });
+            
+            // Add beforeunload warning for unsaved changes
+            window.addEventListener('beforeunload', function(e) {
+                // Check if there's unsaved data (simplified check)
+                const saved = localStorage.getItem('quiltTracker2026');
+                if (saved) {
+                    // Don't show warning since we auto-save
+                    return;
                 }
             });
         });
