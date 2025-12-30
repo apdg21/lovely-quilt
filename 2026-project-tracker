@@ -1,0 +1,945 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>2026 Quilt Project Tracker - Lovely Quilt Co.</title>
+    <style>
+        /* Base Styles */
+        body { 
+            font-family: 'Georgia', serif; 
+            color: #4a3c31; 
+            line-height: 1.5; 
+            padding: 0; 
+            margin: 0; 
+            background-color: #fefcf8;
+        }
+        
+        /* Print Styles */
+        @media print {
+            .page { 
+                border: none; 
+                margin: 0 !important; 
+                width: 100% !important; 
+                height: auto !important; 
+                box-shadow: none !important;
+                padding: 0.5in !important;
+            }
+            
+            body { 
+                background: white; 
+                padding: 0 !important;
+            }
+            
+            .no-print { 
+                display: none !important; 
+            }
+        }
+        
+        /* Button Container */
+        .button-container {
+            text-align: center;
+            padding: 30px;
+            background-color: #fefcf8;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .action-btn {
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 15px;
+            font-family: 'Georgia', serif;
+            border-radius: 4px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s ease;
+            min-width: 200px;
+            justify-content: center;
+        }
+        
+        .pdf-btn {
+            background-color: #b5a48b;
+        }
+        
+        .sheet-btn {
+            background-color: #5a7a5a;
+        }
+        
+        .action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        
+        .pdf-btn:hover {
+            background-color: #9c8e7a;
+        }
+        
+        .sheet-btn:hover {
+            background-color: #4a6a4a;
+        }
+        
+        .action-btn:active {
+            transform: translateY(0);
+        }
+        
+        /* Instructions */
+        .instructions {
+            max-width: 800px;
+            margin: 0 auto 30px;
+            padding: 20px;
+            background-color: #fffbf5;
+            border-radius: 8px;
+            border-left: 4px solid #b5a48b;
+            font-size: 14px;
+            line-height: 1.6;
+            color: #7a6b5a;
+            text-align: center;
+        }
+        
+        /* Page Layout */
+        .page { 
+            width: 8.5in; 
+            min-height: 11in; 
+            padding: 0.75in; 
+            margin: 0 auto 30px; 
+            box-sizing: border-box; 
+            background: white; 
+            border: 1px solid #eee; 
+            box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+        }
+        
+        /* Header */
+        header { 
+            text-align: center; 
+            border-bottom: 3px double #b5a48b; 
+            padding-bottom: 25px; 
+            margin-bottom: 35px; 
+            position: relative;
+        }
+        
+        header:after {
+            content: "";
+            position: absolute;
+            bottom: -5px;
+            left: 25%;
+            width: 50%;
+            height: 1px;
+            background-color: #d4c5ad;
+        }
+        
+        h1 { 
+            font-family: 'Georgia', serif; 
+            font-style: italic; 
+            font-size: 36px; 
+            margin: 0; 
+            color: #4a3c31;
+            letter-spacing: -0.5px;
+        }
+        
+        .subtitle { 
+            text-transform: uppercase; 
+            letter-spacing: 3px; 
+            font-size: 13px; 
+            color: #b5a48b; 
+            font-weight: bold; 
+            margin-top: 8px;
+            font-family: 'Helvetica Neue', sans-serif;
+        }
+        
+        .header-quote {
+            font-style: italic;
+            color: #7a6b5a;
+            font-size: 14px;
+            margin-top: 15px;
+            max-width: 500px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        /* Section Headers */
+        h2 { 
+            font-size: 18px; 
+            text-transform: uppercase; 
+            border-left: 4px solid #b5a48b; 
+            padding-left: 12px; 
+            margin-top: 35px; 
+            margin-bottom: 20px;
+            color: #4a3c31; 
+            font-family: 'Helvetica Neue', sans-serif;
+            font-weight: 600;
+            letter-spacing: 1px;
+        }
+        
+        h2.section-decorated {
+            position: relative;
+            padding-bottom: 8px;
+            margin-bottom: 25px;
+        }
+        
+        h2.section-decorated:after {
+            content: "";
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 60px;
+            height: 2px;
+            background-color: #d4c5ad;
+        }
+        
+        /* Input Groups */
+        .row { 
+            display: flex; 
+            gap: 30px; 
+            margin-bottom: 20px; 
+        }
+        
+        .input-group { 
+            flex: 1; 
+        }
+        
+        label { 
+            display: block; 
+            font-size: 12px; 
+            font-weight: bold; 
+            margin-bottom: 8px; 
+            color: #7a6b5a; 
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-family: 'Helvetica Neue', sans-serif;
+        }
+        
+        .line { 
+            border-bottom: 2px dotted #d4c5ad; 
+            height: 32px; 
+            width: 100%; 
+            padding-top: 5px;
+            font-size: 16px;
+            color: #4a3c31;
+        }
+        
+        /* Tables */
+        table { 
+            width: 100%; 
+            border-collapse: collapse; 
+            margin-top: 10px; 
+            border: 1px solid #e9e1d5;
+        }
+        
+        th { 
+            font-size: 11px; 
+            text-align: left; 
+            background: #f9f5f0; 
+            padding: 12px 10px; 
+            border: 1px solid #e9e1d5; 
+            text-transform: uppercase;
+            color: #7a6b5a;
+            font-family: 'Helvetica Neue', sans-serif;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+        
+        td { 
+            border: 1px solid #e9e1d5; 
+            height: 45px; 
+            padding: 10px; 
+            vertical-align: middle;
+            font-size: 14px;
+        }
+        
+        tr:nth-child(even) {
+            background-color: #fefcf8;
+        }
+        
+        /* Checklists */
+        .checklist { 
+            display: grid; 
+            grid-template-columns: 1fr 1fr; 
+            gap: 12px; 
+            margin-top: 10px; 
+        }
+        
+        .check-item { 
+            font-size: 14px; 
+            display: flex; 
+            align-items: center; 
+            color: #5d4a36;
+        }
+        
+        .box { 
+            width: 18px; 
+            height: 18px; 
+            border: 2px solid #b5a48b; 
+            margin-right: 12px; 
+            border-radius: 3px;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+        
+        .box.checked {
+            background-color: #b5a48b;
+            position: relative;
+        }
+        
+        .box.checked:after {
+            content: "✓";
+            position: absolute;
+            color: white;
+            font-size: 12px;
+            font-weight: bold;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+        
+        /* WIP Section */
+        .wip-section .line {
+            margin-bottom: 15px;
+        }
+        
+        /* Monthly Goals */
+        .monthly-goals { 
+            font-size: 13px; 
+            display: grid; 
+            grid-template-columns: 1fr 1fr 1fr; 
+            gap: 15px; 
+            margin-top: 10px; 
+        }
+        
+        .month-item { 
+            padding: 12px; 
+            border-radius: 4px; 
+            background-color: #f9f5f0;
+            border-left: 3px solid #d4c5ad;
+        }
+        
+        .month-item strong { 
+            display: block; 
+            margin-bottom: 5px; 
+            color: #4a3c31;
+            font-family: 'Helvetica Neue', sans-serif;
+        }
+        
+        /* Footer */
+        footer { 
+            margin-top: 60px; 
+            text-align: center; 
+            font-size: 11px; 
+            color: #9c8e7a; 
+            border-top: 1px solid #e9e1d5; 
+            padding-top: 25px; 
+            font-family: 'Helvetica Neue', sans-serif;
+        }
+        
+        .footer-logo {
+            font-family: 'Georgia', serif;
+            font-style: italic;
+            font-size: 16px;
+            color: #b5a48b;
+            margin-bottom: 10px;
+        }
+        
+        /* Notes Section */
+        .notes-section {
+            margin-top: 35px;
+            padding: 20px;
+            background-color: #f9f5f0;
+            border-radius: 6px;
+            border: 1px dashed #d4c5ad;
+        }
+        
+        .notes-section h3 {
+            font-size: 14px;
+            text-transform: uppercase;
+            color: #7a6b5a;
+            margin-top: 0;
+            font-family: 'Helvetica Neue', sans-serif;
+            letter-spacing: 1px;
+        }
+        
+        .notes-area {
+            width: 100%;
+            height: 80px;
+            border: 1px solid #e9e1d5;
+            background-color: white;
+            border-radius: 4px;
+            padding: 10px;
+            font-family: 'Georgia', serif;
+            font-size: 14px;
+            color: #4a3c31;
+            resize: vertical;
+        }
+        
+        /* Export Options Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal-content {
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            text-align: center;
+        }
+        
+        .modal h3 {
+            color: #4a3c31;
+            margin-top: 0;
+            font-family: 'Georgia', serif;
+            font-size: 24px;
+        }
+        
+        .modal-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 25px;
+            flex-wrap: wrap;
+        }
+        
+        .modal-btn {
+            padding: 12px 25px;
+            border-radius: 4px;
+            border: none;
+            font-family: 'Helvetica Neue', sans-serif;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-width: 140px;
+        }
+        
+        .csv-btn {
+            background-color: #5a7a5a;
+            color: white;
+        }
+        
+        .excel-btn {
+            background-color: #217346;
+            color: white;
+        }
+        
+        .close-btn {
+            background-color: #f0e9dd;
+            color: #7a6b5a;
+        }
+        
+        .modal-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        
+        .modal-instructions {
+            background-color: #f9f5f0;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 20px 0;
+            font-size: 14px;
+            text-align: left;
+            line-height: 1.5;
+        }
+    </style>
+    
+    <!-- Include html2pdf library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+</head>
+<body>
+    <div class="button-container no-print">
+        <button class="action-btn pdf-btn" onclick="downloadPDF()">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="7 10 12 15 17 10"></polyline>
+                <line x1="12" y1="15" x2="12" y2="3"></line>
+            </svg>
+            Download as PDF
+        </button>
+        
+        <button class="action-btn sheet-btn" onclick="showExportModal()">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                <polyline points="14 2 14 8 20 8"></polyline>
+                <line x1="16" y1="13" x2="8" y2="13"></line>
+                <line x1="16" y1="17" x2="8" y2="17"></line>
+                <polyline points="10 9 9 9 8 9"></polyline>
+            </svg>
+            Export to Spreadsheet
+        </button>
+        
+        <div class="instructions">
+            <p><strong>How to use this tracker:</strong> Fill out your quilting goals for 2026. Click "Download as PDF" to save a printable version, or "Export to Spreadsheet" to create a Google Sheets/Excel file for easy tracking.</p>
+        </div>
+    </div>
+
+    <!-- Export Options Modal -->
+    <div id="exportModal" class="modal">
+        <div class="modal-content">
+            <h3>Export to Spreadsheet</h3>
+            <p>Choose your preferred format for exporting your quilt project data:</p>
+            
+            <div class="modal-instructions">
+                <strong>Google Sheets:</strong> Download as CSV and import into Google Sheets<br>
+                <strong>Excel:</strong> Download as CSV and open with Microsoft Excel<br>
+                <strong>Both options:</strong> Create a spreadsheet with all your project data
+            </div>
+            
+            <div class="modal-buttons">
+                <button class="modal-btn csv-btn" onclick="exportToCSV()">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 8px;">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                        <polyline points="7 10 12 15 17 10"></polyline>
+                        <line x1="12" y1="15" x2="12" y2="3"></line>
+                    </svg>
+                    Download CSV File
+                </button>
+                <button class="modal-btn excel-btn" onclick="exportToExcel()">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 8px;">
+                        <rect x="2" y="2" width="20" height="20" rx="2" ry="2"></rect>
+                        <line x1="7" y1="2" x2="7" y2="22"></line>
+                        <line x1="17" y1="2" x2="17" y2="22"></line>
+                        <line x1="2" y1="12" x2="22" y2="12"></line>
+                        <line x1="2" y1="7" x2="7" y2="7"></line>
+                        <line x1="2" y1="17" x2="7" y2="17"></line>
+                        <line x1="17" y1="17" x2="22" y2="17"></line>
+                        <line x1="17" y1="7" x2="22" y2="7"></line>
+                    </svg>
+                    Excel Format
+                </button>
+                <button class="modal-btn close-btn" onclick="closeExportModal()">
+                    Cancel
+                </button>
+            </div>
+            
+            <div style="margin-top: 20px; font-size: 12px; color: #7a6b5a;">
+                <strong>Tip:</strong> CSV files can be opened in Google Sheets, Excel, and other spreadsheet programs
+            </div>
+        </div>
+    </div>
+
+    <div class="page" id="tracker-content">
+        <header>
+            <h1>2026 Quilt Project Tracker</h1>
+            <div class="subtitle">Lovely Quilt Co. • Intentional Stitching</div>
+            <div class="header-quote">"Every stitch tells a story. Plan yours for 2026."</div>
+        </header>
+
+        <div class="row">
+            <div class="input-group">
+                <label>MY WORD FOR 2026</label>
+                <div class="line" contenteditable="true" id="word-2026"></div>
+            </div>
+            <div class="input-group">
+                <label>SKILL I WANT TO MASTER</label>
+                <div class="line" contenteditable="true" id="skill-master"></div>
+            </div>
+        </div>
+
+        <h2 class="section-decorated">Current Project Queue</h2>
+        <table id="project-table">
+            <thead>
+                <tr>
+                    <th width="30%">Project Name</th>
+                    <th width="25%">Pattern</th>
+                    <th width="25%">Fabric Palette</th>
+                    <th width="20%">Goal Finish Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td contenteditable="true" class="project-name"></td><td contenteditable="true" class="project-pattern"></td><td contenteditable="true" class="project-fabric"></td><td contenteditable="true" class="project-date"></td></tr>
+                <tr><td contenteditable="true" class="project-name"></td><td contenteditable="true" class="project-pattern"></td><td contenteditable="true" class="project-fabric"></td><td contenteditable="true" class="project-date"></td></tr>
+                <tr><td contenteditable="true" class="project-name"></td><td contenteditable="true" class="project-pattern"></td><td contenteditable="true" class="project-fabric"></td><td contenteditable="true" class="project-date"></td></tr>
+                <tr><td contenteditable="true" class="project-name"></td><td contenteditable="true" class="project-pattern"></td><td contenteditable="true" class="project-fabric"></td><td contenteditable="true" class="project-date"></td></tr>
+                <tr><td contenteditable="true" class="project-name"></td><td contenteditable="true" class="project-pattern"></td><td contenteditable="true" class="project-fabric"></td><td contenteditable="true" class="project-date"></td></tr>
+            </tbody>
+        </table>
+
+        <div style="display: flex; gap: 40px; margin-top: 30px;">
+            <div style="flex: 1;">
+                <h2 class="section-decorated">The Progress Checklist</h2>
+                <div class="checklist" id="progress-checklist">
+                    <div class="check-item"><div class="box" onclick="toggleCheck(this)"></div> Choose Pattern</div>
+                    <div class="check-item"><div class="box" onclick="toggleCheck(this)"></div> Fabric Pull</div>
+                    <div class="check-item"><div class="box" onclick="toggleCheck(this)"></div> Cut Pieces</div>
+                    <div class="check-item"><div class="box" onclick="toggleCheck(this)"></div> Prep & Starch</div>
+                    <div class="check-item"><div class="box" onclick="toggleCheck(this)"></div> Piece Quilt Top</div>
+                    <div class="check-item"><div class="box" onclick="toggleCheck(this)"></div> Quilting Design</div>
+                    <div class="check-item"><div class="box" onclick="toggleCheck(this)"></div> Quilt & Bind</div>
+                    <div class="check-item"><div class="box" onclick="toggleCheck(this)"></div> Label & Gift</div>
+                </div>
+            </div>
+            <div style="flex: 1;">
+                <h2 class="section-decorated">WIP Audit (Unfinished Projects)</h2>
+                <div class="wip-section">
+                    <div class="line" contenteditable="true" id="wip-1"></div>
+                    <div class="line" contenteditable="true" id="wip-2"></div>
+                    <div class="line" contenteditable="true" id="wip-3"></div>
+                    <div class="line" contenteditable="true" id="wip-4"></div>
+                </div>
+            </div>
+        </div>
+
+        <h2 class="section-decorated">2026 Monthly Mini-Goals</h2>
+        <div class="monthly-goals">
+            <div class="month-item"><strong>JAN:</strong> Organize Stash</div>
+            <div class="month-item"><strong>FEB:</strong> Small Project</div>
+            <div class="month-item"><strong>MAR:</strong> Skill Builder</div>
+            <div class="month-item"><strong>APR:</strong> Finish a WIP</div>
+            <div class="month-item"><strong>MAY:</strong> Sew a Gift</div>
+            <div class="month-item"><strong>JUN:</strong> Mid-Year Review</div>
+            <div class="month-item"><strong>JUL:</strong> Holiday Prep</div>
+            <div class="month-item"><strong>AUG:</strong> Charity Quilt</div>
+            <div class="month-item"><strong>SEP:</strong> Fall Palette</div>
+            <div class="month-item"><strong>OCT:</strong> Mastery Project</div>
+            <div class="month-item"><strong>NOV:</strong> Fast Finishes</div>
+            <div class="month-item"><strong>DEC:</strong> Reflect & Rest</div>
+        </div>
+        
+        <div class="notes-section">
+            <h3>Notes & Inspiration</h3>
+            <textarea class="notes-area" id="notes" placeholder="Add project notes, fabric swatch ideas, or inspirational quotes here..."></textarea>
+        </div>
+
+        <footer>
+            <div class="footer-logo">LOVELY QUILT CO.</div>
+            &copy; 2026 LOVELY QUILT CO. | HAPPY STITCHING! | WWW.LOVELYQUILT.COM
+        </footer>
+    </div>
+
+    <script>
+        // Function to toggle checkbox state
+        function toggleCheck(box) {
+            box.classList.toggle('checked');
+        }
+        
+        // Function to download as PDF (original version)
+        function downloadPDF() {
+            const element = document.getElementById('tracker-content');
+            
+            // Options for PDF generation
+            const options = {
+                margin: 0.5,
+                filename: '2026-Quilt-Project-Tracker.pdf',
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { 
+                    scale: 2,
+                    useCORS: true,
+                    logging: false
+                },
+                jsPDF: { 
+                    unit: 'in', 
+                    format: 'letter', 
+                    orientation: 'portrait' 
+                }
+            };
+            
+            // Generate and download PDF
+            html2pdf().set(options).from(element).save();
+            
+            // Show feedback
+            const btn = document.querySelector('.pdf-btn');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg> Downloaded!';
+            btn.style.backgroundColor = '#7a9c7a';
+            
+            setTimeout(() => {
+                btn.innerHTML = originalText;
+                btn.style.backgroundColor = '#b5a48b';
+            }, 2000);
+        }
+        
+        // Modal functions
+        function showExportModal() {
+            document.getElementById('exportModal').style.display = 'flex';
+        }
+        
+        function closeExportModal() {
+            document.getElementById('exportModal').style.display = 'none';
+        }
+        
+        // Function to get clean text from contenteditable elements
+        function getCleanText(element) {
+            if (!element) return '';
+            const text = element.innerText || element.textContent || '';
+            const cleanText = text.replace('Click to edit', '').trim();
+            return cleanText || '';
+        }
+        
+        // Function to export to CSV (Google Sheets compatible)
+        function exportToCSV() {
+            // Collect all data
+            const data = collectTrackerData();
+            
+            // Create CSV content
+            let csvContent = "2026 Quilt Project Tracker - Lovely Quilt Co.\n";
+            csvContent += `"Exported: ${new Date().toLocaleDateString()}"\n\n`;
+            
+            // Basic info
+            csvContent += "BASIC INFO\n";
+            csvContent += `"My Word for 2026","${data.word2026}"\n`;
+            csvContent += `"Skill to Master","${data.skillMaster}"\n\n`;
+            
+            // Projects
+            csvContent += "PROJECT QUEUE\n";
+            csvContent += '"Project Name","Pattern","Fabric Palette","Goal Finish Date"\n';
+            data.projects.forEach(project => {
+                csvContent += `"${project.name}","${project.pattern}","${project.fabric}","${project.date}"\n`;
+            });
+            csvContent += "\n";
+            
+            // WIP Audit
+            csvContent += "WIP AUDIT (Unfinished Projects)\n";
+            data.wipAudit.forEach((wip, index) => {
+                csvContent += `"WIP ${index + 1}","${wip}"\n`;
+            });
+            csvContent += "\n";
+            
+            // Progress Checklist
+            csvContent += "PROGRESS CHECKLIST\n";
+            data.checklist.forEach(item => {
+                const status = item.checked ? "Completed" : "Not Started";
+                csvContent += `"${item.task}","${status}"\n`;
+            });
+            csvContent += "\n";
+            
+            // Monthly Goals
+            csvContent += "MONTHLY MINI-GOALS\n";
+            const months = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
+            const goals = ['Organize Stash', 'Small Project', 'Skill Builder', 'Finish a WIP', 'Sew a Gift', 
+                          'Mid-Year Review', 'Holiday Prep', 'Charity Quilt', 'Fall Palette', 
+                          'Mastery Project', 'Fast Finishes', 'Reflect & Rest'];
+            
+            months.forEach((month, index) => {
+                csvContent += `"${month}","${goals[index]}"\n`;
+            });
+            csvContent += "\n";
+            
+            // Notes
+            csvContent += "NOTES & INSPIRATION\n";
+            csvContent += `"${data.notes}"\n`;
+            
+            // Create and download CSV file
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            const url = URL.createObjectURL(blob);
+            link.setAttribute('href', url);
+            link.setAttribute('download', '2026-Quilt-Project-Tracker.csv');
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            // Close modal and show feedback
+            closeExportModal();
+            showFeedback('Sheet exported successfully!', 'sheet-btn');
+        }
+        
+        // Function to export to Excel format (actually CSV with Excel extension)
+        function exportToExcel() {
+            // Collect all data
+            const data = collectTrackerData();
+            
+            // Create CSV content with Excel-friendly formatting
+            let csvContent = "SEP=,\n"; // Excel separator
+            csvContent += "2026 Quilt Project Tracker - Lovely Quilt Co.\n";
+            csvContent += `Exported: ${new Date().toLocaleDateString()}\n\n`;
+            
+            // Basic info section
+            csvContent += "BASIC INFO\n";
+            csvContent += "Field,Value\n";
+            csvContent += `My Word for 2026,${data.word2026}\n`;
+            csvContent += `Skill to Master,${data.skillMaster}\n\n`;
+            
+            // Projects section
+            csvContent += "PROJECT QUEUE\n";
+            csvContent += "Project Name,Pattern,Fabric Palette,Goal Finish Date\n";
+            data.projects.forEach(project => {
+                csvContent += `${project.name},${project.pattern},${project.fabric},${project.date}\n`;
+            });
+            csvContent += "\n";
+            
+            // WIP Audit
+            csvContent += "WIP AUDIT\n";
+            csvContent += "Item,Description\n";
+            data.wipAudit.forEach((wip, index) => {
+                csvContent += `WIP ${index + 1},${wip}\n`;
+            });
+            csvContent += "\n";
+            
+            // Progress Checklist
+            csvContent += "PROGRESS CHECKLIST\n";
+            csvContent += "Task,Status\n";
+            data.checklist.forEach(item => {
+                const status = item.checked ? "✓" : " ";
+                csvContent += `${item.task},${status}\n`;
+            });
+            csvContent += "\n";
+            
+            // Monthly Goals
+            csvContent += "MONTHLY GOALS\n";
+            csvContent += "Month,Goal\n";
+            const months = ['January', 'February', 'March', 'April', 'May', 'June', 
+                          'July', 'August', 'September', 'October', 'November', 'December'];
+            const goals = ['Organize Stash', 'Small Project', 'Skill Builder', 'Finish a WIP', 'Sew a Gift', 
+                          'Mid-Year Review', 'Holiday Prep', 'Charity Quilt', 'Fall Palette', 
+                          'Mastery Project', 'Fast Finishes', 'Reflect & Rest'];
+            
+            months.forEach((month, index) => {
+                csvContent += `${month},${goals[index]}\n`;
+            });
+            csvContent += "\n";
+            
+            // Notes
+            csvContent += "NOTES\n";
+            csvContent += `${data.notes}\n`;
+            
+            // Create and download file with .xls extension (Excel will open it)
+            const blob = new Blob([csvContent], { type: 'application/vnd.ms-excel;charset=utf-8' });
+            const link = document.createElement('a');
+            const url = URL.createObjectURL(blob);
+            link.setAttribute('href', url);
+            link.setAttribute('download', '2026-Quilt-Project-Tracker.xls');
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            // Close modal and show feedback
+            closeExportModal();
+            showFeedback('Excel file downloaded!', 'sheet-btn');
+        }
+        
+        // Function to collect all tracker data
+        function collectTrackerData() {
+            // Basic info
+            const word2026 = getCleanText(document.getElementById('word-2026'));
+            const skillMaster = getCleanText(document.getElementById('skill-master'));
+            
+            // Projects
+            const projects = [];
+            const projectRows = document.querySelectorAll('#project-table tbody tr');
+            projectRows.forEach(row => {
+                const cells = row.querySelectorAll('td');
+                if (cells.length >= 4) {
+                    projects.push({
+                        name: getCleanText(cells[0]),
+                        pattern: getCleanText(cells[1]),
+                        fabric: getCleanText(cells[2]),
+                        date: getCleanText(cells[3])
+                    });
+                }
+            });
+            
+            // WIP Audit
+            const wipAudit = [];
+            for (let i = 1; i <= 4; i++) {
+                const wip = getCleanText(document.getElementById(`wip-${i}`));
+                wipAudit.push(wip);
+            }
+            
+            // Checklist
+            const checklist = [];
+            const checklistItems = document.querySelectorAll('#progress-checklist .check-item');
+            checklistItems.forEach(item => {
+                const box = item.querySelector('.box');
+                const task = item.textContent.replace('✓', '').trim();
+                checklist.push({
+                    task: task,
+                    checked: box.classList.contains('checked')
+                });
+            });
+            
+            // Notes
+            const notes = document.getElementById('notes').value || '';
+            
+            return {
+                word2026,
+                skillMaster,
+                projects,
+                wipAudit,
+                checklist,
+                notes
+            };
+        }
+        
+        // Function to show feedback
+        function showFeedback(message, buttonClass) {
+            const btn = document.querySelector(`.${buttonClass}`);
+            const originalText = btn.innerHTML;
+            btn.innerHTML = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg> ${message}`;
+            
+            setTimeout(() => {
+                btn.innerHTML = originalText;
+            }, 2000);
+        }
+        
+        // Initialize editable fields
+        document.addEventListener('DOMContentLoaded', function() {
+            const editableCells = document.querySelectorAll('[contenteditable="true"]');
+            
+            editableCells.forEach(cell => {
+                // Add placeholder styling
+                if (cell.innerHTML.trim() === '') {
+                    cell.innerHTML = '<span style="color: #b5a48b; font-style: italic;">Click to edit</span>';
+                }
+                
+                // Handle focus
+                cell.addEventListener('focus', function() {
+                    if (this.innerHTML.includes('Click to edit')) {
+                        this.innerHTML = '';
+                        this.style.color = '#4a3c31';
+                    }
+                });
+                
+                // Handle blur
+                cell.addEventListener('blur', function() {
+                    if (this.innerHTML.trim() === '') {
+                        this.innerHTML = '<span style="color: #b5a48b; font-style: italic;">Click to edit</span>';
+                    }
+                });
+            });
+            
+            // Handle notes textarea
+            const notesArea = document.getElementById('notes');
+            notesArea.addEventListener('focus', function() {
+                if (this.value === '') {
+                    this.style.color = '#4a3c31';
+                }
+            });
+            
+            // Close modal when clicking outside
+            document.getElementById('exportModal').addEventListener('click', function(e) {
+                if (e.target === this) {
+                    closeExportModal();
+                }
+            });
+            
+            // Add keyboard shortcuts
+            document.addEventListener('keydown', function(e) {
+                // Ctrl+S or Cmd+S to save as PDF
+                if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+                    e.preventDefault();
+                    downloadPDF();
+                }
+                // Escape to close modal
+                if (e.key === 'Escape') {
+                    closeExportModal();
+                }
+            });
+        });
+    </script>
+</body>
+</html>
