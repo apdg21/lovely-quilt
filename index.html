@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lovely Quilt - Quilting Tutorials & Guides</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            --primary-color: #8a3a6d;
+            --secondary-color: #5b8c5a;
+            --accent-color: #d4a574;
+            --light-color: #f9f5f0;
+            --dark-color: #3a2c2c;
+            --border-radius: 8px;
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        body {
+            background-color: #fefefe;
+            color: var(--dark-color);
+            line-height: 1.6;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(248, 240, 232, 0.6) 0%, transparent 20%),
+                radial-gradient(circle at 90% 80%, rgba(232, 245, 233, 0.6) 0%, transparent 20%);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header Styles */
+        header {
+            background: linear-gradient(135deg, var(--primary-color), #6a2a55);
+            color: white;
+            padding: 2rem 0;
+            text-align: center;
+            border-bottom: 8px solid var(--accent-color);
+            position: relative;
+            overflow: hidden;
+        }
+
+        header::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: 
+                repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(255,255,255,0.05) 10px, rgba(255,255,255,0.05) 20px);
+            pointer-events: none;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1rem;
+        }
+
+        .logo-icon {
+            font-size: 2.5rem;
+            margin-right: 15px;
+            color: var(--accent-color);
+        }
+
+        h1 {
+            font-size: 2.8rem;
+            margin-bottom: 0.5rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+
+        .tagline {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Navigation */
+        nav {
+            background-color: var(--light-color);
+            padding: 1rem 0;
+            box-shadow: var(--shadow);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .nav-links {
+            display: flex;
+            justify-content: center;
+            list-style: none;
+            flex-wrap: wrap;
+        }
+
+        .nav-links li {
+            margin: 0 15px;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--dark-color);
+            font-weight: 600;
+            padding: 8px 15px;
+            border-radius: var(--border-radius);
+            transition: all 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        /* Main Content */
+        main {
+            padding: 3rem 0;
+        }
+
+        .intro {
+            text-align: center;
+            margin-bottom: 3rem;
+            padding: 2rem;
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            border-left: 5px solid var(--secondary-color);
+        }
+
+        .intro h2 {
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+            font-size: 2.2rem;
+        }
+
+        .intro p {
+            font-size: 1.1rem;
+            max-width: 800px;
+            margin: 0 auto;
+            color: #555;
+        }
+
+        /* Tutorial Grid */
+        .tutorials-section h2 {
+            text-align: center;
+            color: var(--primary-color);
+            margin-bottom: 2.5rem;
+            font-size: 2.2rem;
+            position: relative;
+            padding-bottom: 15px;
+        }
+
+        .tutorials-section h2::after {
+            content: "";
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 4px;
+            background-color: var(--accent-color);
+            border-radius: 2px;
+        }
+
+        .tutorials-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .tutorial-card {
+            background-color: white;
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border-top: 5px solid var(--secondary-color);
+        }
+
+        .tutorial-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .card-header {
+            background-color: var(--light-color);
+            padding: 1.5rem;
+            border-bottom: 1px solid #eee;
+        }
+
+        .card-header h3 {
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+            font-size: 1.5rem;
+        }
+
+        .card-meta {
+            display: flex;
+            justify-content: space-between;
+            color: #777;
+            font-size: 0.9rem;
+        }
+
+        .card-content {
+            padding: 1.5rem;
+        }
+
+        .card-content p {
+            color: #555;
+            margin-bottom: 1.5rem;
+        }
+
+        .card-footer {
+            padding: 0 1.5rem 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .btn {
+            display: inline-block;
+            background-color: var(--primary-color);
+            color: white;
+            padding: 10px 20px;
+            border-radius: var(--border-radius);
+            text-decoration: none;
+            font-weight: 600;
+            transition: background-color 0.3s ease;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn:hover {
+            background-color: #6a2a55;
+        }
+
+        .btn-secondary {
+            background-color: var(--secondary-color);
+        }
+
+        .btn-secondary:hover {
+            background-color: #4a7a49;
+        }
+
+        .btn-small {
+            padding: 8px 15px;
+            font-size: 0.9rem;
+        }
+
+        .time-ago {
+            font-style: italic;
+            color: #888;
+            font-size: 0.9rem;
+        }
+
+        /* Recent Updates */
+        .updates-section {
+            background-color: var(--light-color);
+            padding: 2.5rem;
+            border-radius: var(--border-radius);
+            margin-bottom: 3rem;
+            box-shadow: var(--shadow);
+        }
+
+        .updates-section h2 {
+            color: var(--primary-color);
+            margin-bottom: 1.5rem;
+            font-size: 1.8rem;
+            display: flex;
+            align-items: center;
+        }
+
+        .updates-section h2 i {
+            margin-right: 10px;
+            color: var(--accent-color);
+        }
+
+        .update-list {
+            list-style: none;
+        }
+
+        .update-item {
+            padding: 1rem 0;
+            border-bottom: 1px dashed #ccc;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .update-item:last-child {
+            border-bottom: none;
+        }
+
+        .update-info {
+            flex-grow: 1;
+        }
+
+        .update-title {
+            font-weight: 600;
+            color: var(--dark-color);
+            margin-bottom: 5px;
+        }
+
+        .update-desc {
+            color: #666;
+            font-size: 0.95rem;
+        }
+
+        /* Footer */
+        footer {
+            background-color: var(--dark-color);
+            color: white;
+            padding: 3rem 0 2rem;
+            text-align: center;
+        }
+
+        .footer-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .footer-logo {
+            font-size: 2rem;
+            margin-bottom: 1.5rem;
+            color: var(--accent-color);
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            list-style: none;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .footer-links li {
+            margin: 0 15px;
+        }
+
+        .footer-links a {
+            color: #ddd;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .footer-links a:hover {
+            color: var(--accent-color);
+        }
+
+        .copyright {
+            color: #aaa;
+            font-size: 0.9rem;
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid #444;
+            width: 100%;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2.2rem;
+            }
+            
+            .tutorials-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .nav-links {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .nav-links li {
+                margin: 5px 0;
+            }
+            
+            .update-item {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .time-ago {
+                margin-top: 5px;
+            }
+        }
+
+        /* Quilt Pattern Background Element */
+        .quilt-pattern {
+            position: fixed;
+            bottom: 0;
+            right: 0;
+            width: 300px;
+            height: 300px;
+            opacity: 0.05;
+            z-index: -1;
+            background-image: 
+                linear-gradient(45deg, var(--primary-color) 25%, transparent 25%),
+                linear-gradient(-45deg, var(--primary-color) 25%, transparent 25%),
+                linear-gradient(45deg, transparent 75%, var(--primary-color) 75%),
+                linear-gradient(-45deg, transparent 75%, var(--primary-color) 75%);
+            background-size: 40px 40px;
+            background-position: 0 0, 0 20px, 20px -20px, -20px 0px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Quilt pattern background element -->
+    <div class="quilt-pattern"></div>
+
+    <!-- Header Section -->
+    <header>
+        <div class="container">
+            <div class="logo">
+                <i class="fas fa-th-large logo-icon"></i>
+                <h1>Lovely Quilt</h1>
+            </div>
+            <p class="tagline">Your comprehensive resource for quilting tutorials, guides, and inspiration for all skill levels.</p>
+        </div>
+    </header>
+
+    <!-- Navigation -->
+    <nav>
+        <div class="container">
+            <ul class="nav-links">
+                <li><a href="#tutorials"><i class="fas fa-book-open"></i> Tutorials</a></li>
+                <li><a href="#updates"><i class="fas fa-history"></i> Recent Updates</a></li>
+                <li><a href="#"><i class="fas fa-project-diagram"></i> Project Tracker</a></li>
+                <li><a href="#"><i class="fas fa-question-circle"></i> Getting Started</a></li>
+                <li><a href="#"><i class="fas fa-envelope"></i> Contact</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="container">
+        <!-- Introduction -->
+        <section class="intro">
+            <h2>Welcome to Lovely Quilt Tutorials</h2>
+            <p>Discover a world of quilting knowledge with our carefully crafted tutorials and guides. Whether you're a beginner looking to create your first quilt or an experienced quilter seeking new techniques, you'll find inspiration and detailed instructions here.</p>
+            <a href="#tutorials" class="btn" style="margin-top: 1.5rem;">Explore Tutorials</a>
+        </section>
+
+        <!-- Tutorials Grid -->
+        <section id="tutorials" class="tutorials-section">
+            <h2>Featured Quilting Tutorials</h2>
+            <div class="tutorials-grid">
+                <!-- Tutorial Card 1 -->
+                <div class="tutorial-card">
+                    <div class="card-header">
+                        <h3>3-in-1 Festive Quilt Borders Guide</h3>
+                        <div class="card-meta">
+                            <span><i class="far fa-calendar-alt"></i> Updated last month</span>
+                            <span><i class="fas fa-tag"></i> Borders, Festive</span>
+                        </div>
+                    </div>
+                    <div class="card-content">
+                        <p>Learn how to create three different festive quilt borders using the same foundational technique. Perfect for holiday quilts and seasonal projects.</p>
+                    </div>
+                    <div class="card-footer">
+                        <a href="3-in-1-festive-quilt-borders-guide.html" class="btn btn-small">View Tutorial</a>
+                        <span class="time-ago">Updated last month</span>
+                    </div>
+                </div>
+
+                <!-- Tutorial Card 2 -->
+                <div class="tutorial-card">
+                    <div class="card-header">
+                        <h3>Fast Finish Quilted Mug Rug</h3>
+                        <div class="card-meta">
+                            <span><i class="far fa-calendar-alt"></i> Updated 2 months ago</span>
+                            <span><i class="fas fa-tag"></i> Small Projects, Quick</span>
+                        </div>
+                    </div>
+                    <div class="card-content">
+                        <p>Create a beautiful and practical mug rug in just a few hours. This quick project is perfect for practicing quilting techniques and makes a great gift.</p>
+                    </div>
+                    <div class="card-footer">
+                        <a href="fast-finish-quilted-mug-rug.html" class="btn btn-small">View Tutorial</a>
+                        <span class="time-ago">Updated 2 months ago</span>
+                    </div>
+                </div>
+
+                <!-- Tutorial Card 3 -->
+                <div class="tutorial-card">
+                    <div class="card-header">
+                        <h3>Guide to Scrappy Quilting</h3>
+                        <div class="card-meta">
+                            <span><i class="far fa-calendar-alt"></i> Updated 3 months ago</span>
+                            <span><i class="fas fa-tag"></i> Scrap Fabric, Creative</span>
+                        </div>
+                    </div>
+                    <div class="card-content">
+                        <p>Turn your fabric scraps into beautiful, creative quilts. This comprehensive guide covers color theory, pattern selection, and efficient scrap management.</p>
+                    </div>
+                    <div class="card-footer">
+                        <a href="guide-to-scrappy-quilting.html" class="btn btn-small">View Tutorial</a>
+                        <span class="time-ago">Updated 3 months ago</span>
+                    </div>
+                </div>
+
+                <!-- Tutorial Card 4 -->
+                <div class="tutorial-card">
+                    <div class="card-header">
+                        <h3>Ultimate Guide to Artistic Quilting</h3>
+                        <div class="card-meta">
+                            <span><i class="far fa-calendar-alt"></i> Updated 3 months ago</span>
+                            <span><i class="fas fa-tag"></i> Art Quilts, Advanced</span>
+                        </div>
+                    </div>
+                    <div class="card-content">
+                        <p>Explore advanced techniques for creating artistic quilts that are true works of art. Includes sections on design, texture, and unconventional materials.</p>
+                    </div>
+                    <div class="card-footer">
+                        <a href="ultimate-guide-to-artistic-quilting.html" class="btn btn-small">View Tutorial</a>
+                        <span class="time-ago">Updated 3 months ago</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Recent Updates Section -->
+        <section id="updates" class="updates-section">
+            <h2><i class="fas fa-history"></i> Recent Updates</h2>
+            <ul class="update-list">
+                <li class="update-item">
+                    <div class="update-info">
+                        <div class="update-title">2026 Project Tracker</div>
+                        <div class="update-desc">Updated by apdg21 with new features and improved interface</div>
+                    </div>
+                    <span class="time-ago">Last week</span>
+                </li>
+                <li class="update-item">
+                    <div class="update-info">
+                        <div class="update-title">3-in-1 Festive Quilt Borders Guide</div>
+                        <div class="update-desc">Renamed and restructured for better navigation</div>
+                    </div>
+                    <span class="time-ago">Last month</span>
+                </li>
+                <li class="update-item">
+                    <div class="update-info">
+                        <div class="update-title">Fast Finish Quilted Mug Rug</div>
+                        <div class="update-desc">Added new patterns and step-by-step video references</div>
+                    </div>
+                    <span class="time-ago">2 months ago</span>
+                </li>
+            </ul>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-logo">
+                    <i class="fas fa-th-large"></i>
+                </div>
+                <ul class="footer-links">
+                    <li><a href="#tutorials">Tutorials</a></li>
+                    <li><a href="#updates">Updates</a></li>
+                    <li><a href="#">Blog</a></li>
+                    <li><a href="#">Community</a></li>
+                    <li><a href="#">Privacy Policy</a></li>
+                </ul>
+                <div class="copyright">
+                    &copy; 2023 Lovely Quilt Tutorials. All tutorials and content are provided for educational purposes.
+                    <br>Maintained by apdg21 • 1 Branch • 0 Tags
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Simple script to handle smooth scrolling for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                
+                const targetId = this.getAttribute('href');
+                if (targetId === '#') return;
+                
+                const targetElement = document.querySelector(targetId);
+                if (targetElement) {
+                    window.scrollTo({
+                        top: targetElement.offsetTop - 80,
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+
+        // Add a simple visual effect to tutorial cards on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            const cards = document.querySelectorAll('.tutorial-card');
+            cards.forEach((card, index) => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(20px)';
+                
+                setTimeout(() => {
+                    card.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+                    card.style.opacity = '1';
+                    card.style.transform = 'translateY(0)';
+                }, 100 * index);
+            });
+        });
+    </script>
+</body>
+</html>
