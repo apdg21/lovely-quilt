@@ -946,7 +946,7 @@
     </section>
 
     <div style="text-align:center; padding: 20px 0 60px;">
-        <a href="#" onclick="history.back(); return false;" style="color: var(--muted); font-size:13px; letter-spacing:1px; text-decoration:none; border-bottom:1px solid rgba(168,149,144,0.3); padding-bottom:3px;">← Back to email</a>
+        <a href="#" onclick="if(document.referrer){history.back();}else{window.location.href='https://lovelyquilt.com';} return false;" style="color: var(--muted); font-size:13px; letter-spacing:1px; text-decoration:none; border-bottom:1px solid rgba(168,149,144,0.3); padding-bottom:3px;">← Back</a>
     </div>
 
 </div><!-- /.page-wrap -->
