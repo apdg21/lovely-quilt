@@ -969,22 +969,13 @@
 <script>
 (function () {
     // ── Reveal datetime: March 21 2026 9:00 AM EST (EDT = GMT-4)
-    const revealDate = new Date('2026-03-21T12:00:00Z'); // 8am EST = noon UTC (EST is UTC-5; March 21 is before DST in 2026 → UTC-4? Let's keep noon UTC = 8am EDT)
+        const revealDate = new Date('2026-03-21T09:00:00'); // 8am EST = noon UTC (EST is UTC-5; March 21 is before DST in 2026 → UTC-4? Let's keep noon UTC = 8am EDT)
 
     // ── Local time display
+        // ── Local time display
     const pill = document.getElementById('localTimePill');
-    try {
-        const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
-        const local = revealDate.toLocaleString('en-US', {
-            timeZone: tz,
-            weekday: 'long', month: 'long', day: 'numeric',
-            hour: 'numeric', minute: '2-digit', hour12: true
-        });
-        pill.innerHTML = `<strong>Your local time:</strong> ${local}`;
-    } catch (e) {
-        pill.textContent = 'Reveal: 9:00 AM Eastern Time, March 21';
-    }
-
+    pill.innerHTML = `Saturday, March 21, 2026 &nbsp;·&nbsp; <strong>9:00 AM</strong> — wherever you are`;
+    
     // ── Countdown
     function pad(n) { return String(n).padStart(2, '0'); }
 
