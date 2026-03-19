@@ -571,7 +571,7 @@
             color: rgba(255,255,255,0.45);
         }
 
-        .local-time-pill {
+        .PDT-time-pill {
             display: inline-block;
             background: rgba(255,255,255,0.08);
             border: 1px solid rgba(255,255,255,0.15);
@@ -582,7 +582,7 @@
             font-weight: 300;
         }
 
-        .local-time-pill strong {
+        .PDT-time-pill strong {
             color: var(--gold-light);
             font-weight: 400;
         }
@@ -806,7 +806,7 @@
             </div>
             <div class="date-part">
                 <span class="val">9:00 AM</span>
-                <span class="lbl">local Time</span>
+                <span class="lbl">PDT Time</span>
             </div>
         </div>
     </section>
@@ -864,7 +864,7 @@
             </div>
             <div class="detail-row">
                 <div class="detail-label">Time</div>
-                <div class="detail-value">9:00 AM local Time (converts automatically to your local time)</div>
+                <div class="detail-value">9:00 AM PDT Time (converts automatically to your PDT time)</div>
             </div>
             <div class="detail-row">
                 <div class="detail-label">About</div>
@@ -874,7 +874,7 @@
                 <div class="detail-label">Link</div>
                 <div class="detail-value">
                     <a href="https://lovelyquilt.com/collections/patterns">lovelyquilt.com/collections/patterns</a>
-                    <span style="color: var(--muted); font-size:13px; display:block; margin-top:4px;">Goes live at 9:00 AM local</span>
+                    <span style="color: var(--muted); font-size:13px; display:block; margin-top:4px;">Goes live at 9:00 AM PDT</span>
                 </div>
             </div>
 
@@ -916,7 +916,7 @@
                 </div>
             </div>
 
-            <div class="local-time-pill" id="localTimePill">Detecting your timezone…</div>
+            <div class="PDT-time-pill" id="PDTTimePill">Detecting your timezone…</div>
         </div>
     </section>
 
@@ -969,11 +969,11 @@
 <script>
 (function () {
     // ── Reveal datetime: March 21 2026 9:00 AM EST (EDT = GMT-4)
-        const revealDate = new Date('2026-03-21T09:00:00'); // 8am EST = noon UTC (EST is UTC-5; March 21 is before DST in 2026 → UTC-4? Let's keep noon UTC = 8am EDT)
+        pill.innerHTML = `Saturday, March 21, 2026 &nbsp;·&nbsp; <strong>9:00 AM PDT</strong>`; // 8am EST = noon UTC (EST is UTC-5; March 21 is before DST in 2026 → UTC-4? Let's keep noon UTC = 8am EDT)
 
-    // ── Local time display
-        // ── Local time display
-    const pill = document.getElementById('localTimePill');
+    // ── PDT time display
+        // ── PDT time display
+    const pill = document.getElementById('PDTTimePill');
     pill.innerHTML = `Saturday, March 21, 2026 &nbsp;·&nbsp; <strong>9:00 AM</strong> — wherever you are`;
     
     // ── Countdown
