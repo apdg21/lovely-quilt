@@ -805,7 +805,7 @@
                 <span class="lbl">Day</span>
             </div>
             <div class="date-part">
-                <span class="val">8:00 AM</span>
+                <span class="val">9:00 AM</span>
                 <span class="lbl">Eastern Time</span>
             </div>
         </div>
@@ -864,7 +864,7 @@
             </div>
             <div class="detail-row">
                 <div class="detail-label">Time</div>
-                <div class="detail-value">8:00 AM Eastern Time (converts automatically to your local time)</div>
+                <div class="detail-value">9:00 AM Eastern Time (converts automatically to your local time)</div>
             </div>
             <div class="detail-row">
                 <div class="detail-label">About</div>
@@ -874,7 +874,7 @@
                 <div class="detail-label">Link</div>
                 <div class="detail-value">
                     <a href="https://lovelyquilt.com/collections/patterns">lovelyquilt.com/collections/patterns</a>
-                    <span style="color: var(--muted); font-size:13px; display:block; margin-top:4px;">Goes live at 8:00 AM Eastern</span>
+                    <span style="color: var(--muted); font-size:13px; display:block; margin-top:4px;">Goes live at 9:00 AM Eastern</span>
                 </div>
             </div>
 
@@ -968,7 +968,7 @@
 
 <script>
 (function () {
-    // ── Reveal datetime: March 21 2026 8:00 AM EST (EDT = GMT-4)
+    // ── Reveal datetime: March 21 2026 9:00 AM EST (EDT = GMT-4)
     const revealDate = new Date('2026-03-21T12:00:00Z'); // 8am EST = noon UTC (EST is UTC-5; March 21 is before DST in 2026 → UTC-4? Let's keep noon UTC = 8am EDT)
 
     // ── Local time display
@@ -982,7 +982,7 @@
         });
         pill.innerHTML = `<strong>Your local time:</strong> ${local}`;
     } catch (e) {
-        pill.textContent = 'Reveal: 8:00 AM Eastern Time, March 21';
+        pill.textContent = 'Reveal: 9:00 AM Eastern Time, March 21';
     }
 
     // ── Countdown
