@@ -968,14 +968,13 @@
 
 <script>
 (function () {
-    // ── Reveal datetime: March 21 2026 9:00 AM EST (EDT = GMT-4)
-        pill.innerHTML = `Saturday, March 21, 2026 &nbsp;·&nbsp; <strong>9:00 AM PDT</strong>`; // 8am EST = noon UTC (EST is UTC-5; March 21 is before DST in 2026 → UTC-4? Let's keep noon UTC = 8am EDT)
+    // ── Reveal datetime: March 21 2026 9:00 AM PDT (UTC-7)
+    const revealDate = new Date('2026-03-21T16:00:00Z');
 
     // ── PDT time display
-        // ── PDT time display
     const pill = document.getElementById('PDTTimePill');
-    pill.innerHTML = `Saturday, March 21, 2026 &nbsp;·&nbsp; <strong>9:00 AM</strong> — wherever you are`;
-    
+    pill.innerHTML = `Saturday, March 21, 2026 &nbsp;·&nbsp; <strong>9:00 AM PDT</strong>`;
+
     // ── Countdown
     function pad(n) { return String(n).padStart(2, '0'); }
 
@@ -1003,8 +1002,8 @@
         title: 'Lovely Quilt Spring Collection 2026 Reveal',
         desc:  'Join us for the exclusive reveal of our 2026 Spring Pattern Collection on National Quilting Day. Be the first to shop new designs and limited-edition colorways at lovelyquilt.com/collections/patterns',
         loc:   'https://lovelyquilt.com/collections/patterns',
-        start: '20260321T120000Z',
-        end:   '20260321T130000Z',
+        start: '20260321T160000Z',
+        end:   '20260321T170000Z',
     };
 
     // Google Calendar
@@ -1064,7 +1063,7 @@
 
     // ── Social share
     const url  = encodeURIComponent(window.location.href);
-    const text = encodeURIComponent("The Lovely Quilt Spring Collection 2026 is being revealed on March 21 at 8am ET! 🌸🧵");
+    const text = encodeURIComponent("The Lovely Quilt Spring Collection 2026 is being revealed on March 21 at 9am PDT! 🌸🧵");
     document.querySelector('.social-facebook').href  = `https://www.facebook.com/sharer/sharer.php?u=${url}`;
     document.querySelector('.social-twitter').href   = `https://twitter.com/intent/tweet?text=${text}&url=${url}`;
     document.querySelector('.social-pinterest').href = `https://pinterest.com/pin/create/button/?url=${url}&description=${text}`;
