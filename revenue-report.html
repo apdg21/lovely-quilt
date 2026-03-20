@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Lovely Quilt Brand · Omnisend Performance Report (Jan 2025 – Feb 2026)</title>
+    <!-- Chart.js CDN for clean, responsive charts -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <!-- Optional: lightweight helper for formatting numbers -->
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #f4f7fc;
+            font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, sans-serif;
+            padding: 2rem 1.5rem;
+            color: #1a2c3e;
+        }
+
+        /* simulate smooth font */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap');
+
+        .report-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 2rem;
+            box-shadow: 0 20px 35px -12px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+            padding: 1.8rem 2rem 2.5rem 2rem;
+        }
+
+        /* header section */
+        .brand-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            border-bottom: 2px solid #e9edf2;
+            padding-bottom: 1.5rem;
+        }
+        .title-section h1 {
+            font-size: 1.9rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #2c5a6e, #1e3b4a);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            letter-spacing: -0.3px;
+        }
+        .title-section p {
+            color: #4a627a;
+            font-weight: 500;
+            margin-top: 0.3rem;
+            font-size: 0.9rem;
+        }
+        .date-badge {
+            background: #eef2f8;
+            padding: 0.5rem 1.2rem;
+            border-radius: 40px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: #1f5e7a;
+        }
+
+        /* kpi mini row */
+        .kpi-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.2rem;
+            margin-bottom: 2rem;
+            background: #f8fafd;
+            border-radius: 1.5rem;
+            padding: 1.2rem 1.8rem;
+            justify-content: space-between;
+        }
+        .kpi-card {
+            flex: 1;
+            min-width: 130px;
+        }
+        .kpi-label {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 600;
+            color: #5f7f9a;
+        }
+        .kpi-value {
+            font-size: 1.7rem;
+            font-weight: 800;
+            color: #1d4e6b;
+            line-height: 1.2;
+        }
+        .trend {
+            font-size: 0.75rem;
+            font-weight: 500;
+            margin-left: 0.5rem;
+        }
+        .trend-up { color: #2b7e4a; }
+        .trend-down { color: #bc4742; }
+
+        /* chart row */
+        .charts-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 2rem;
+            margin-bottom: 2.5rem;
+        }
+        .chart-card {
+            flex: 1;
+            min-width: 280px;
+            background: #ffffff;
+            border-radius: 1.2rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+            border: 1px solid #eef2f8;
+            padding: 1rem 1rem 0.8rem 1rem;
+            transition: all 0.2s;
+        }
+        .chart-card h3 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+            padding-left: 0.25rem;
+            color: #2c5f8a;
+            border-left: 4px solid #7cb3cf;
+            padding-left: 12px;
+        }
+        canvas {
+            max-height: 300px;
+            width: 100%;
+        }
+
+        /* table styling */
+        .data-table-wrapper {
+            overflow-x: auto;
+            margin-top: 1.8rem;
+            border-radius: 1.2rem;
+            border: 1px solid #e2e8f0;
+            background: white;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.8rem;
+            min-width: 1000px;
+        }
+        th {
+            background: #f1f5f9;
+            padding: 12px 10px;
+            font-weight: 600;
+            color: #1f4662;
+            border-bottom: 1px solid #dce3ec;
+            text-align: right;
+        }
+        th:first-child {
+            text-align: left;
+            position: sticky;
+            left: 0;
+            background: #f1f5f9;
+        }
+        td {
+            padding: 10px 10px;
+            border-bottom: 1px solid #ecf1f6;
+            text-align: right;
+            font-feature-settings: "tnum";
+            font-variant-numeric: tabular-nums;
+        }
+        td:first-child {
+            text-align: left;
+            font-weight: 500;
+            background-color: white;
+            position: sticky;
+            left: 0;
+            background: white;
+            box-shadow: 2px 0 5px -2px rgba(0,0,0,0.02);
+        }
+        tr:hover td {
+            background-color: #fafcff;
+        }
+        .revenue-highlight {
+            font-weight: 600;
+            color: #1f6e43;
+        }
+        .negative {
+            color: #b13e3e;
+        }
+        .table-caption {
+            font-size: 0.7rem;
+            text-align: right;
+            padding: 0.6rem 1rem;
+            background: #fafcff;
+            border-top: 1px solid #e9edf2;
+            color: #557c99;
+        }
+        footer {
+            margin-top: 2rem;
+            text-align: center;
+            font-size: 0.7rem;
+            color: #7b96af;
+            border-top: 1px solid #e4ebf2;
+            padding-top: 1.5rem;
+        }
+        @media (max-width: 680px) {
+            .report-container { padding: 1rem; }
+            .kpi-value { font-size: 1.3rem; }
+        }
+    </style>
+</head>
+<body>
+<div class="report-container">
+    <div class="brand-header">
+        <div class="title-section">
+            <h1>🧵 Lovely Quilt · Omnisend Performance</h1>
+            <p>Email & automation revenue deep-dive | January 2025 – February 2026</p>
+        </div>
+        <div class="date-badge">
+            📅 14 months | Full overview
+        </div>
+    </div>
+
+    <!-- dynamic KPI summary (calculated from dataset) -->
+    <div class="kpi-grid" id="kpiContainer">
+        <!-- JS will inject aggregated KPIs -->
+        <div class="kpi-card">Loading metrics...</div>
+    </div>
+
+    <!-- Charts section: Omnisend revenue trend + campaign vs automation breakdown -->
+    <div class="charts-row">
+        <div class="chart-card">
+            <h3>📈 Omnisend Monthly Revenue (USD)</h3>
+            <canvas id="omnisendRevenueChart" width="400" height="250" style="max-height:260px"></canvas>
+        </div>
+        <div class="chart-card">
+            <h3>📧 Campaigns vs Automation Revenue</h3>
+            <canvas id="campaignAutomationChart" width="400" height="250" style="max-height:260px"></canvas>
+        </div>
+    </div>
+    
+    <!-- second chart row: Orders overview (omnisend orders vs total orders) -->
+    <div class="charts-row">
+        <div class="chart-card">
+            <h3>🛍️ Omnisend Orders vs Total Store Orders</h3>
+            <canvas id="ordersComparisonChart" width="400" height="250" style="max-height:260px"></canvas>
+        </div>
+        <div class="chart-card">
+            <h3>📊 Revenue Contribution (Omnisend / Total Store)</h3>
+            <canvas id="revenueShareChart" width="400" height="250" style="max-height:260px"></canvas>
+        </div>
+    </div>
+    
+    <!-- Full data table -->
+    <div class="data-table-wrapper">
+        <table id="performanceTable">
+            <thead>
+                <tr><th>Month</th><th>Omnisend Rev</th><th>% Δ</th><th>Omni Orders</th><th>Campaigns Rev</th><th>Campaign Orders</th><th>Automation Rev</th><th>Automation Orders</th><th>Total Store Rev</th><th>Total Orders</th></tr>
+            </thead>
+            <tbody id="tableBody">
+                <!-- injected via js -->
+            </tbody>
+        </table>
+        <div class="table-caption">⭐ Omnisend revenue includes campaigns + automation. Percent changes reflect month-over-month Omnisend revenue variation.<br>Data source: Lovely Quilt brand reporting (Jan 2025 – Feb 2026).</div>
+    </div>
+    <footer>Lovely Quilt · Omnisend performance analytics · Interactive charts visualize revenue evolution & channel split</footer>
+</div>
+
+<script>
+    // ----- Dataset (exactly as provided)
+    const rawData = [
+        { month: "Jan 2025", omniRev: 869.90, pctChange: "+83.3%", omniOrders: 60, campRev: 544.15, campOrders: 35, autoRev: 325.75, autoOrders: 25, storeRev: 2400.35, storeOrders: 188 },
+        { month: "Feb 2025", omniRev: 554.85, pctChange: "-50.49%", omniOrders: 38, campRev: 183.47, campOrders: 8, autoRev: 371.38, autoOrders: 30, storeRev: 2549.11, storeOrders: 213 },
+        { month: "Mar 2025", omniRev: 1675.66, pctChange: "+62.1%", omniOrders: 142, campRev: 0.00, campOrders: 0, autoRev: 1675.66, autoOrders: 142, storeRev: 10813.85, storeOrders: 967 },
+        { month: "Apr 2025", omniRev: 1712.48, pctChange: "+4.7%", omniOrders: 132, campRev: 0.00, campOrders: 0, autoRev: 1712.48, autoOrders: 132, storeRev: 8585.47, storeOrders: 760 },
+        { month: "May 2025", omniRev: 264.93, pctChange: "-549.76%", omniOrders: 16, campRev: 0.00, campOrders: 0, autoRev: 264.93, autoOrders: 16, storeRev: 1714.60, storeOrders: 136 },
+        { month: "Jun 2025", omniRev: 531.58, pctChange: "+50.1%", omniOrders: 38, campRev: 0.00, campOrders: 0, autoRev: 531.58, autoOrders: 38, storeRev: 2795.61, storeOrders: 240 },
+        { month: "Jul 2025", omniRev: 849.97, pctChange: "+35.4%", omniOrders: 74, campRev: 223.39, campOrders: 17, autoRev: 626.58, autoOrders: 57, storeRev: 5519.43, storeOrders: 461 },
+        { month: "Aug 2025", omniRev: 1069.60, pctChange: "+20.5%", omniOrders: 72, campRev: 639.51, campOrders: 41, autoRev: 430.09, autoOrders: 31, storeRev: 3092.30, storeOrders: 253 },
+        { month: "Sep 2025", omniRev: 1030.61, pctChange: "+2.2%", omniOrders: 70, campRev: 505.31, campOrders: 30, autoRev: 525.30, autoOrders: 40, storeRev: 3720.29, storeOrders: 290 },
+        { month: "Oct 2025", omniRev: 1039.80, pctChange: "+0.1%", omniOrders: 76, campRev: 324.45, campOrders: 23, autoRev: 715.35, autoOrders: 53, storeRev: 3366.56, storeOrders: 264 },
+        { month: "Nov 2025", omniRev: 615.64, pctChange: "-62.59%", omniOrders: 41, campRev: 410.67, campOrders: 24, autoRev: 204.97, autoOrders: 17, storeRev: 1493.64, storeOrders: 118 },
+        { month: "Dec 2025", omniRev: 671.28, pctChange: "+1.6%", omniOrders: 42, campRev: 603.24, campOrders: 34, autoRev: 68.04, autoOrders: 8, storeRev: 1100.88, storeOrders: 84 },
+        { month: "Jan 2026", omniRev: 278.80, pctChange: "-140.77%", omniOrders: 17, campRev: 163.34, campOrders: 12, autoRev: 115.46, autoOrders: 5, storeRev: 987.64, storeOrders: 74 },
+        { month: "Feb 2026", omniRev: 2052.13, pctChange: "+86.4%", omniOrders: 150, campRev: 421.68, campOrders: 28, autoRev: 1630.45, autoOrders: 122, storeRev: 12823.50, storeOrders: 1022 }
+    ];
+
+    // Extract arrays for charts
+    const months = rawData.map(d => d.month);
+    const omniRevenue = rawData.map(d => d.omniRev);
+    const campaignRevenue = rawData.map(d => d.campRev);
+    const automationRevenue = rawData.map(d => d.autoRev);
+    const omniOrdersArr = rawData.map(d => d.omniOrders);
+    const totalOrdersArr = rawData.map(d => d.storeOrders);
+    const totalStoreRev = rawData.map(d => d.storeRev);
+
+    // Compute simple KPIs
+    const totalOmniRev = omniRevenue.reduce((a,b) => a+b, 0);
+    const avgOmniRev = totalOmniRev / rawData.length;
+    const lastMonthRev = rawData[rawData.length-1].omniRev;
+    const prevMonthRev = rawData[rawData.length-2].omniRev;
+    const latestChange = ((lastMonthRev - prevMonthRev) / prevMonthRev * 100).toFixed(1);
+    const totalCampRev = campaignRevenue.reduce((a,b)=>a+b,0);
+    const totalAutoRev = automationRevenue.reduce((a,b)=>a+b,0);
+    const bestMonth = [...rawData].sort((a,b)=>b.omniRev - a.omniRev)[0];
+    
+    // render KPI cards
+    function renderKPIs() {
+        const container = document.getElementById('kpiContainer');
+        container.innerHTML = `
+            <div class="kpi-card"><div class="kpi-label">📬 Total Omnisend Revenue</div><div class="kpi-value">$${totalOmniRev.toLocaleString()}</div></div>
+            <div class="kpi-card"><div class="kpi-label">⚙️ Automation vs Campaigns</div><div class="kpi-value">$${totalAutoRev.toLocaleString()} <span style="font-size:0.8rem;">/ $${totalCampRev.toLocaleString()}</span></div><div style="font-size:0.7rem;">Auto ${((totalAutoRev/totalOmniRev)*100).toFixed(0)}% · Campaign ${((totalCampRev/totalOmniRev)*100).toFixed(0)}%</div></div>
+            <div class="kpi-card"><div class="kpi-label">🏆 Top Month (Omni Rev)</div><div class="kpi-value">${bestMonth.month} <span style="font-size:1.2rem;">$${bestMonth.omniRev.toLocaleString()}</span></div></div>
+            <div class="kpi-card"><div class="kpi-label">📈 Latest MoM (Feb 26)</div><div class="kpi-value">${latestChange}% <span class="${latestChange >=0 ? 'trend-up' : 'trend-down'}">${latestChange >=0 ? '▲' : '▼'}</span></div><div style="font-size:0.7rem;">Feb rev: $${lastMonthRev.toLocaleString()}</div></div>
+        `;
+    }
+
+    // helper to format percentage signs (original values used in table)
+    function formatChange(pctStr) {
+        return pctStr;
+    }
+
+    // fill table body
+    function renderTable() {
+        const tbody = document.getElementById('tableBody');
+        tbody.innerHTML = '';
+        rawData.forEach(row => {
+            const tr = document.createElement('tr');
+            // format currency helper
+            const formatUSD = (val) => `$${val.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2})}`;
+            tr.innerHTML = `
+                <td><strong>${row.month}</strong></td>
+                <td class="revenue-highlight">${formatUSD(row.omniRev)}</td>
+                <td>${row.pctChange}</td>
+                <td>${row.omniOrders}</td>
+                <td>${formatUSD(row.campRev)}</td>
+                <td>${row.campOrders}</td>
+                <td>${formatUSD(row.autoRev)}</td>
+                <td>${row.autoOrders}</td>
+                <td>${formatUSD(row.storeRev)}</td>
+                <td>${row.storeOrders.toLocaleString()}</td>
+            `;
+            tbody.appendChild(tr);
+        });
+    }
+    
+    // Charts initialization
+    let omniChart, campAutoChart, ordersChart, shareChart;
+
+    function initCharts() {
+        // 1) Omnisend revenue line chart
+        const ctx1 = document.getElementById('omnisendRevenueChart').getContext('2d');
+        if (omniChart) omniChart.destroy();
+        omniChart = new Chart(ctx1, {
+            type: 'line',
+            data: {
+                labels: months,
+                datasets: [{
+                    label: 'Omnisend Revenue (USD)',
+                    data: omniRevenue,
+                    borderColor: '#2c7da0',
+                    backgroundColor: 'rgba(44,125,160,0.05)',
+                    borderWidth: 3,
+                    pointRadius: 4,
+                    pointBackgroundColor: '#1f5e7e',
+                    pointBorderColor: '#fff',
+                    tension: 0.2,
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                plugins: { tooltip: { callbacks: { label: (ctx) => `$${ctx.raw.toLocaleString()}` } }, legend: { position: 'top' } }
+            }
+        });
+
+        // 2) Campaign vs Automation (grouped bar)
+        const ctx2 = document.getElementById('campaignAutomationChart').getContext('2d');
+        if (campAutoChart) campAutoChart.destroy();
+        campAutoChart = new Chart(ctx2, {
+            type: 'bar',
+            data: {
+                labels: months,
+                datasets: [
+                    { label: 'Campaigns Revenue', data: campaignRevenue, backgroundColor: '#6c9ebf', borderRadius: 6 },
+                    { label: 'Automation Revenue', data: automationRevenue, backgroundColor: '#e9b35f', borderRadius: 6 }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                plugins: { tooltip: { callbacks: { label: (ctx) => `$${ctx.raw.toLocaleString()}` } } },
+                scales: { x: { stacked: false }, y: { title: { display: true, text: 'Revenue (USD)' } } }
+            }
+        });
+
+        // 3) Orders comparison: Omnisend orders vs Total Store orders
+        const ctx3 = document.getElementById('ordersComparisonChart').getContext('2d');
+        if (ordersChart) ordersChart.destroy();
+        ordersChart = new Chart(ctx3, {
+            type: 'line',
+            data: {
+                labels: months,
+                datasets: [
+                    { label: 'Omnisend Orders', data: omniOrdersArr, borderColor: '#3b8db0', backgroundColor: 'transparent', borderWidth: 2.5, tension: 0.2, pointStyle: 'circle' },
+                    { label: 'Total Store Orders', data: totalOrdersArr, borderColor: '#7c9c6e', backgroundColor: 'transparent', borderWidth: 2.5, borderDash: [5,5], tension: 0.2 }
+                ]
+            },
+            options: { responsive: true, maintainAspectRatio: true, plugins: { tooltip: { callbacks: { label: (ctx) => `${ctx.dataset.label}: ${ctx.raw.toLocaleString()}` } } } }
+        });
+
+        // 4) Revenue Share: Omnisend % of Total Store Revenue
+        const sharePercent = omniRevenue.map((omni, idx) => (omni / totalStoreRev[idx]) * 100);
+        const ctx4 = document.getElementById('revenueShareChart').getContext('2d');
+        if (shareChart) shareChart.destroy();
+        shareChart = new Chart(ctx4, {
+            type: 'bar',
+            data: {
+                labels: months,
+                datasets: [{
+                    label: 'Omnisend % of Total Revenue',
+                    data: sharePercent,
+                    backgroundColor: '#9bbf8f',
+                    borderRadius: 6,
+                    borderSkipped: false
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                scales: { y: { title: { display: true, text: 'Percentage (%)' }, max: 70, beginAtZero: true, ticks: { callback: (val) => val + '%' } } },
+                plugins: { tooltip: { callbacks: { label: (ctx) => `${ctx.raw.toFixed(1)}% of total store revenue` } } }
+            }
+        });
+    }
+
+    // page resize handler to avoid flickering (optional)
+    window.addEventListener('resize', () => {
+        if (omniChart) omniChart.resize();
+        if (campAutoChart) campAutoChart.resize();
+        if (ordersChart) ordersChart.resize();
+        if (shareChart) shareChart.resize();
+    });
+    
+    // Initialize all
+    renderKPIs();
+    renderTable();
+    initCharts();
+</script>
+</body>
+</html>
