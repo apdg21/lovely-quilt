@@ -2,14 +2,14 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Lovely Quilt · Omnisend Performance | Campaigns vs Automation</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lovely Quilt · Email Health & Revenue Dashboard</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             background: #f0f4f9;
-            font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+            font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
             padding: 2rem 1.5rem;
             color: #1a2c3e;
         }
@@ -19,7 +19,7 @@
             background: white;
             border-radius: 2rem;
             box-shadow: 0 20px 35px -12px rgba(0,0,0,0.08);
-            padding: 1.8rem 2rem 2.5rem 2rem;
+            padding: 1.8rem 2rem 2.5rem;
         }
         .brand-header {
             display: flex;
@@ -39,12 +39,19 @@
             -webkit-background-clip: text;
             color: transparent;
         }
-        .title-section p { color: #4a627a; margin-top: 0.3rem; }
+        .insight-badge {
+            background: #fef7e0;
+            padding: 0.5rem 1.2rem;
+            border-radius: 40px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            border-left: 4px solid #e9b35f;
+        }
         .kpi-grid {
             display: flex;
             flex-wrap: wrap;
             gap: 1rem;
-            margin-bottom: 2rem;
+            margin-bottom: 1.5rem;
             background: #f8fafd;
             border-radius: 1.5rem;
             padding: 1.2rem 1.8rem;
@@ -52,35 +59,21 @@
         }
         .kpi-card { flex: 1; min-width: 130px; }
         .kpi-label { font-size: 0.7rem; text-transform: uppercase; font-weight: 600; color: #5f7f9a; }
-        .kpi-value { font-size: 1.6rem; font-weight: 800; color: #1d4e6b; line-height: 1.2; }
+        .kpi-value { font-size: 1.6rem; font-weight: 800; color: #1d4e6b; }
         .trend-up { color: #2b7e4a; }
         .trend-down { color: #bc4742; }
-        .diagnostic-grid {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 1rem;
-            margin-bottom: 2rem;
-        }
-        .diagnostic-card {
-            flex: 1;
-            min-width: 180px;
-            background: #ffffff;
-            border-radius: 1rem;
-            border: 1px solid #e2e8f0;
+        
+        .alert-box {
+            background: #fff3cd;
+            border-left: 4px solid #e9b35f;
             padding: 1rem;
-            text-align: center;
+            margin-bottom: 1.5rem;
+            border-radius: 0.8rem;
+            font-size: 0.85rem;
         }
-        .diagnostic-status {
-            font-size: 0.8rem;
-            font-weight: 600;
-            padding: 0.2rem 0.8rem;
-            border-radius: 20px;
-            display: inline-block;
-            margin-top: 0.5rem;
-        }
-        .status-green { background: #d4edda; color: #155724; }
-        .status-yellow { background: #fff3cd; color: #856404; }
-        .status-red { background: #f8d7da; color: #721c24; }
+        .critical-alert { background: #f8d7da; border-left-color: #bc4742; }
+        .good-alert { background: #d4edda; border-left-color: #2b7e4a; }
+        
         .charts-row {
             display: flex;
             flex-wrap: wrap;
@@ -90,7 +83,7 @@
         .chart-card {
             flex: 1;
             min-width: 300px;
-            background: #ffffff;
+            background: white;
             border-radius: 1.2rem;
             border: 1px solid #eef2f8;
             padding: 1rem;
@@ -103,6 +96,7 @@
             padding-left: 12px;
         }
         canvas { max-height: 260px; width: 100%; }
+        
         .data-table-wrapper {
             overflow-x: auto;
             margin-top: 1.8rem;
@@ -113,7 +107,7 @@
             width: 100%;
             border-collapse: collapse;
             font-size: 0.75rem;
-            min-width: 1200px;
+            min-width: 1100px;
         }
         th {
             background: #f1f5f9;
@@ -129,15 +123,15 @@
             text-align: right;
         }
         td:first-child { text-align: left; font-weight: 500; }
-        .campaign-cell { color: #6c9ebf; font-weight: 600; }
-        .automation-cell { color: #e9b35f; font-weight: 600; }
-        .footer-note {
+        .death-spiral { background: #fff0f0; }
+        .revival { background: #e8f5e9; }
+        .footer {
             margin-top: 1.5rem;
             font-size: 0.7rem;
             text-align: center;
             color: #7b96af;
-            border-top: 1px solid #e4ebf2;
             padding-top: 1rem;
+            border-top: 1px solid #e4ebf2;
         }
         .add-data-hint {
             background: #eef2fa;
@@ -153,261 +147,218 @@
 <div class="report-container">
     <div class="brand-header">
         <div class="title-section">
-            <h1>🧵 Lovely Quilt · Omnisend Performance</h1>
-            <p>Campaigns vs Automation · Subscriber Growth Drives Revenue</p>
+            <h1>🧵 Lovely Quilt · Email Health Dashboard</h1>
+            <p>New subscribers = lifeblood | Without them, the list slowly dies</p>
         </div>
-        <div class="kpi-card" style="max-width:200px;">
-            <div class="kpi-label">🎯 5,000 Engaged Target</div>
-            <div class="kpi-value">$4,500–$6,000</div>
-            <div style="font-size:0.7rem;">monthly Omnisend potential</div>
-        </div>
+        <div class="insight-badge">📉 Nov–Jan: List death spiral | 📈 Feb: Revival</div>
     </div>
 
-    <!-- KPI Row -->
     <div class="kpi-grid" id="kpiContainer"></div>
 
-    <!-- Diagnostic Panel -->
-    <div class="diagnostic-grid" id="diagnosticPanel"></div>
+    <!-- Alert based on current new subscriber rate -->
+    <div id="alertBox" class="alert-box"></div>
 
-    <!-- Charts Row 1: Campaigns vs Automation -->
     <div class="charts-row">
+        <div class="chart-card">
+            <h3>💀 The Death Spiral: New Subs vs Engaged List</h3>
+            <canvas id="deathSpiralChart" width="400" height="240"></canvas>
+            <div style="font-size:0.7rem; text-align:center;">🔵 New Subs &nbsp;|&nbsp; 🟠 Engaged List (30d)</div>
+        </div>
         <div class="chart-card">
             <h3>📧 Campaigns vs Automation Revenue</h3>
             <canvas id="campAutoChart" width="400" height="240"></canvas>
-            <div style="font-size:0.7rem; text-align:center;">🔵 Campaigns &nbsp;|&nbsp; 🟠 Automation = Total Omnisend</div>
-        </div>
-        <div class="chart-card">
-            <h3>📈 New Subscribers vs Omnisend Revenue</h3>
-            <canvas id="correlationChart" width="400" height="240"></canvas>
         </div>
     </div>
 
-    <!-- Charts Row 2: Engagement & Growth -->
     <div class="charts-row">
         <div class="chart-card">
-            <h3>📧 Email Subscriber Growth</h3>
-            <canvas id="subscriberChart" width="400" height="240"></canvas>
+            <h3>📈 New Subscribers = Omnisend Revenue</h3>
+            <canvas id="revenueCorrelationChart" width="400" height="240"></canvas>
         </div>
         <div class="chart-card">
-            <h3>🎯 Engaged List Projection → 5,000+</h3>
+            <h3>🎯 Engaged List Projection to 5,000+</h3>
             <canvas id="engagedProjectionChart" width="400" height="240"></canvas>
         </div>
     </div>
 
-    <!-- Full Data Table -->
     <div class="data-table-wrapper">
-        <table id="masterTable">
+        <table>
             <thead>
-                <tr>
-                    <th>Month</th><th>Omnisend Rev</th><th>Campaigns Rev</th><th>Campaign Orders</th><th>Automation Rev</th><th>Automation Orders</th>
-                    <th>Store Rev</th><th>New Email Subs</th><th>Total Email</th><th>Engaged (30d)</th>
-                </tr>
+                <tr><th>Month</th><th>New Subs</th><th>Engaged List</th><th>Campaigns Rev</th><th>Automation Rev</th><th>Omnisend Rev</th><th>Store Rev</th><th>Status</th></tr>
             </thead>
             <tbody id="tableBody"></tbody>
         </table>
         <div class="add-data-hint">
-            ✨ <strong>Add future data:</strong> Edit the <code>monthlyData</code> array in JavaScript. Add object with month, omniRev, campRev, campOrders, autoRev, autoOrders, storeRev, newEmail, totalEmail, engaged30d. Charts auto-update.
+            ✨ <strong>Add future data:</strong> Edit the <code>monthlyData</code> array in JavaScript. New subscribers below 100/month triggers "Critical Zone" alert.
         </div>
     </div>
-    <div class="footer-note">
-        📊 <strong>Diagnostic:</strong> If Automation drops >30% MoM → check flows (welcome, abandoned cart). If Campaigns drop → review content/send frequency.<br>
-        📈 Correlation: Each 100 new subscribers = ~$185–$250 Omnisend revenue. Engaged list is the engine.
+    <div class="footer">
+        📊 <strong>The Insight:</strong> From May 2025, marketing was reduced. New subscribers dropped from 950+ to ~100. Without new blood, the engaged list decayed from 3,100 to 1,300 (-58%). When new subscribers returned in Feb 2026 (768), the list revived and Omnisend revenue exploded 635%.
     </div>
 </div>
 
 <script>
-    // ==================== MASTER DATA (Revenue + Campaign/Auto Breakdown) ====================
+    // Complete dataset with all metrics
     const monthlyData = [
-        { month:"Jan 2025", omniRev:869.90, campRev:544.15, campOrders:35, autoRev:325.75, autoOrders:25, storeRev:2400.35, newEmail:96, totalEmail:4041, engaged30d:1500 },
-        { month:"Feb 2025", omniRev:554.85, campRev:183.47, campOrders:8, autoRev:371.38, autoOrders:30, storeRev:2549.11, newEmail:153, totalEmail:4139, engaged30d:1600 },
-        { month:"Mar 2025", omniRev:1675.66, campRev:0.00, campOrders:0, autoRev:1675.66, autoOrders:142, storeRev:10813.85, newEmail:970, totalEmail:5059, engaged30d:2800 },
-        { month:"Apr 2025", omniRev:1712.48, campRev:0.00, campOrders:0, autoRev:1712.48, autoOrders:132, storeRev:8585.47, newEmail:957, totalEmail:5945, engaged30d:3100 },
-        { month:"May 2025", omniRev:264.93, campRev:0.00, campOrders:0, autoRev:264.93, autoOrders:16, storeRev:1714.60, newEmail:98, totalEmail:6012, engaged30d:1900 },
-        { month:"Jun 2025", omniRev:531.58, campRev:0.00, campOrders:0, autoRev:531.58, autoOrders:38, storeRev:2795.61, newEmail:173, totalEmail:6166, engaged30d:2100 },
-        { month:"Jul 2025", omniRev:849.97, campRev:223.39, campOrders:17, autoRev:626.58, autoOrders:57, storeRev:5519.43, newEmail:338, totalEmail:6405, engaged30d:2400 },
-        { month:"Aug 2025", omniRev:1069.60, campRev:639.51, campOrders:41, autoRev:430.09, autoOrders:31, storeRev:3092.30, newEmail:164, totalEmail:6402, engaged30d:2450 },
-        { month:"Sep 2025", omniRev:1030.61, campRev:505.31, campOrders:30, autoRev:525.30, autoOrders:40, storeRev:3720.29, newEmail:207, totalEmail:6494, engaged30d:2400 },
-        { month:"Oct 2025", omniRev:1039.80, campRev:324.45, campOrders:23, autoRev:715.35, autoOrders:53, storeRev:3366.56, newEmail:224, totalEmail:6595, engaged30d:2350 },
-        { month:"Nov 2025", omniRev:615.64, campRev:410.67, campOrders:24, autoRev:204.97, autoOrders:17, storeRev:1493.64, newEmail:83, totalEmail:6574, engaged30d:1850 },
-        { month:"Dec 2025", omniRev:671.28, campRev:603.24, campOrders:34, autoRev:68.04, autoOrders:8, storeRev:1100.88, newEmail:33, totalEmail:6514, engaged30d:1500 },
-        { month:"Jan 2026", omniRev:278.80, campRev:163.34, campOrders:12, autoRev:115.46, autoOrders:5, storeRev:987.64, newEmail:53, totalEmail:6476, engaged30d:1300 },
-        { month:"Feb 2026", omniRev:2052.13, campRev:421.68, campOrders:28, autoRev:1630.45, autoOrders:122, storeRev:12823.50, newEmail:768, totalEmail:7130, engaged30d:2500 }
+        { month:"Jan 2025", newEmail:96, engaged:1500, campRev:544.15, autoRev:325.75, omniRev:869.90, storeRev:2400.35, totalEmail:4041 },
+        { month:"Feb 2025", newEmail:153, engaged:1600, campRev:183.47, autoRev:371.38, omniRev:554.85, storeRev:2549.11, totalEmail:4139 },
+        { month:"Mar 2025", newEmail:970, engaged:2800, campRev:0.00, autoRev:1675.66, omniRev:1675.66, storeRev:10813.85, totalEmail:5059 },
+        { month:"Apr 2025", newEmail:957, engaged:3100, campRev:0.00, autoRev:1712.48, omniRev:1712.48, storeRev:8585.47, totalEmail:5945 },
+        { month:"May 2025", newEmail:98, engaged:1900, campRev:0.00, autoRev:264.93, omniRev:264.93, storeRev:1714.60, totalEmail:6012 },
+        { month:"Jun 2025", newEmail:173, engaged:2100, campRev:0.00, autoRev:531.58, omniRev:531.58, storeRev:2795.61, totalEmail:6166 },
+        { month:"Jul 2025", newEmail:338, engaged:2400, campRev:223.39, autoRev:626.58, omniRev:849.97, storeRev:5519.43, totalEmail:6405 },
+        { month:"Aug 2025", newEmail:164, engaged:2450, campRev:639.51, autoRev:430.09, omniRev:1069.60, storeRev:3092.30, totalEmail:6402 },
+        { month:"Sep 2025", newEmail:207, engaged:2400, campRev:505.31, autoRev:525.30, omniRev:1030.61, storeRev:3720.29, totalEmail:6494 },
+        { month:"Oct 2025", newEmail:224, engaged:2350, campRev:324.45, autoRev:715.35, omniRev:1039.80, storeRev:3366.56, totalEmail:6595 },
+        { month:"Nov 2025", newEmail:83, engaged:1850, campRev:410.67, autoRev:204.97, omniRev:615.64, storeRev:1493.64, totalEmail:6574 },
+        { month:"Dec 2025", newEmail:33, engaged:1500, campRev:603.24, autoRev:68.04, omniRev:671.28, storeRev:1100.88, totalEmail:6514 },
+        { month:"Jan 2026", newEmail:53, engaged:1300, campRev:163.34, autoRev:115.46, omniRev:278.80, storeRev:987.64, totalEmail:6476 },
+        { month:"Feb 2026", newEmail:768, engaged:2500, campRev:421.68, autoRev:1630.45, omniRev:2052.13, storeRev:12823.50, totalEmail:7130 }
     ];
 
-    // Calculate derived metrics
-    monthlyData.forEach(d => {
-        d.autoPct = (d.autoRev / d.omniRev * 100).toFixed(1);
-        d.campPct = (d.campRev / d.omniRev * 100).toFixed(1);
-    });
-
-    // ==================== RENDER FUNCTIONS ====================
     function renderKPIs() {
-        const totalOmni = monthlyData.reduce((s,d) => s + d.omniRev, 0);
-        const totalAuto = monthlyData.reduce((s,d) => s + d.autoRev, 0);
-        const totalCamp = monthlyData.reduce((s,d) => s + d.campRev, 0);
         const latest = monthlyData[monthlyData.length-1];
         const prev = monthlyData[monthlyData.length-2];
-        const latestGrowth = ((latest.omniRev - prev.omniRev) / prev.omniRev * 100).toFixed(1);
-        const avgAutoPct = (totalAuto / totalOmni * 100).toFixed(0);
+        const growth = ((latest.omniRev - prev.omniRev) / prev.omniRev * 100).toFixed(1);
+        const avgNewSubsLast3 = monthlyData.slice(-3).reduce((s,d) => s + d.newEmail, 0) / 3;
         
         document.getElementById('kpiContainer').innerHTML = `
-            <div class="kpi-card"><div class="kpi-label">📬 Total Omnisend Rev</div><div class="kpi-value">$${totalOmni.toLocaleString()}</div></div>
-            <div class="kpi-card"><div class="kpi-label">⚙️ Automation (total)</div><div class="kpi-value">$${totalAuto.toLocaleString()}</div><div>${avgAutoPct}% of Omnisend</div></div>
-            <div class="kpi-card"><div class="kpi-label">📧 Campaigns (total)</div><div class="kpi-value">$${totalCamp.toLocaleString()}</div><div>${100-avgAutoPct}% of Omnisend</div></div>
-            <div class="kpi-card"><div class="kpi-label">📈 Latest MoM (Feb 26)</div><div class="kpi-value ${latestGrowth >=0 ? 'trend-up' : 'trend-down'}">${latestGrowth}%</div><div>$${latest.omniRev.toLocaleString()}</div></div>
+            <div class="kpi-card"><div class="kpi-label">📬 Latest Omnisend</div><div class="kpi-value">$${latest.omniRev.toLocaleString()}</div><div class="${growth >=0 ? 'trend-up' : 'trend-down'}">${growth}% MoM</div></div>
+            <div class="kpi-card"><div class="kpi-label">🆕 New Subs (latest)</div><div class="kpi-value">${latest.newEmail}</div><div>Avg last 3: ${avgNewSubsLast3.toFixed(0)}</div></div>
+            <div class="kpi-card"><div class="kpi-label">👥 Engaged List</div><div class="kpi-value">${latest.engaged}</div><div>Target: 5,000</div></div>
+            <div class="kpi-card"><div class="kpi-label">⚙️ Automation %</div><div class="kpi-value">${((latest.autoRev/latest.omniRev)*100).toFixed(0)}%</div><div>of Omnisend</div></div>
         `;
     }
 
-    function renderDiagnostics() {
-        // Get last 3 months to detect trends
-        const last3 = monthlyData.slice(-3);
-        const autoTrend = last3.map(d => d.autoRev);
-        const campTrend = last3.map(d => d.campRev);
-        const autoDeclining = autoTrend[2] < autoTrend[1] && autoTrend[1] < autoTrend[0];
-        const campDeclining = campTrend[2] < campTrend[1] && campTrend[1] < campTrend[0];
-        const autoHealthy = last3[2].autoRev > last3[1].autoRev * 0.8;
-        const campHealthy = last3[2].campRev > last3[1].campRev * 0.7;
+    function renderAlert() {
+        const last3Avg = monthlyData.slice(-3).reduce((s,d) => s + d.newEmail, 0) / 3;
+        const latestEngaged = monthlyData[monthlyData.length-1].engaged;
+        const alertBox = document.getElementById('alertBox');
         
-        const latest = monthlyData[monthlyData.length-1];
-        const autoPct = latest.autoPct;
-        const autoStatus = autoPct > 60 ? 'green' : (autoPct > 40 ? 'yellow' : 'red');
-        const autoStatusText = autoPct > 60 ? 'Strong' : (autoPct > 40 ? 'Moderate' : 'Weak');
+        if (last3Avg < 100) {
+            alertBox.className = "alert-box critical-alert";
+            alertBox.innerHTML = `⚠️ <strong>CRITICAL ZONE:</strong> New subscribers average ${last3Avg.toFixed(0)}/month (below 100). Without new subscribers, the engaged list will continue to decay. <strong>Action needed:</strong> Restart acquisition campaigns immediately.`;
+        } else if (last3Avg < 300) {
+            alertBox.className = "alert-box";
+            alertBox.innerHTML = `⚠️ <strong>Moderate Risk:</strong> New subscribers average ${last3Avg.toFixed(0)}/month. To grow engaged list to 5,000+, target 500+ new subs/month.`;
+        } else {
+            alertBox.className = "alert-box good-alert";
+            alertBox.innerHTML = `✅ <strong>Healthy Acquisition:</strong> New subscribers average ${last3Avg.toFixed(0)}/month. Keep this momentum to reach 5,000 engaged subscribers.`;
+        }
         
-        const newSubsLatest = latest.newEmail;
-        const subStatus = newSubsLatest > 300 ? 'green' : (newSubsLatest > 100 ? 'yellow' : 'red');
-        
-        document.getElementById('diagnosticPanel').innerHTML = `
-            <div class="diagnostic-card">
-                <strong>🤖 Automation Health</strong><br>
-                <span style="font-size:1.4rem; font-weight:700;">${latest.autoRev.toLocaleString()}</span>
-                <div class="diagnostic-status status-${autoStatus}">${autoStatusText} (${autoPct}% of total)</div>
-                <div style="font-size:0.7rem;">${autoDeclining ? '⚠️ Declining trend' : '✅ Stable/improving'}</div>
-            </div>
-            <div class="diagnostic-card">
-                <strong>📧 Campaign Health</strong><br>
-                <span style="font-size:1.4rem; font-weight:700;">${latest.campRev.toLocaleString()}</span>
-                <div class="diagnostic-status ${campHealthy ? 'status-green' : 'status-yellow'}">${campHealthy ? 'Performing' : 'Needs attention'}</div>
-                <div style="font-size:0.7rem;">${campDeclining ? '⚠️ Declining trend' : '✅ Stable/improving'}</div>
-            </div>
-            <div class="diagnostic-card">
-                <strong>📥 New Subscribers</strong><br>
-                <span style="font-size:1.4rem; font-weight:700;">${latest.newEmail}</span>
-                <div class="diagnostic-status status-${subStatus}">${newSubsLatest > 300 ? 'Excellent' : (newSubsLatest > 100 ? 'Moderate' : 'Critical')}</div>
-                <div style="font-size:0.7rem;">Need 300+ monthly for growth</div>
-            </div>
-            <div class="diagnostic-card">
-                <strong>👥 Engaged List</strong><br>
-                <span style="font-size:1.4rem; font-weight:700;">${latest.engaged30d}</span>
-                <div class="diagnostic-status ${latest.engaged30d > 2500 ? 'status-green' : (latest.engaged30d > 1800 ? 'status-yellow' : 'status-red')}">
-                    ${latest.engaged30d > 2500 ? 'Healthy' : (latest.engaged30d > 1800 ? 'Rebuilding' : 'Critical')}
-                </div>
-                <div style="font-size:0.7rem;">Target: 5,000+</div>
-            </div>
-        `;
+        if (latestEngaged < 2000) {
+            alertBox.innerHTML += `<br>📉 <strong>Engaged list at ${latestEngaged}</strong> — below healthy threshold. Focus on re-engagement campaigns.`;
+        }
     }
 
     function renderTable() {
         const tbody = document.getElementById('tableBody');
         tbody.innerHTML = '';
         monthlyData.forEach(row => {
+            const isDeathPhase = (row.month === "Nov 2025" || row.month === "Dec 2025" || row.month === "Jan 2026");
+            const isRevival = row.month === "Feb 2026";
+            let status = "";
+            if (isDeathPhase) status = "💀 Death Spiral";
+            else if (isRevival) status = "✨ Revival";
+            else if (row.newEmail > 300) status = "✅ Healthy";
+            else if (row.newEmail > 100) status = "⚠️ Stable";
+            else status = "🔻 Declining";
+            
             const tr = document.createElement('tr');
+            if (isDeathPhase) tr.className = "death-spiral";
+            if (isRevival) tr.className = "revival";
             tr.innerHTML = `
                 <td><strong>${row.month}</strong></td>
+                <td class="${row.newEmail < 100 ? 'trend-down' : 'trend-up'}">${row.newEmail}</td>
+                <td>${row.engaged}</td>
+                <td>$${row.campRev.toFixed(2)}</td>
+                <td>$${row.autoRev.toFixed(2)}</td>
                 <td class="revenue-highlight">$${row.omniRev.toFixed(2)}</td>
-                <td class="campaign-cell">$${row.campRev.toFixed(2)}</td>
-                <td>${row.campOrders}</td>
-                <td class="automation-cell">$${row.autoRev.toFixed(2)}</td>
-                <td>${row.autoOrders}</td>
                 <td>$${row.storeRev.toFixed(2)}</td>
-                <td class="${row.newEmail > 200 ? 'trend-up' : ''}">${row.newEmail}</td>
-                <td>${row.totalEmail.toLocaleString()}</td>
-                <td>${row.engaged30d}</td>
+                <td>${status}</td>
             `;
             tbody.appendChild(tr);
         });
     }
 
-    // ==================== CHARTS ====================
-    let campAutoChart, correlationChart, subscriberChart, engagedProjectionChart;
+    // Charts
+    let deathChart, campAutoChart, revenueChart, engagedProjChart;
 
     function initCharts() {
         const months = monthlyData.map(d => d.month);
-        const campRevs = monthlyData.map(d => d.campRev);
-        const autoRevs = monthlyData.map(d => d.autoRev);
         const newSubs = monthlyData.map(d => d.newEmail);
+        const engaged = monthlyData.map(d => d.engaged);
+        const campRev = monthlyData.map(d => d.campRev);
+        const autoRev = monthlyData.map(d => d.autoRev);
         const omniRev = monthlyData.map(d => d.omniRev);
-        const totalEmail = monthlyData.map(d => d.totalEmail);
-        const engaged = monthlyData.map(d => d.engaged30d);
         
-        // Chart 1: Campaigns vs Automation (stacked bar)
-        const ctx1 = document.getElementById('campAutoChart').getContext('2d');
-        if (campAutoChart) campAutoChart.destroy();
-        campAutoChart = new Chart(ctx1, {
+        // Death Spiral Chart
+        const ctx1 = document.getElementById('deathSpiralChart').getContext('2d');
+        if (deathChart) deathChart.destroy();
+        deathChart = new Chart(ctx1, {
             type: 'bar',
             data: {
                 labels: months,
                 datasets: [
-                    { label: 'Campaigns Revenue', data: campRevs, backgroundColor: '#6c9ebf', borderRadius: 5, stack: 'total' },
-                    { label: 'Automation Revenue', data: autoRevs, backgroundColor: '#e9b35f', borderRadius: 5, stack: 'total' }
+                    { label: 'New Subscribers', data: newSubs, backgroundColor: '#6c9ebf', borderRadius: 5, yAxisID: 'y' },
+                    { label: 'Engaged List (30d)', data: engaged, type: 'line', borderColor: '#e9b35f', borderWidth: 3, backgroundColor: 'transparent', tension: 0.2, pointRadius: 4, yAxisID: 'y1', fill: false }
                 ]
             },
             options: {
                 responsive: true,
-                maintainAspectRatio: true,
-                plugins: { tooltip: { callbacks: { label: (ctx) => `$${ctx.raw.toFixed(2)}` } } },
-                scales: { y: { title: { display: true, text: 'Revenue (USD)' }, stacked: true }, x: { stacked: true } }
+                plugins: { tooltip: { callbacks: { label: (ctx) => ctx.dataset.label === 'Engaged List' ? `${ctx.raw} engaged` : `${ctx.raw} new subs` } } },
+                scales: { y: { title: { text: 'New Subscribers' }, beginAtZero: true }, y1: { position: 'right', title: { text: 'Engaged List Size' }, min: 1000, grid: { drawOnChartArea: false } } }
             }
         });
         
-        // Chart 2: Correlation (new subs vs omnisend)
-        const ctx2 = document.getElementById('correlationChart').getContext('2d');
-        if (correlationChart) correlationChart.destroy();
-        correlationChart = new Chart(ctx2, {
+        // Campaign vs Automation
+        const ctx2 = document.getElementById('campAutoChart').getContext('2d');
+        if (campAutoChart) campAutoChart.destroy();
+        campAutoChart = new Chart(ctx2, {
+            type: 'bar',
+            data: { labels: months, datasets: [
+                { label: 'Campaigns', data: campRev, backgroundColor: '#6c9ebf', stack: 'total' },
+                { label: 'Automation', data: autoRev, backgroundColor: '#e9b35f', stack: 'total' }
+            ] },
+            options: { responsive: true, scales: { y: { stacked: true, title: { text: 'Revenue (USD)' } }, x: { stacked: true } } }
+        });
+        
+        // Revenue Correlation
+        const ctx3 = document.getElementById('revenueCorrelationChart').getContext('2d');
+        if (revenueChart) revenueChart.destroy();
+        revenueChart = new Chart(ctx3, {
             type: 'bar',
             data: {
                 labels: months,
                 datasets: [
-                    { label: 'New Email Subscribers', data: newSubs, backgroundColor: '#7c9c6e', borderRadius: 5, yAxisID: 'y' },
+                    { label: 'New Subscribers', data: newSubs, backgroundColor: '#7c9c6e', yAxisID: 'y' },
                     { label: 'Omnisend Revenue', data: omniRev, type: 'line', borderColor: '#d9534f', borderWidth: 3, backgroundColor: 'transparent', tension: 0.2, pointRadius: 3, yAxisID: 'y1', fill: false }
                 ]
             },
             options: {
                 responsive: true,
-                plugins: { tooltip: { callbacks: { label: (ctx) => ctx.dataset.label === 'Omnisend Revenue' ? `$${ctx.raw.toFixed(2)}` : `${ctx.raw} subs` } } },
-                scales: { y: { title: { text: 'New Subscribers' }, beginAtZero: true }, y1: { position: 'right', title: { text: 'Revenue (USD)' }, grid: { drawOnChartArea: false } } }
+                scales: { y: { title: { text: 'New Subscribers' } }, y1: { position: 'right', title: { text: 'Revenue (USD)' }, grid: { drawOnChartArea: false } } }
             }
         });
         
-        // Chart 3: Email subscriber growth
-        const ctx3 = document.getElementById('subscriberChart').getContext('2d');
-        if (subscriberChart) subscriberChart.destroy();
-        subscriberChart = new Chart(ctx3, {
-            type: 'line',
-            data: { labels: months, datasets: [{ label: 'Total Email Subscribers', data: totalEmail, borderColor: '#2c7da0', backgroundColor: 'rgba(44,125,160,0.05)', fill: true, tension: 0.2 }] },
-            options: { responsive: true }
-        });
-        
-        // Chart 4: Engaged projection to 5,000
-        const currentEngaged = monthlyData[monthlyData.length-1].engaged30d;
+        // Engaged Projection to 5,000
+        const currentEngaged = monthlyData[monthlyData.length-1].engaged;
         const futureMonths = ['Mar 2026', 'Apr 2026', 'May 2026', 'Jun 2026', 'Jul 2026', 'Aug 2026'];
         const increments = (5000 - currentEngaged) / 6;
         const projected = [];
         for (let i = 1; i <= 6; i++) projected.push(Math.round(currentEngaged + increments * i));
-        const allLabels = [...months, ...futureMonths];
-        const allEngaged = [...engaged, ...projected];
         
         const ctx4 = document.getElementById('engagedProjectionChart').getContext('2d');
-        if (engagedProjectionChart) engagedProjectionChart.destroy();
-        engagedProjectionChart = new Chart(ctx4, {
+        if (engagedProjChart) engagedProjChart.destroy();
+        engagedProjChart = new Chart(ctx4, {
             type: 'line',
-            data: { labels: allLabels, datasets: [{ label: 'Engaged Subscribers (30d)', data: allEngaged, borderColor: '#2b7e4a', backgroundColor: 'rgba(43,126,74,0.1)', fill: true, borderWidth: 3, pointRadius: 3 }] },
-            options: { responsive: true, scales: { y: { title: { display: true, text: 'Engaged Subscribers' }, min: 1000 } } }
+            data: { labels: [...months, ...futureMonths], datasets: [{ label: 'Engaged Subscribers', data: [...engaged, ...projected], borderColor: '#2b7e4a', backgroundColor: 'rgba(43,126,74,0.1)', borderWidth: 3, fill: true }] },
+            options: { responsive: true, scales: { y: { title: { text: 'Engaged Subscribers' }, min: 1000 } } }
         });
     }
 
-    // Initialize everything
     renderKPIs();
-    renderDiagnostics();
+    renderAlert();
     renderTable();
     initCharts();
 </script>
