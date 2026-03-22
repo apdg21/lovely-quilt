@@ -2,144 +2,277 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lovely Quilt · Email Health & Revenue Dashboard</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <title>Lovely Quilt · Email Health & Revenue Dashboard | Sticky First Column</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
             background: #f0f4f9;
-            font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
-            padding: 2rem 1.5rem;
+            font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, sans-serif;
+            padding: 1rem;
             color: #1a2c3e;
         }
+
+        @media (min-width: 768px) {
+            body {
+                padding: 2rem 1.5rem;
+            }
+        }
+
         .report-container {
             max-width: 1500px;
             margin: 0 auto;
             background: white;
-            border-radius: 2rem;
-            box-shadow: 0 20px 35px -12px rgba(0,0,0,0.08);
-            padding: 1.8rem 2rem 2.5rem;
+            border-radius: 1.5rem;
+            box-shadow: 0 20px 35px -12px rgba(0, 0, 0, 0.08);
+            padding: 1.2rem 1rem 1.8rem 1rem;
+            overflow-x: hidden;
         }
+
+        @media (min-width: 768px) {
+            .report-container {
+                padding: 1.8rem 2rem 2.5rem 2rem;
+                border-radius: 2rem;
+            }
+        }
+
         .brand-header {
             display: flex;
-            justify-content: space-between;
-            align-items: flex-end;
-            flex-wrap: wrap;
-            gap: 1rem;
-            margin-bottom: 2rem;
+            flex-direction: column;
+            gap: 0.8rem;
+            margin-bottom: 1.5rem;
             border-bottom: 2px solid #e9edf2;
-            padding-bottom: 1.5rem;
+            padding-bottom: 1rem;
         }
+
+        @media (min-width: 640px) {
+            .brand-header {
+                flex-direction: row;
+                justify-content: space-between;
+                align-items: flex-end;
+            }
+        }
+
         .title-section h1 {
-            font-size: 1.9rem;
+            font-size: 1.4rem;
             font-weight: 700;
             background: linear-gradient(135deg, #2c5a6e, #1e3b4a);
             background-clip: text;
             -webkit-background-clip: text;
             color: transparent;
         }
+
+        @media (min-width: 768px) {
+            .title-section h1 {
+                font-size: 1.9rem;
+            }
+        }
+
+        .title-section p {
+            color: #4a627a;
+            font-size: 0.75rem;
+            margin-top: 0.2rem;
+        }
+
         .insight-badge {
             background: #fef7e0;
-            padding: 0.5rem 1.2rem;
+            padding: 0.4rem 0.8rem;
             border-radius: 40px;
-            font-size: 0.85rem;
+            font-size: 0.7rem;
             font-weight: 500;
-            border-left: 4px solid #e9b35f;
+            border-left: 3px solid #e9b35f;
+            display: inline-block;
+            align-self: flex-start;
         }
+
+        /* KPI grid responsive */
         .kpi-grid {
             display: flex;
             flex-wrap: wrap;
-            gap: 1rem;
+            gap: 0.8rem;
             margin-bottom: 1.5rem;
             background: #f8fafd;
-            border-radius: 1.5rem;
-            padding: 1.2rem 1.8rem;
+            border-radius: 1.2rem;
+            padding: 1rem;
             justify-content: space-between;
         }
-        .kpi-card { flex: 1; min-width: 130px; }
-        .kpi-label { font-size: 0.7rem; text-transform: uppercase; font-weight: 600; color: #5f7f9a; }
-        .kpi-value { font-size: 1.6rem; font-weight: 800; color: #1d4e6b; }
+
+        .kpi-card {
+            flex: 1;
+            min-width: 120px;
+        }
+
+        .kpi-label {
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            font-weight: 600;
+            color: #5f7f9a;
+            letter-spacing: 0.3px;
+        }
+
+        .kpi-value {
+            font-size: 1.3rem;
+            font-weight: 800;
+            color: #1d4e6b;
+            line-height: 1.2;
+        }
+
+        @media (min-width: 768px) {
+            .kpi-value {
+                font-size: 1.6rem;
+            }
+        }
+
         .trend-up { color: #2b7e4a; }
         .trend-down { color: #bc4742; }
-        
+
         .alert-box {
-            background: #fff3cd;
-            border-left: 4px solid #e9b35f;
-            padding: 1rem;
+            padding: 0.8rem 1rem;
             margin-bottom: 1.5rem;
             border-radius: 0.8rem;
-            font-size: 0.85rem;
+            font-size: 0.75rem;
+            line-height: 1.4;
         }
-        .critical-alert { background: #f8d7da; border-left-color: #bc4742; }
-        .good-alert { background: #d4edda; border-left-color: #2b7e4a; }
-        
+        .critical-alert { background: #f8d7da; border-left: 4px solid #bc4742; }
+        .good-alert { background: #d4edda; border-left: 4px solid #2b7e4a; }
+        .warning-alert { background: #fff3cd; border-left: 4px solid #e9b35f; }
+
         .charts-row {
             display: flex;
-            flex-wrap: wrap;
-            gap: 2rem;
-            margin-bottom: 2rem;
+            flex-direction: column;
+            gap: 1.5rem;
+            margin-bottom: 1.8rem;
         }
+
+        @media (min-width: 768px) {
+            .charts-row {
+                flex-direction: row;
+                gap: 2rem;
+            }
+        }
+
         .chart-card {
             flex: 1;
-            min-width: 300px;
             background: white;
-            border-radius: 1.2rem;
+            border-radius: 1rem;
             border: 1px solid #eef2f8;
-            padding: 1rem;
+            padding: 0.8rem;
         }
+
         .chart-card h3 {
-            font-size: 1rem;
+            font-size: 0.9rem;
             font-weight: 600;
-            margin-bottom: 0.75rem;
-            border-left: 4px solid #7cb3cf;
-            padding-left: 12px;
+            margin-bottom: 0.6rem;
+            border-left: 3px solid #7cb3cf;
+            padding-left: 10px;
         }
-        canvas { max-height: 260px; width: 100%; }
-        
+
+        canvas {
+            max-height: 220px;
+            width: 100%;
+        }
+
+        @media (min-width: 768px) {
+            canvas {
+                max-height: 260px;
+            }
+        }
+
+        /* TABLE WITH STICKY FIRST COLUMN (mobile & desktop) */
         .data-table-wrapper {
             overflow-x: auto;
             margin-top: 1.8rem;
-            border-radius: 1.2rem;
+            border-radius: 1rem;
             border: 1px solid #e2e8f0;
+            background: white;
+            position: relative;
+            -webkit-overflow-scrolling: touch;
         }
+
         table {
             width: 100%;
-            border-collapse: collapse;
-            font-size: 0.75rem;
-            min-width: 1100px;
+            border-collapse: separate;
+            border-spacing: 0;
+            font-size: 0.7rem;
+            min-width: 800px;
         }
+
+        @media (min-width: 768px) {
+            table {
+                font-size: 0.75rem;
+                min-width: 1000px;
+            }
+        }
+
         th {
             background: #f1f5f9;
-            padding: 10px 6px;
+            padding: 10px 8px;
             font-weight: 600;
             color: #1f4662;
             text-align: right;
+            border-bottom: 1px solid #dce3ec;
+            white-space: nowrap;
         }
-        th:first-child { text-align: left; }
+
         td {
-            padding: 8px 6px;
+            padding: 8px 8px;
             border-bottom: 1px solid #ecf1f6;
             text-align: right;
+            white-space: nowrap;
         }
-        td:first-child { text-align: left; font-weight: 500; }
-        .death-spiral { background: #fff0f0; }
-        .revival { background: #e8f5e9; }
+
+        /* STICKY FIRST COLUMN (month column) */
+        th:first-child,
+        td:first-child {
+            position: sticky;
+            left: 0;
+            background-color: white;
+            z-index: 10;
+            text-align: left;
+            font-weight: 600;
+            box-shadow: 2px 0 5px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        th:first-child {
+            background-color: #f1f5f9;
+            z-index: 11;
+        }
+
+        /* hover effect for better readability */
+        tr:hover td {
+            background-color: #fafcff;
+        }
+        tr:hover td:first-child {
+            background-color: #fafcff;
+        }
+
+        .death-spiral td:first-child { background-color: #fff0f0; }
+        .death-spiral td { background-color: #fff0f0; }
+        .revival td:first-child { background-color: #e8f5e9; }
+        .revival td { background-color: #e8f5e9; }
+
+        .revenue-highlight { font-weight: 700; color: #1f6e43; }
+        .add-data-hint {
+            background: #eef2fa;
+            border-radius: 0.8rem;
+            padding: 0.6rem 0.8rem;
+            font-family: monospace;
+            font-size: 0.65rem;
+            margin-top: 1rem;
+        }
         .footer {
             margin-top: 1.5rem;
-            font-size: 0.7rem;
+            font-size: 0.65rem;
             text-align: center;
             color: #7b96af;
             padding-top: 1rem;
             border-top: 1px solid #e4ebf2;
-        }
-        .add-data-hint {
-            background: #eef2fa;
-            border-radius: 0.8rem;
-            padding: 0.5rem 1rem;
-            font-family: monospace;
-            font-size: 0.7rem;
-            margin-top: 1rem;
         }
     </style>
 </head>
@@ -147,58 +280,65 @@
 <div class="report-container">
     <div class="brand-header">
         <div class="title-section">
-            <h1>🧵 Lovely Quilt · Email Health Dashboard</h1>
-            <p>New subscribers = lifeblood | Without them, the list slowly dies</p>
+            <h1>🧵 Lovely Quilt · Email Health</h1>
+            <p>New subscribers = lifeblood | Sticky month column for easy scrolling</p>
         </div>
-        <div class="insight-badge">📉 Nov–Jan: List death spiral | 📈 Feb: Revival</div>
+        <div class="insight-badge">📉 Nov–Jan: Death spiral | 📈 Feb: Revival</div>
     </div>
 
     <div class="kpi-grid" id="kpiContainer"></div>
-
-    <!-- Alert based on current new subscriber rate -->
     <div id="alertBox" class="alert-box"></div>
 
     <div class="charts-row">
         <div class="chart-card">
-            <h3>💀 The Death Spiral: New Subs vs Engaged List</h3>
-            <canvas id="deathSpiralChart" width="400" height="240"></canvas>
-            <div style="font-size:0.7rem; text-align:center;">🔵 New Subs &nbsp;|&nbsp; 🟠 Engaged List (30d)</div>
+            <h3>💀 Death Spiral: New Subs vs Engaged List</h3>
+            <canvas id="deathSpiralChart"></canvas>
         </div>
         <div class="chart-card">
             <h3>📧 Campaigns vs Automation Revenue</h3>
-            <canvas id="campAutoChart" width="400" height="240"></canvas>
+            <canvas id="campAutoChart"></canvas>
         </div>
     </div>
 
     <div class="charts-row">
         <div class="chart-card">
             <h3>📈 New Subscribers = Omnisend Revenue</h3>
-            <canvas id="revenueCorrelationChart" width="400" height="240"></canvas>
+            <canvas id="revenueCorrelationChart"></canvas>
         </div>
         <div class="chart-card">
-            <h3>🎯 Engaged List Projection to 5,000+</h3>
-            <canvas id="engagedProjectionChart" width="400" height="240"></canvas>
+            <h3>🎯 Engaged List → 5,000+ Target</h3>
+            <canvas id="engagedProjectionChart"></canvas>
         </div>
     </div>
 
     <div class="data-table-wrapper">
         <table>
             <thead>
-                <tr><th>Month</th><th>New Subs</th><th>Engaged List</th><th>Campaigns Rev</th><th>Automation Rev</th><th>Omnisend Rev</th><th>Store Rev</th><th>Status</th></tr>
+                <tr>
+                    <th>📅 Month</th>
+                    <th>🆕 New Subs</th>
+                    <th>👥 Engaged</th>
+                    <th>📧 Campaigns $</th>
+                    <th>⚙️ Auto $</th>
+                    <th>📬 Omnisend $</th>
+                    <th>🏪 Store $</th>
+                    <th>📊 Status</th>
+                </tr>
             </thead>
             <tbody id="tableBody"></tbody>
         </table>
         <div class="add-data-hint">
-            ✨ <strong>Add future data:</strong> Edit the <code>monthlyData</code> array in JavaScript. New subscribers below 100/month triggers "Critical Zone" alert.
+            ✨ <strong>Add future data:</strong> Edit <code>monthlyData</code> array in JS. First column (Month) stays frozen while scrolling horizontally → perfect for mobile.
         </div>
     </div>
     <div class="footer">
-        📊 <strong>The Insight:</strong> From May 2025, marketing was reduced. New subscribers dropped from 950+ to ~100. Without new blood, the engaged list decayed from 3,100 to 1,300 (-58%). When new subscribers returned in Feb 2026 (768), the list revived and Omnisend revenue exploded 635%.
+        📊 <strong>Key insight:</strong> From May 2025 marketing reduced → new subs dropped from 950+ → engaged list decayed 3,100 → 1,300 (-58%).<br>
+        When new subs returned (Feb 2026: 768), list revived & Omnisend revenue exploded +635%.
     </div>
 </div>
 
 <script>
-    // Complete dataset with all metrics
+    // ==================== FULL DATASET ====================
     const monthlyData = [
         { month:"Jan 2025", newEmail:96, engaged:1500, campRev:544.15, autoRev:325.75, omniRev:869.90, storeRev:2400.35, totalEmail:4041 },
         { month:"Feb 2025", newEmail:153, engaged:1600, campRev:183.47, autoRev:371.38, omniRev:554.85, storeRev:2549.11, totalEmail:4139 },
@@ -216,20 +356,23 @@
         { month:"Feb 2026", newEmail:768, engaged:2500, campRev:421.68, autoRev:1630.45, omniRev:2052.13, storeRev:12823.50, totalEmail:7130 }
     ];
 
+    // Render KPIs
     function renderKPIs() {
         const latest = monthlyData[monthlyData.length-1];
         const prev = monthlyData[monthlyData.length-2];
         const growth = ((latest.omniRev - prev.omniRev) / prev.omniRev * 100).toFixed(1);
         const avgNewSubsLast3 = monthlyData.slice(-3).reduce((s,d) => s + d.newEmail, 0) / 3;
+        const autoPct = ((latest.autoRev / latest.omniRev) * 100).toFixed(0);
         
         document.getElementById('kpiContainer').innerHTML = `
             <div class="kpi-card"><div class="kpi-label">📬 Latest Omnisend</div><div class="kpi-value">$${latest.omniRev.toLocaleString()}</div><div class="${growth >=0 ? 'trend-up' : 'trend-down'}">${growth}% MoM</div></div>
-            <div class="kpi-card"><div class="kpi-label">🆕 New Subs (latest)</div><div class="kpi-value">${latest.newEmail}</div><div>Avg last 3: ${avgNewSubsLast3.toFixed(0)}</div></div>
-            <div class="kpi-card"><div class="kpi-label">👥 Engaged List</div><div class="kpi-value">${latest.engaged}</div><div>Target: 5,000</div></div>
-            <div class="kpi-card"><div class="kpi-label">⚙️ Automation %</div><div class="kpi-value">${((latest.autoRev/latest.omniRev)*100).toFixed(0)}%</div><div>of Omnisend</div></div>
+            <div class="kpi-card"><div class="kpi-label">🆕 New Subs (latest)</div><div class="kpi-value">${latest.newEmail}</div><div>Avg 3m: ${avgNewSubsLast3.toFixed(0)}</div></div>
+            <div class="kpi-card"><div class="kpi-label">👥 Engaged List</div><div class="kpi-value">${latest.engaged}</div><div>🎯 Target: 5,000</div></div>
+            <div class="kpi-card"><div class="kpi-label">⚙️ Automation %</div><div class="kpi-value">${autoPct}%</div><div>of Omnisend</div></div>
         `;
     }
 
+    // Alert logic
     function renderAlert() {
         const last3Avg = monthlyData.slice(-3).reduce((s,d) => s + d.newEmail, 0) / 3;
         const latestEngaged = monthlyData[monthlyData.length-1].engaged;
@@ -237,20 +380,21 @@
         
         if (last3Avg < 100) {
             alertBox.className = "alert-box critical-alert";
-            alertBox.innerHTML = `⚠️ <strong>CRITICAL ZONE:</strong> New subscribers average ${last3Avg.toFixed(0)}/month (below 100). Without new subscribers, the engaged list will continue to decay. <strong>Action needed:</strong> Restart acquisition campaigns immediately.`;
+            alertBox.innerHTML = `⚠️ <strong>CRITICAL ZONE:</strong> New subscribers avg ${last3Avg.toFixed(0)}/month (below 100). Without new subscribers, engaged list decays. <strong>Action:</strong> Restart acquisition campaigns.`;
         } else if (last3Avg < 300) {
-            alertBox.className = "alert-box";
-            alertBox.innerHTML = `⚠️ <strong>Moderate Risk:</strong> New subscribers average ${last3Avg.toFixed(0)}/month. To grow engaged list to 5,000+, target 500+ new subs/month.`;
+            alertBox.className = "alert-box warning-alert";
+            alertBox.innerHTML = `⚠️ <strong>Moderate Risk:</strong> New subscribers avg ${last3Avg.toFixed(0)}/month. To reach 5,000 engaged, target 500+ new subs/month.`;
         } else {
             alertBox.className = "alert-box good-alert";
-            alertBox.innerHTML = `✅ <strong>Healthy Acquisition:</strong> New subscribers average ${last3Avg.toFixed(0)}/month. Keep this momentum to reach 5,000 engaged subscribers.`;
+            alertBox.innerHTML = `✅ <strong>Healthy Acquisition:</strong> New subscribers avg ${last3Avg.toFixed(0)}/month. Maintain momentum to reach 5,000 engaged.`;
         }
         
         if (latestEngaged < 2000) {
-            alertBox.innerHTML += `<br>📉 <strong>Engaged list at ${latestEngaged}</strong> — below healthy threshold. Focus on re-engagement campaigns.`;
+            alertBox.innerHTML += `<br>📉 <strong>Engaged list at ${latestEngaged}</strong> — below healthy threshold. Run re-engagement campaigns.`;
         }
     }
 
+    // Render table with sticky first column (already handled via CSS)
     function renderTable() {
         const tbody = document.getElementById('tableBody');
         tbody.innerHTML = '';
@@ -265,8 +409,9 @@
             else status = "🔻 Declining";
             
             const tr = document.createElement('tr');
-            if (isDeathPhase) tr.className = "death-spiral";
-            if (isRevival) tr.className = "revival";
+            if (isDeathPhase) tr.classList.add('death-spiral');
+            if (isRevival) tr.classList.add('revival');
+            
             tr.innerHTML = `
                 <td><strong>${row.month}</strong></td>
                 <td class="${row.newEmail < 100 ? 'trend-down' : 'trend-up'}">${row.newEmail}</td>
@@ -281,7 +426,7 @@
         });
     }
 
-    // Charts
+    // ==================== CHARTS ====================
     let deathChart, campAutoChart, revenueChart, engagedProjChart;
 
     function initCharts() {
@@ -292,7 +437,7 @@
         const autoRev = monthlyData.map(d => d.autoRev);
         const omniRev = monthlyData.map(d => d.omniRev);
         
-        // Death Spiral Chart
+        // 1) Death spiral (new subs bar + engaged line)
         const ctx1 = document.getElementById('deathSpiralChart').getContext('2d');
         if (deathChart) deathChart.destroy();
         deathChart = new Chart(ctx1, {
@@ -301,29 +446,29 @@
                 labels: months,
                 datasets: [
                     { label: 'New Subscribers', data: newSubs, backgroundColor: '#6c9ebf', borderRadius: 5, yAxisID: 'y' },
-                    { label: 'Engaged List (30d)', data: engaged, type: 'line', borderColor: '#e9b35f', borderWidth: 3, backgroundColor: 'transparent', tension: 0.2, pointRadius: 4, yAxisID: 'y1', fill: false }
+                    { label: 'Engaged List (30d)', data: engaged, type: 'line', borderColor: '#e9b35f', borderWidth: 3, backgroundColor: 'transparent', tension: 0.2, pointRadius: 3, pointBackgroundColor: '#e9b35f', yAxisID: 'y1', fill: false }
                 ]
             },
             options: {
-                responsive: true,
+                responsive: true, maintainAspectRatio: true,
                 plugins: { tooltip: { callbacks: { label: (ctx) => ctx.dataset.label === 'Engaged List' ? `${ctx.raw} engaged` : `${ctx.raw} new subs` } } },
-                scales: { y: { title: { text: 'New Subscribers' }, beginAtZero: true }, y1: { position: 'right', title: { text: 'Engaged List Size' }, min: 1000, grid: { drawOnChartArea: false } } }
+                scales: { y: { title: { display: true, text: 'New Subscribers' }, beginAtZero: true }, y1: { position: 'right', title: { text: 'Engaged List Size' }, min: 1000, grid: { drawOnChartArea: false } } }
             }
         });
         
-        // Campaign vs Automation
+        // 2) Campaigns vs Automation (stacked)
         const ctx2 = document.getElementById('campAutoChart').getContext('2d');
         if (campAutoChart) campAutoChart.destroy();
         campAutoChart = new Chart(ctx2, {
             type: 'bar',
             data: { labels: months, datasets: [
-                { label: 'Campaigns', data: campRev, backgroundColor: '#6c9ebf', stack: 'total' },
-                { label: 'Automation', data: autoRev, backgroundColor: '#e9b35f', stack: 'total' }
+                { label: 'Campaigns Revenue', data: campRev, backgroundColor: '#6c9ebf', stack: 'total', borderRadius: 4 },
+                { label: 'Automation Revenue', data: autoRev, backgroundColor: '#e9b35f', stack: 'total', borderRadius: 4 }
             ] },
-            options: { responsive: true, scales: { y: { stacked: true, title: { text: 'Revenue (USD)' } }, x: { stacked: true } } }
+            options: { responsive: true, maintainAspectRatio: true, scales: { y: { stacked: true, title: { display: true, text: 'Revenue (USD)' } }, x: { stacked: true } }, plugins: { tooltip: { callbacks: { label: (ctx) => `$${ctx.raw.toFixed(2)}` } } } }
         });
         
-        // Revenue Correlation
+        // 3) New subs vs Omnisend revenue (correlation)
         const ctx3 = document.getElementById('revenueCorrelationChart').getContext('2d');
         if (revenueChart) revenueChart.destroy();
         revenueChart = new Chart(ctx3, {
@@ -331,32 +476,48 @@
             data: {
                 labels: months,
                 datasets: [
-                    { label: 'New Subscribers', data: newSubs, backgroundColor: '#7c9c6e', yAxisID: 'y' },
-                    { label: 'Omnisend Revenue', data: omniRev, type: 'line', borderColor: '#d9534f', borderWidth: 3, backgroundColor: 'transparent', tension: 0.2, pointRadius: 3, yAxisID: 'y1', fill: false }
+                    { label: 'New Subscribers', data: newSubs, backgroundColor: '#7c9c6e', yAxisID: 'y', borderRadius: 4 },
+                    { label: 'Omnisend Revenue', data: omniRev, type: 'line', borderColor: '#d9534f', borderWidth: 3, backgroundColor: 'transparent', tension: 0.2, pointRadius: 3, pointBackgroundColor: '#bc4742', yAxisID: 'y1', fill: false }
                 ]
             },
             options: {
-                responsive: true,
-                scales: { y: { title: { text: 'New Subscribers' } }, y1: { position: 'right', title: { text: 'Revenue (USD)' }, grid: { drawOnChartArea: false } } }
+                responsive: true, maintainAspectRatio: true,
+                scales: { y: { title: { text: 'New Subscribers' }, beginAtZero: true }, y1: { position: 'right', title: { text: 'Revenue (USD)' }, grid: { drawOnChartArea: false } } },
+                plugins: { tooltip: { callbacks: { label: (ctx) => ctx.dataset.label === 'Omnisend Revenue' ? `$${ctx.raw.toFixed(2)}` : `${ctx.raw} subs` } } }
             }
         });
         
-        // Engaged Projection to 5,000
+        // 4) Engaged projection to 5,000
         const currentEngaged = monthlyData[monthlyData.length-1].engaged;
         const futureMonths = ['Mar 2026', 'Apr 2026', 'May 2026', 'Jun 2026', 'Jul 2026', 'Aug 2026'];
         const increments = (5000 - currentEngaged) / 6;
         const projected = [];
         for (let i = 1; i <= 6; i++) projected.push(Math.round(currentEngaged + increments * i));
+        const allLabels = [...months, ...futureMonths];
+        const allEngaged = [...engaged, ...projected];
         
         const ctx4 = document.getElementById('engagedProjectionChart').getContext('2d');
         if (engagedProjChart) engagedProjChart.destroy();
         engagedProjChart = new Chart(ctx4, {
             type: 'line',
-            data: { labels: [...months, ...futureMonths], datasets: [{ label: 'Engaged Subscribers', data: [...engaged, ...projected], borderColor: '#2b7e4a', backgroundColor: 'rgba(43,126,74,0.1)', borderWidth: 3, fill: true }] },
-            options: { responsive: true, scales: { y: { title: { text: 'Engaged Subscribers' }, min: 1000 } } }
+            data: { labels: allLabels, datasets: [{ label: 'Engaged Subscribers (30d)', data: allEngaged, borderColor: '#2b7e4a', backgroundColor: 'rgba(43,126,74,0.1)', borderWidth: 3, pointRadius: 3, fill: true }] },
+            options: { responsive: true, maintainAspectRatio: true, scales: { y: { title: { display: true, text: 'Engaged Subscribers' }, min: 1000 } } }
         });
     }
 
+    // Resize handler to avoid chart glitches on mobile
+    let resizeTimer;
+    window.addEventListener('resize', function() {
+        if (resizeTimer) clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(() => {
+            if (deathChart) deathChart.resize();
+            if (campAutoChart) campAutoChart.resize();
+            if (revenueChart) revenueChart.resize();
+            if (engagedProjChart) engagedProjChart.resize();
+        }, 150);
+    });
+
+    // INITIALIZE ALL
     renderKPIs();
     renderAlert();
     renderTable();
