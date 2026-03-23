@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Lovely Quilt · Reports Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(145deg, #f9f5ef 0%, #f0e9e0 100%);
+            font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+            color: #2c2418;
+            line-height: 1.4;
+            min-height: 100vh;
+            padding: 2rem 1.5rem;
+        }
+
+        /* main container */
+        .dashboard {
+            max-width: 1280px;
+            margin: 0 auto;
+        }
+
+        /* header with quilt-inspired accent */
+        .header {
+            text-align: center;
+            margin-bottom: 3rem;
+            position: relative;
+        }
+
+        .brand {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(255,248,235,0.7);
+            backdrop-filter: blur(4px);
+            padding: 0.5rem 1.8rem;
+            border-radius: 100px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+            margin-bottom: 1.2rem;
+        }
+
+        .brand-icon {
+            font-size: 2rem;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+        }
+
+        h1 {
+            font-size: 2.2rem;
+            font-weight: 600;
+            letter-spacing: -0.01em;
+            background: linear-gradient(135deg, #4a3729, #7b5a44);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+        }
+
+        .tagline {
+            color: #6b4f32;
+            font-weight: 450;
+            border-top: 1px solid #e5d5bf;
+            display: inline-block;
+            padding-top: 0.5rem;
+            margin-top: 0.5rem;
+            font-size: 1rem;
+        }
+
+        /* description card */
+        .intro-card {
+            background: #ffffffdd;
+            backdrop-filter: blur(8px);
+            border-radius: 2rem;
+            padding: 1.5rem 2rem;
+            margin-bottom: 3rem;
+            border: 1px solid #fff6ea;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.03), 0 2px 4px rgba(0,0,0,0.02);
+            text-align: center;
+        }
+
+        .intro-card p {
+            font-size: 1.1rem;
+            color: #3b2c1f;
+            max-width: 680px;
+            margin: 0 auto;
+        }
+
+        .intro-card strong {
+            color: #b1622c;
+            font-weight: 600;
+        }
+
+        /* dashboard grid: two main report cards */
+        .reports-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 2rem;
+            justify-content: center;
+            margin-bottom: 3.5rem;
+        }
+
+        .report-card {
+            flex: 1;
+            min-width: 280px;
+            background: #ffffff;
+            border-radius: 2rem;
+            overflow: hidden;
+            transition: transform 0.25s ease, box-shadow 0.3s ease;
+            box-shadow: 0 12px 28px -8px rgba(0,0,0,0.1);
+            border: 1px solid #efe3d2;
+            backdrop-filter: blur(0px);
+        }
+
+        .report-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 22px 32px -12px rgba(0,0,0,0.15);
+            border-color: #e2cfb8;
+        }
+
+        .card-header {
+            padding: 1.5rem 1.8rem 0.8rem 1.8rem;
+            border-bottom: 2px solid #f3ede5;
+        }
+
+        .card-header h2 {
+            font-size: 1.75rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: #3f2c1c;
+        }
+
+        .card-header h2 span {
+            font-size: 2rem;
+        }
+
+        .card-badge {
+            display: inline-block;
+            background: #f0e4d4;
+            color: #8b5a2e;
+            font-size: 0.7rem;
+            font-weight: 600;
+            padding: 0.2rem 0.8rem;
+            border-radius: 30px;
+            margin-top: 0.5rem;
+            letter-spacing: 0.3px;
+        }
+
+        .card-preview {
+            padding: 1.2rem 1.8rem;
+            background: #fefaf5;
+            border-bottom: 1px solid #f1e7dd;
+        }
+
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .stat-label {
+            color: #826b51;
+            font-weight: 450;
+        }
+
+        .stat-value {
+            font-weight: 600;
+            color: #4a3422;
+        }
+
+        .highlight {
+            color: #bc6c25;
+            font-weight: 700;
+        }
+
+        .card-footer {
+            padding: 1.2rem 1.8rem 1.8rem;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            background: #2c2418;
+            color: white;
+            text-decoration: none;
+            font-weight: 600;
+            padding: 0.8rem 1.8rem;
+            border-radius: 60px;
+            transition: all 0.2s ease;
+            width: 100%;
+            font-size: 1rem;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+        }
+
+        .btn:hover {
+            background: #4f3926;
+            transform: scale(0.98);
+            gap: 12px;
+            box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+        }
+
+        .btn-outline {
+            background: #fff3e8;
+            color: #5c3e24;
+            border: 1px solid #e1cfbb;
+        }
+
+        .btn-outline:hover {
+            background: #faeedf;
+            color: #2c1c10;
+        }
+
+        /* extra insight section (monthly/daily quick glance) */
+        .insight-section {
+            background: #ffffffc9;
+            backdrop-filter: blur(4px);
+            border-radius: 2rem;
+            padding: 1.6rem 2rem;
+            margin-top: 1rem;
+            border: 1px solid #ede0d0;
+        }
+
+        .insight-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            color: #4e3722;
+        }
+
+        .metrics-flex {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.8rem;
+            justify-content: space-between;
+        }
+
+        .metric-block {
+            background: #fef7ef;
+            padding: 0.8rem 1.2rem;
+            border-radius: 1.2rem;
+            flex: 1;
+            min-width: 130px;
+            text-align: center;
+        }
+
+        .metric-number {
+            font-size: 1.7rem;
+            font-weight: 800;
+            color: #b1622c;
+            line-height: 1;
+        }
+
+        .metric-label {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #7c6246;
+        }
+
+        hr {
+            margin: 1.5rem 0;
+            border: 0;
+            height: 1px;
+            background: linear-gradient(to right, #e9dccc, transparent);
+        }
+
+        .footer-note {
+            text-align: center;
+            font-size: 0.8rem;
+            color: #9b846b;
+            margin-top: 2.5rem;
+        }
+
+        @media (max-width: 720px) {
+            body {
+                padding: 1.2rem;
+            }
+            .card-header h2 {
+                font-size: 1.4rem;
+            }
+            .metrics-flex {
+                flex-direction: column;
+                gap: 0.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="dashboard">
+    <div class="header">
+        <div class="brand">
+            <span class="brand-icon">🧵</span>
+            <h1>Lovely Quilt · Reports</h1>
+        </div>
+        <div class="tagline">data-driven insights · quilt studio performance</div>
+    </div>
+
+    <div class="intro-card">
+        <p>📊 Central dashboard for <strong>email health metrics</strong> and <strong>daily campaign pulse</strong>. Access real-time reports to monitor subscriber growth, unsubscribe spikes, campaign revenue, and engagement trends.</p>
+    </div>
+
+    <!-- MAIN LINKS: monthly & daily reports -->
+    <div class="reports-grid">
+        <!-- Monthly Data Card -->
+        <div class="report-card">
+            <div class="card-header">
+                <h2><span>📆</span> Monthly Health</h2>
+                <div class="card-badge">subscriber analytics · MoM revenue</div>
+            </div>
+            <div class="card-preview">
+                <div class="stat-row">
+                    <span class="stat-label">📬 Latest Omnisend</span>
+                    <span class="stat-value highlight">$2,052.13</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">🆕 New subs (latest)</span>
+                    <span class="stat-value">768</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">🚫 Unsub rate (latest)</span>
+                    <span class="stat-value">1.60%</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">👥 Engaged list</span>
+                    <span class="stat-value">2,500 / 5,000 target</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">⚠️ Elevated unsubscribes</span>
+                    <span class="stat-value">monitor fatigue spikes</span>
+                </div>
+            </div>
+            <div class="card-footer">
+                <a href="https://lovely-quilt.pages.dev/monthly-data" class="btn" target="_blank" rel="noopener noreferrer">
+                    🔍 Open monthly dashboard →
+                </a>
+                <div style="font-size: 0.7rem; text-align: center; margin-top: 0.7rem; color:#a6896e;">
+                    full table · net growth · unsubscribe trend
+                </div>
+            </div>
+        </div>
+
+        <!-- Daily Data Card -->
+        <div class="report-card">
+            <div class="card-header">
+                <h2><span>📨</span> Daily Campaign Pulse</h2>
+                <div class="card-badge">recent sends · opens & revenue</div>
+            </div>
+            <div class="card-preview">
+                <div class="stat-row">
+                    <span class="stat-label">📧 Total sends (Mar 2026)</span>
+                    <span class="stat-value">24,882</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">💰 Total revenue</span>
+                    <span class="stat-value highlight">$288.19</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">📈 Avg open rate</span>
+                    <span class="stat-value">49.3%</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">🎯 Avg click rate</span>
+                    <span class="stat-value">2.8%</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">🏆 Top campaign</span>
+                    <span class="stat-value">Nat’l Quilting Day</span>
+                </div>
+            </div>
+            <div class="card-footer">
+                <a href="https://lovely-quilt.pages.dev/daily-data" class="btn" target="_blank" rel="noopener noreferrer">
+                    📬 Explore daily reports →
+                </a>
+                <div style="font-size: 0.7rem; text-align: center; margin-top: 0.7rem; color:#a6896e;">
+                    campaign-level clicks · JSON data editor
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Additional insights: quick highlights from monthly & daily to reinforce dashboard feel -->
+    <div class="insight-section">
+        <div class="insight-title">
+            <span>✨</span> performance at a glance
+        </div>
+        <div class="metrics-flex">
+            <div class="metric-block">
+                <div class="metric-number">+654</div>
+                <div class="metric-label">net growth (Feb 2026)</div>
+                <div style="font-size: 0.7rem;">768 new subs · 114 unsubs</div>
+            </div>
+            <div class="metric-block">
+                <div class="metric-number">636%</div>
+                <div class="metric-label">Omnisend MoM growth</div>
+                <div style="font-size: 0.7rem;">$2,052 vs prev month</div>
+            </div>
+            <div class="metric-block">
+                <div class="metric-number">69.3%</div>
+                <div class="metric-label">peak open rate</div>
+                <div style="font-size: 0.7rem;">Mar 2 campaign · Creative Spark</div>
+            </div>
+            <div class="metric-block">
+                <div class="metric-number">$73.39</div>
+                <div class="metric-label">top campaign revenue</div>
+                <div style="font-size: 0.7rem;">National Craft Month Kickoff</div>
+            </div>
+        </div>
+        <hr>
+        <div style="display: flex; flex-wrap: wrap; justify-content: space-between; gap: 1rem; font-size: 0.85rem;">
+            <div>⚠️ <strong>Unsubscribe watch:</strong> Aug 2025 spike (167 unsubs, 2.61% rate) → content fatigue signals</div>
+            <div>📊 <strong>Engaged list target:</strong> 5,000 — currently 2,500 (Feb 2026)</div>
+            <div>🎯 <strong>Daily best click rate:</strong> 5.5% (Spring Garden Collection Launch)</div>
+        </div>
+    </div>
+
+    <div class="footer-note">
+        🧵 Lovely Quilt · Reports hub — direct links to <strong>monthly-data</strong> and <strong>daily-data</strong> dashboards.<br>
+        Data reflects latest Omnisend & campaign metrics. Use daily page to edit campaigns via JSON.
+    </div>
+</div>
+</body>
+</html>
