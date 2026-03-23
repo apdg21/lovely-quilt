@@ -2,672 +2,146 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Lovely Quilt · Daily Campaign Analytics</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🧵 Lovely Quilt · daily campaign pulse</title>
     <style>
-        * {
-            box-sizing: border-box;
-        }
-
         body {
-            font-family: system-ui, 'Segoe UI', 'Inter', -apple-system, BlinkMacSystemFont, 'Roboto', sans-serif;
-            background: #f6f3ef;
-            margin: 0;
-            padding: 24px 20px;
-            color: #2c241a;
-        }
-
-        .dashboard-container {
-            max-width: 1600px;
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+            max-width: 1400px;
             margin: 0 auto;
+            padding: 2rem;
+            background: #faf7f2;
+            color: #2c2418;
         }
-
-        .header {
-            margin-bottom: 28px;
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 1rem;
+            margin: 2rem 0;
         }
-
-        .brand {
-            display: flex;
-            align-items: baseline;
-            justify-content: space-between;
-            flex-wrap: wrap;
-            gap: 12px;
-            margin-bottom: 12px;
-        }
-
-        h1 {
-            font-size: 1.85rem;
-            font-weight: 600;
-            margin: 0;
-            background: linear-gradient(135deg, #3b2a1f, #7a5a4b);
-            background-clip: text;
-            -webkit-background-clip: text;
-            color: transparent;
-            letter-spacing: -0.3px;
-        }
-
-        .badge-date {
-            background: #e7dfd7;
-            padding: 6px 14px;
-            border-radius: 60px;
-            font-size: 0.85rem;
-            font-weight: 500;
-            color: #4a3524;
-        }
-
-        .insight-cards {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 16px;
-            margin-top: 20px;
-            margin-bottom: 28px;
-        }
-
-        .stat-card {
+        .kpi-card {
             background: white;
-            border-radius: 28px;
-            padding: 14px 22px;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.03), 0 1px 2px rgba(0,0,0,0.05);
-            flex: 1 1 180px;
-            border: 1px solid #e9e1d9;
+            padding: 1.2rem;
+            border-radius: 1rem;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
         }
-
-        .stat-label {
-            font-size: 0.75rem;
-            text-transform: uppercase;
-            letter-spacing: 0.6px;
-            font-weight: 600;
-            color: #8f7a66;
-        }
-
-        .stat-number {
+        .kpi-value {
             font-size: 1.8rem;
-            font-weight: 700;
-            color: #2f241b;
-            line-height: 1.2;
+            font-weight: bold;
+            color: #b1622c;
         }
-
-        .table-wrapper {
-            background: white;
-            border-radius: 28px;
-            border: 1px solid #e9dfd5;
-            overflow-x: auto;
-            box-shadow: 0 6px 14px rgba(0,0,0,0.02);
-            margin-bottom: 32px;
-        }
-
-        .campaign-table {
+        table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 0.85rem;
-            min-width: 950px;
-        }
-
-        .campaign-table th {
-            text-align: left;
-            padding: 16px 12px;
-            background-color: #fefaf6;
-            font-weight: 600;
-            color: #4f3e2e;
-            border-bottom: 1px solid #e2d6cc;
-            font-size: 0.8rem;
-            letter-spacing: 0.3px;
-        }
-
-        .campaign-table td {
-            padding: 14px 12px;
-            border-bottom: 1px solid #f0e8e0;
-            vertical-align: middle;
-            color: #2c241c;
-        }
-
-        .campaign-table tr:hover td {
-            background-color: #fef9f3;
-        }
-
-        .campaign-name {
-            font-weight: 500;
-            max-width: 260px;
-            white-space: normal;
-            word-break: break-word;
-        }
-
-        .revenue-cell {
-            font-weight: 600;
-            color: #1f6e43;
-        }
-
-        /* JSON editor panel */
-        .json-panel {
             background: white;
-            border-radius: 28px;
-            border: 1px solid #e9dfd5;
-            padding: 20px 24px;
-            margin-top: 24px;
-            margin-bottom: 40px;
+            border-radius: 1rem;
+            overflow-x: auto;
+            display: block;
+            margin: 1.5rem 0;
         }
-
-        .json-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 12px;
-            margin-bottom: 16px;
+        th, td {
+            padding: 0.75rem;
+            text-align: right;
+            border-bottom: 1px solid #eee;
         }
-
-        .json-title {
-            font-size: 1.3rem;
-            font-weight: 600;
-            margin: 0;
-            display: flex;
-            align-items: center;
-            gap: 8px;
+        th:first-child, td:first-child {
+            text-align: left;
         }
-
-        .json-actions {
-            display: flex;
-            gap: 10px;
+        th {
+            background: #f5ede3;
         }
-
-        .btn {
-            padding: 8px 18px;
-            border-radius: 40px;
-            font-weight: 600;
-            font-size: 0.8rem;
-            cursor: pointer;
-            border: none;
-            transition: 0.2s;
-            font-family: inherit;
+        h1 {
+            color: #4a3729;
         }
-
-        .btn-primary {
-            background: #2f5e3a;
-            color: white;
+        .last-updated {
+            font-size: 0.75rem;
+            color: #9b846b;
+            margin-top: 1rem;
         }
-
-        .btn-primary:hover {
-            background: #1f452c;
-        }
-
-        .btn-secondary {
-            background: #e3d9d0;
-            color: #4a3727;
-        }
-
-        .btn-secondary:hover {
-            background: #d2c6ba;
-        }
-
-        .btn-warning {
-            background: #dcb88a;
-            color: #3a2a1c;
-        }
-
-        .btn-warning:hover {
-            background: #c9a56e;
-        }
-
         .json-editor {
-            width: 100%;
-            font-family: 'Monaco', 'Menlo', 'Courier New', monospace;
+            background: #2c2418;
+            color: #e5d5bf;
+            padding: 1rem;
+            border-radius: 0.75rem;
+            font-family: monospace;
             font-size: 0.8rem;
-            padding: 16px;
-            border-radius: 20px;
-            border: 1px solid #ddd2c6;
-            background: #fefcf9;
-            resize: vertical;
-            margin-bottom: 16px;
-        }
-
-        .validation-message {
-            font-size: 0.75rem;
-            padding: 8px 12px;
-            border-radius: 40px;
-            margin-top: 8px;
-        }
-
-        .validation-success {
-            background: #e0f2e4;
-            color: #1f5e3a;
-        }
-
-        .validation-error {
-            background: #fee9e6;
-            color: #b34a3a;
-        }
-
-        .small-note {
-            font-size: 0.7rem;
-            color: #aa9886;
-            margin-top: 12px;
-        }
-
-        .footer-note {
-            text-align: center;
-            font-size: 0.75rem;
-            color: #ab9a88;
-            border-top: 1px solid #e3d8cf;
-            padding-top: 24px;
-            margin-top: 16px;
+            margin: 1rem 0;
         }
     </style>
 </head>
 <body>
-<div class="dashboard-container">
-    <div class="header">
-        <div class="brand">
-            <h1>🧵 Lovely Quilt · daily campaign pulse</h1>
-            <div class="badge-date">📅 Mar 2026 · daily breakdown</div>
-        </div>
-        <div class="insight-cards">
-            <div class="stat-card"><div class="stat-label">📧 Total sends</div><div class="stat-number" id="totalSendsStat">0</div></div>
-            <div class="stat-card"><div class="stat-label">💰 Total revenue</div><div class="stat-number" id="totalRevenueStat">$0</div></div>
-            <div class="stat-card"><div class="stat-label">📈 Avg open rate</div><div class="stat-number" id="avgOpenStat">—</div></div>
-            <div class="stat-card"><div class="stat-label">🎯 Avg click rate</div><div class="stat-number" id="avgClickStat">—</div></div>
-        </div>
-    </div>
+    <h1>🧵 Lovely Quilt · daily campaign pulse</h1>
+    <div id="kpiContainer" class="kpi-grid">Loading data...</div>
+    <div id="tableContainer">Loading campaigns...</div>
+    <div class="last-updated" id="lastUpdated"></div>
 
-    <!-- Table area -->
-    <div class="table-wrapper">
-        <table class="campaign-table" id="campaignTable">
-            <thead>
-                <tr>
-                    <th>Campaign name</th>
-                    <th>Date &amp; time</th>
-                    <th>Channel</th>
-                    <th>Sent</th>
-                    <th>Open rate</th>
-                    <th>Opens</th>
-                    <th>Click rate</th>
-                    <th>Clicks</th>
-                    <th>Revenue</th>
-                    <th>Orders</th>
-                </tr>
-            </thead>
-            <tbody id="tableBody"></tbody>
-        </table>
-    </div>
+    <script>
+        async function loadData() {
+            try {
+                const response = await fetch('/data.json?t=' + Date.now());
+                const data = await response.json();
+                const daily = data.daily;
 
-    <!-- JSON Editor Panel - Easy data management -->
-    <div class="json-panel">
-        <div class="json-header">
-            <div class="json-title">
-                📋 <strong>JSON Data Source</strong>
-                <span style="font-size: 0.7rem; font-weight: normal; color: #8f7a66;">— edit campaigns directly in JSON format</span>
-            </div>
-            <div class="json-actions">
-                <button class="btn btn-secondary" id="formatJsonBtn">✨ Format JSON</button>
-                <button class="btn btn-primary" id="applyJsonBtn">💾 Apply & Refresh Table</button>
-                <button class="btn btn-warning" id="resetJsonBtn">↻ Reset to default</button>
-            </div>
-        </div>
-        <textarea id="jsonEditor" class="json-editor" rows="18" style="font-family: monospace;"></textarea>
-        <div id="validationMsg" class="validation-message"></div>
-        <div class="small-note">
-            💡 <strong>How to use:</strong> Edit the JSON array above — add, remove, or modify campaigns. Each campaign requires: name, dateTime, channel, sent, openRate, opens, clickRate, clicks, revenue, orders.<br>
-            📌 Click "Apply & Refresh Table" to see changes. JSON is stored directly in this HTML file — just save the page to keep your data.
-        </div>
-    </div>
-    <div class="footer-note">
-        🧵 All campaign data stored in JSON format within this file • Edit the data source directly • No database needed
-    </div>
-</div>
+                // Update KPIs
+                document.getElementById('kpiContainer').innerHTML = `
+                    <div class="kpi-card">
+                        <div class="kpi-value">${daily.totalSends.toLocaleString()}</div>
+                        <div class="kpi-label">Total sends</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-value">$${daily.totalRevenue.toFixed(2)}</div>
+                        <div class="kpi-label">Total revenue</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-value">${daily.avgOpenRate}%</div>
+                        <div class="kpi-label">Avg open rate</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-value">${daily.avgClickRate}%</div>
+                        <div class="kpi-label">Avg click rate</div>
+                    </div>
+                `;
 
-<script>
-    // ============================================================
-    // 📦 MASTER JSON DATA SOURCE - Edit campaigns directly here!
-    // ============================================================
-    const CAMPAIGNS_JSON = [
-        {
-            "name": "The National Quilting Day Celebration",
-            "dateTime": "Mar 21, 2026 at 9:00 AM",
-            "channel": "Email",
-            "sent": 2433,
-            "openRate": 40.7,
-            "opens": 991,
-            "clickRate": 5.1,
-            "clicks": 126,
-            "revenue": 35.80,
-            "orders": 2
-        },
-        {
-            "name": "The National Quilting Day Teaser",
-            "dateTime": "Mar 19, 2026 at 10:00 AM",
-            "channel": "Email",
-            "sent": 2419,
-            "openRate": 41.7,
-            "opens": 1011,
-            "clickRate": 2.1,
-            "clicks": 52,
-            "revenue": 0.00,
-            "orders": 0
-        },
-        {
-            "name": "Tools of the Trade - The Maker’s Toolkit",
-            "dateTime": "Mar 18, 2026 at 10:00 AM",
-            "channel": "Email",
-            "sent": 1736,
-            "openRate": 59.3,
-            "opens": 1031,
-            "clickRate": 1.9,
-            "clicks": 33,
-            "revenue": 35.80,
-            "orders": 1
-        },
-        {
-            "name": "Surprise Bloom Gift - Less Engaged",
-            "dateTime": "Mar 16, 2026 at 10:00 AM",
-            "channel": "Email",
-            "sent": 5575,
-            "openRate": 2.7,
-            "opens": 154,
-            "clickRate": 0.73,
-            "clicks": 41,
-            "revenue": 17.90,
-            "orders": 1
-        },
-        {
-            "name": "Spring Garden Collection (Final Call)",
-            "dateTime": "Mar 14, 2026 at 12:00 PM",
-            "channel": "Email",
-            "sent": 1615,
-            "openRate": 61.3,
-            "opens": 991,
-            "clickRate": 3.6,
-            "clicks": 59,
-            "revenue": 17.90,
-            "orders": 2
-        },
-        {
-            "name": "The Spring Garden Collection Launch",
-            "dateTime": "Mar 12, 2026 at 10:00 AM",
-            "channel": "Email",
-            "sent": 1601,
-            "openRate": 63.4,
-            "opens": 1016,
-            "clickRate": 5.5,
-            "clicks": 89,
-            "revenue": 53.70,
-            "orders": 3
-        },
-        {
-            "name": "Behind the Seams (The Art of Texture)",
-            "dateTime": "Mar 10, 2026 at 8:00 AM",
-            "channel": "Email",
-            "sent": 3965,
-            "openRate": 5.5,
-            "opens": 219,
-            "clickRate": 0.2,
-            "clicks": 8,
-            "revenue": 0.00,
-            "orders": 0
-        },
-        {
-            "name": "International Women’s Day (Final Call)",
-            "dateTime": "Mar 8, 2026 at 12:00 PM",
-            "channel": "Email",
-            "sent": 1384,
-            "openRate": 64.3,
-            "opens": 891,
-            "clickRate": 3.1,
-            "clicks": 44,
-            "revenue": 35.80,
-            "orders": 1
-        },
-        {
-            "name": "International Women’s Day VIP Access",
-            "dateTime": "Mar 6, 2026 at 10:00 AM",
-            "channel": "Email",
-            "sent": 1388,
-            "openRate": 66.2,
-            "opens": 919,
-            "clickRate": 2.0,
-            "clicks": 29,
-            "revenue": 0.00,
-            "orders": 0
-        },
-        {
-            "name": "Spring Petals Tutorial",
-            "dateTime": "Mar 4, 2026 at 10:00 AM",
-            "channel": "Email",
-            "sent": 1384,
-            "openRate": 68.4,
-            "opens": 948,
-            "clickRate": 4.6,
-            "clicks": 64,
-            "revenue": 17.90,
-            "orders": 2
-        },
-        {
-            "name": "National Craft Month Kickoff (The Creative Spark)",
-            "dateTime": "Mar 2, 2026 at 10:00 AM",
-            "channel": "Email",
-            "sent": 1382,
-            "openRate": 69.3,
-            "opens": 958,
-            "clickRate": 2.4,
-            "clicks": 34,
-            "revenue": 73.39,
-            "orders": 4
-        }
-    ];
+                // Build campaign table
+                let tableHtml = `
+                    <table>
+                        <thead>
+                            <tr><th>Campaign name</th><th>Date & time</th><th>Sent</th><th>Open rate</th><th>Opens</th><th>Click rate</th><th>Clicks</th><th>Revenue</th><th>Orders</th></tr>
+                        </thead>
+                        <tbody>
+                `;
 
-    // Current working data
-    let currentData = [];
-
-    // Helper functions
-    function formatMoney(value) {
-        if (value === undefined || value === null) return "$0.00";
-        return "$" + parseFloat(value).toFixed(2);
-    }
-
-    function formatRate(rate) {
-        if (rate === undefined || rate === null) return "—";
-        let num = parseFloat(rate);
-        if (isNaN(num)) return "—";
-        return num.toFixed(1) + "%";
-    }
-
-    function sortByDateDescending(data) {
-        return [...data].sort((a, b) => {
-            const dateA = parseFlexibleDate(a.dateTime);
-            const dateB = parseFlexibleDate(b.dateTime);
-            if (dateA && dateB) return dateB - dateA;
-            return (b.dateTime || "").localeCompare(a.dateTime || "");
-        });
-    }
-
-    function parseFlexibleDate(dateStr) {
-        if (!dateStr) return null;
-        try {
-            let normalized = dateStr.replace(' at ', ' ');
-            const d = new Date(normalized);
-            if (!isNaN(d.getTime())) return d;
-            return null;
-        } catch(e) { return null; }
-    }
-
-    function updateSummaryCards(data) {
-        const totalSends = data.reduce((sum, row) => sum + (row.sent || 0), 0);
-        const totalRevenue = data.reduce((sum, row) => sum + (row.revenue || 0), 0);
-        const validOpenRates = data.filter(r => typeof r.openRate === 'number' && !isNaN(r.openRate));
-        const avgOpen = validOpenRates.length ? (validOpenRates.reduce((a,b)=> a + b.openRate,0) / validOpenRates.length) : 0;
-        const validClickRates = data.filter(r => typeof r.clickRate === 'number' && !isNaN(r.clickRate));
-        const avgClick = validClickRates.length ? (validClickRates.reduce((a,b)=> a + b.clickRate,0) / validClickRates.length) : 0;
-
-        document.getElementById("totalSendsStat").innerText = totalSends.toLocaleString();
-        document.getElementById("totalRevenueStat").innerHTML = formatMoney(totalRevenue);
-        document.getElementById("avgOpenStat").innerHTML = avgOpen ? avgOpen.toFixed(1) + "%" : "—";
-        document.getElementById("avgClickStat").innerHTML = avgClick ? avgClick.toFixed(1) + "%" : "—";
-    }
-
-    function renderTable(data) {
-        const tbody = document.getElementById("tableBody");
-        if (!tbody) return;
-        tbody.innerHTML = "";
-        const sortedData = sortByDateDescending(data);
-        sortedData.forEach((row) => {
-            const tr = document.createElement("tr");
-            
-            tr.innerHTML = `
-                <td class="campaign-name">${escapeHtml(row.name || "Untitled")}</td>
-                <td>${escapeHtml(row.dateTime || "—")}</td>
-                <td>${escapeHtml(row.channel || "Email")}</td>
-                <td>${(row.sent || 0).toLocaleString()}</td>
-                <td>${formatRate(row.openRate)}</td>
-                <td>${(row.opens || 0).toLocaleString()}</td>
-                <td>${formatRate(row.clickRate)}</td>
-                <td>${(row.clicks || 0).toLocaleString()}</td>
-                <td class="revenue-cell">${formatMoney(row.revenue)}</td>
-                <td>${row.orders || 0}</td>
-            `;
-            tbody.appendChild(tr);
-        });
-        updateSummaryCards(sortedData);
-    }
-
-    function escapeHtml(str) {
-        if (!str) return "";
-        return str.replace(/[&<>]/g, function(m) {
-            if (m === '&') return '&amp;';
-            if (m === '<') return '&lt;';
-            if (m === '>') return '&gt;';
-            return m;
-        });
-    }
-
-    function loadDataFromJSON(jsonString) {
-        try {
-            const parsed = JSON.parse(jsonString);
-            if (!Array.isArray(parsed)) {
-                throw new Error("JSON must be an array of campaigns");
-            }
-            // Validate each campaign has required fields
-            parsed.forEach((campaign, idx) => {
-                if (!campaign.name || campaign.dateTime === undefined) {
-                    throw new Error(`Campaign at index ${idx} missing required field (name or dateTime)`);
+                for (const campaign of daily.campaigns) {
+                    tableHtml += `
+                        <tr>
+                            <td>${campaign.name}</td>
+                            <td>${campaign.dateTime}</td>
+                            <td>${campaign.sent.toLocaleString()}</td>
+                            <td>${campaign.openRate}%</td>
+                            <td>${campaign.opens.toLocaleString()}</td>
+                            <td>${campaign.clickRate}%</td>
+                            <td>${campaign.clicks.toLocaleString()}</td>
+                            <td>$${campaign.revenue.toFixed(2)}</td>
+                            <td>${campaign.orders}</td>
+                        </tr>
+                    `;
                 }
-            });
-            currentData = parsed;
-            renderTable(currentData);
-            document.getElementById("validationMsg").innerHTML = "✅ JSON valid! Table updated successfully.";
-            document.getElementById("validationMsg").className = "validation-message validation-success";
-            return true;
-        } catch (e) {
-            document.getElementById("validationMsg").innerHTML = `❌ Invalid JSON: ${e.message}`;
-            document.getElementById("validationMsg").className = "validation-message validation-error";
-            return false;
-        }
-    }
 
-    function updateJsonEditor() {
-        const jsonString = JSON.stringify(currentData, null, 2);
-        document.getElementById("jsonEditor").value = jsonString;
-    }
+                tableHtml += `</tbody></table>`;
+                document.getElementById('tableContainer').innerHTML = tableHtml;
 
-    function applyFromEditor() {
-        const editorValue = document.getElementById("jsonEditor").value;
-        loadDataFromJSON(editorValue);
-    }
+                const now = new Date();
+                document.getElementById('lastUpdated').innerHTML = `📅 Last updated: ${now.toLocaleString()} · Data from data.json · Period: ${daily.period}`;
 
-    function formatJson() {
-        try {
-            const parsed = JSON.parse(document.getElementById("jsonEditor").value);
-            document.getElementById("jsonEditor").value = JSON.stringify(parsed, null, 2);
-            document.getElementById("validationMsg").innerHTML = "✨ JSON formatted successfully!";
-            document.getElementById("validationMsg").className = "validation-message validation-success";
-        } catch (e) {
-            document.getElementById("validationMsg").innerHTML = `❌ Cannot format: ${e.message}`;
-            document.getElementById("validationMsg").className = "validation-message validation-error";
-        }
-    }
-
-    function resetToDefault() {
-        currentData = JSON.parse(JSON.stringify(CAMPAIGNS_JSON));
-        renderTable(currentData);
-        updateJsonEditor();
-        document.getElementById("validationMsg").innerHTML = "↻ Reset to default campaign data";
-        document.getElementById("validationMsg").className = "validation-message validation-success";
-        setTimeout(() => {
-            if (document.getElementById("validationMsg").innerHTML.includes("Reset")) {
-                document.getElementById("validationMsg").innerHTML = "";
+            } catch (err) {
+                console.error('Error loading data:', err);
+                document.getElementById('kpiContainer').innerHTML = '<div style="background:#fff0e6;padding:1rem;border-radius:1rem;">⚠️ Could not load data.json. Make sure the file exists at /data.json</div>';
             }
-        }, 3000);
-    }
+        }
 
-    // Initialize
-    function init() {
-        currentData = JSON.parse(JSON.stringify(CAMPAIGNS_JSON));
-        renderTable(currentData);
-        updateJsonEditor();
-        
-        document.getElementById("applyJsonBtn").addEventListener("click", applyFromEditor);
-        document.getElementById("formatJsonBtn").addEventListener("click", formatJson);
-        document.getElementById("resetJsonBtn").addEventListener("click", resetToDefault);
-    }
-
-    init();
-</script>
-
-    <!-- ── FLOATING HOME BUTTON ── -->
-<style>
-  .home-fab {
-    position: fixed;
-    top: 1.75rem;
-    right: 1.75rem;
-    z-index: 9999;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 5px;
-    text-decoration: none;
-    cursor: pointer;
-  }
-  .home-fab-btn {
-    width: 48px;
-    height: 48px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, #2c1e14, #5c3d28);
-    box-shadow: 0 4px 18px rgba(44,30,20,0.35), 0 1px 4px rgba(44,30,20,0.2);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.15rem;
-    transition: transform 0.22s, box-shadow 0.22s, background 0.22s;
-    border: 1.5px solid rgba(232,221,208,0.15);
-  }
-  .home-fab:hover .home-fab-btn {
-    transform: translateY(-3px) scale(1.07);
-    box-shadow: 0 8px 28px rgba(44,30,20,0.4), 0 2px 6px rgba(44,30,20,0.2);
-    background: linear-gradient(135deg, #3e2718, #7a5236);
-  }
-  .home-fab-label {
-    font-family: 'DM Sans', 'Inter', system-ui, sans-serif;
-    font-size: 0.58rem;
-    font-weight: 700;
-    letter-spacing: 1.2px;
-    text-transform: uppercase;
-    color: #5c3d28;
-    background: rgba(255,252,247,0.92);
-    padding: 0.18rem 0.55rem;
-    border-radius: 100px;
-    border: 1px solid rgba(180,145,115,0.25);
-    box-shadow: 0 2px 8px rgba(44,30,20,0.08);
-    white-space: nowrap;
-    opacity: 0;
-    transform: translateY(4px);
-    transition: opacity 0.2s, transform 0.2s;
-    pointer-events: none;
-  }
-  .home-fab:hover .home-fab-label {
-    opacity: 1;
-    transform: translateY(0);
-  }
-</style>
-<a class="home-fab" href="/reports.html" title="Back to Home">
-  <div class="home-fab-btn">🏚️</div>
-  <span class="home-fab-label">Home</span>
-</a>
+        loadData();
+        setInterval(loadData, 5 * 60 * 1000);
+    </script>
 </body>
 </html>
