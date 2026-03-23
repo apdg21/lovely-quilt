@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>Lovely Quilt · Live Reports Dashboard</title>
+    <title>Lovely Quilt · Reports Dashboard</title>
     <style>
         * {
             margin: 0;
@@ -97,10 +97,6 @@
             background: #dacbbc;
         }
 
-        .loading {
-            opacity: 0.6;
-        }
-
         .reports-grid {
             display: flex;
             flex-wrap: wrap;
@@ -125,7 +121,6 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            flex-wrap: wrap;
         }
 
         .card-header h2 {
@@ -141,8 +136,8 @@
             font-size: 0.7rem;
             padding: 0.2rem 0.6rem;
             border-radius: 20px;
-            background: #f0e4d4;
-            color: #7a5a3a;
+            background: #2c6e2c;
+            color: white;
         }
 
         .card-preview {
@@ -172,15 +167,6 @@
         .highlight {
             color: #bc6c25;
             font-weight: 800;
-        }
-
-        .error-placeholder {
-            color: #b1622c;
-            text-align: center;
-            padding: 1rem;
-            font-size: 0.85rem;
-            background: #fff0e6;
-            border-radius: 1rem;
         }
 
         .card-footer {
@@ -260,6 +246,11 @@
             color: #9b846b;
             margin-top: 2rem;
         }
+
+        @media (max-width: 720px) {
+            body { padding: 1rem; }
+            .card-header h2 { font-size: 1.2rem; }
+        }
     </style>
 </head>
 <body>
@@ -267,13 +258,13 @@
     <div class="header">
         <div class="brand">
             <span class="brand-icon">🧵</span>
-            <h1>Lovely Quilt · Live Reports</h1>
+            <h1>Lovely Quilt · Reports</h1>
         </div>
         <div class="tagline">
-            auto-updating metrics from monthly & daily data
-            <span class="live-badge">LIVE DATA</span>
+            live dashboard — data from shared JSON source
+            <span class="live-badge">AUTO-UPDATING</span>
         </div>
-        <div class="last-updated" id="lastUpdatedText">loading latest data...</div>
+        <div class="last-updated" id="lastUpdatedText">loading data...</div>
     </div>
 
     <div class="refresh-control">
@@ -285,7 +276,7 @@
         <div class="report-card">
             <div class="card-header">
                 <h2><span>📆</span> Monthly Health</h2>
-                <div class="data-status" id="monthlyStatus">fetching...</div>
+                <div class="data-status" id="monthlyStatus">✓ live</div>
             </div>
             <div class="card-preview" id="monthlyPreview">
                 <div class="stat-row"><span class="stat-label">📬 Omnisend revenue</span><span class="stat-value">—</span></div>
@@ -296,7 +287,7 @@
                 <div class="stat-row"><span class="stat-label">⚠️ Latest month</span><span class="stat-value">—</span></div>
             </div>
             <div class="card-footer">
-                <a href="https://lovely-quilt.pages.dev/monthly-data" class="btn" target="_blank" rel="noopener noreferrer">
+                <a href="https://lovely-quilt.pages.dev/monthly-data" class="btn" target="_blank">
                     🔍 Full monthly dashboard →
                 </a>
             </div>
@@ -306,7 +297,7 @@
         <div class="report-card">
             <div class="card-header">
                 <h2><span>📨</span> Daily Campaign Pulse</h2>
-                <div class="data-status" id="dailyStatus">fetching...</div>
+                <div class="data-status" id="dailyStatus">✓ live</div>
             </div>
             <div class="card-preview" id="dailyPreview">
                 <div class="stat-row"><span class="stat-label">📧 Total sends</span><span class="stat-value">—</span></div>
@@ -317,7 +308,7 @@
                 <div class="stat-row"><span class="stat-label">📅 Data period</span><span class="stat-value">—</span></div>
             </div>
             <div class="card-footer">
-                <a href="https://lovely-quilt.pages.dev/daily-data" class="btn" target="_blank" rel="noopener noreferrer">
+                <a href="https://lovely-quilt.pages.dev/daily-data" class="btn" target="_blank">
                     📬 Full daily dashboard →
                 </a>
             </div>
@@ -325,7 +316,7 @@
     </div>
 
     <!-- KPI Snapshot -->
-    <div class="insight-section" id="insightSection">
+    <div class="insight-section">
         <div class="insight-title">
             <span>✨</span> Live KPI Snapshot
         </div>
@@ -336,222 +327,97 @@
             <div class="metric-block"><div class="metric-number">—</div><div class="metric-label">Campaign Revenue</div></div>
         </div>
         <div style="margin-top: 0.8rem; font-size: 0.75rem; text-align: center; color:#a28464;" id="dataNote">
-            ⏳ Auto-fetched from monthly-data and daily-data pages
+            📡 Data from /data.json — update JSON file to refresh all dashboards
         </div>
     </div>
 
     <div class="footer-note">
-        🧵 Data refreshes automatically every 5 minutes — or click "Refresh now". Numbers update when monthly-data or daily-data content changes.
+        🧵 All dashboards share the same <strong>data.json</strong> file. Update one file → all pages refresh automatically.
     </div>
 </div>
 
 <script>
-    // Fetch page content
-    async function fetchPage(url) {
+    let currentData = null;
+
+    async function fetchData() {
         try {
-            const response = await fetch(url, { cache: 'no-store' });
+            const response = await fetch('/data.json?t=' + Date.now(), { cache: 'no-store' });
             if (!response.ok) throw new Error(`HTTP ${response.status}`);
-            return await response.text();
+            return await response.json();
         } catch (err) {
-            console.warn(`Failed to fetch ${url}:`, err);
+            console.error('Failed to fetch data.json:', err);
             return null;
         }
     }
 
-    // Parse monthly data by extracting text values from the page structure
-    function parseMonthlyData(html) {
-        try {
-            // Extract key metrics using regex on the text content
-            const omnisendMatch = html.match(/📬\s*Latest Omnisend\s*\$([\d,]+\.?\d*)/i);
-            const omnisend = omnisendMatch ? parseFloat(omnisendMatch[1].replace(/,/g, '')) : 0;
-            
-            const newSubsMatch = html.match(/🆕\s*New Subs \(latest\)\s*([\d,]+)/i);
-            const newSubs = newSubsMatch ? parseInt(newSubsMatch[1].replace(/,/g, '')) : 0;
-            
-            const unsubRateMatch = html.match(/🚫\s*Unsub Rate \(latest\)\s*([\d.]+)%/i);
-            const unsubRate = unsubRateMatch ? parseFloat(unsubRateMatch[1]) : 0;
-            
-            const engagedMatch = html.match(/👥\s*Engaged List\s*([\d,]+)/i);
-            const engaged = engagedMatch ? parseInt(engagedMatch[1].replace(/,/g, '')) : 0;
-            
-            // Find latest month from the table section (look for the last row in the table data)
-            // The table is in text format with | separators, find the last line with month data
-            const tableMatch = html.match(/📅 Month \|.*?\n([\s\S]*?)✨ Unsubscribes added/i);
-            let latestMonth = "Feb 2026";
-            let netGrowth = 654;
-            
-            if (tableMatch) {
-                const tableContent = tableMatch[1];
-                const rows = tableContent.split('\n');
-                const dataRows = rows.filter(row => row.includes('|') && (row.includes('Jan') || row.includes('Feb') || row.includes('Mar') || 
-                    row.includes('Apr') || row.includes('May') || row.includes('Jun') || row.includes('Jul') || 
-                    row.includes('Aug') || row.includes('Sep') || row.includes('Oct') || row.includes('Nov') || row.includes('Dec')));
-                
-                if (dataRows.length > 0) {
-                    const lastRow = dataRows[dataRows.length - 1];
-                    const cols = lastRow.split('|').map(c => c.trim());
-                    if (cols.length >= 5) {
-                        latestMonth = cols[1] || latestMonth;
-                        // Net growth is in column 4 (index 3 after split)
-                        const growthMatch = cols[4]?.match(/([+-]?\d+)/);
-                        if (growthMatch) netGrowth = parseInt(growthMatch[1]);
-                    }
-                }
-            }
-            
-            return {
-                omnisend,
-                newSubs,
-                unsubRate,
-                engaged,
-                netGrowth,
-                month: latestMonth,
-                success: true
-            };
-        } catch (e) {
-            console.error('Error parsing monthly data:', e);
-            return null;
+    function findTopCampaign(campaigns) {
+        if (!campaigns || campaigns.length === 0) return "N/A";
+        let top = campaigns[0];
+        for (const campaign of campaigns) {
+            if (campaign.revenue > top.revenue) top = campaign;
         }
+        return top.name.length > 35 ? top.name.substring(0, 32) + "..." : top.name;
     }
 
-    // Parse daily data by extracting from the page structure
-    function parseDailyData(html) {
-        try {
-            // Extract summary metrics
-            const totalSendsMatch = html.match(/📧\s*Total sends\s*([\d,]+)/i);
-            const totalSends = totalSendsMatch ? parseInt(totalSendsMatch[1].replace(/,/g, '')) : 0;
-            
-            const totalRevenueMatch = html.match(/💰\s*Total revenue\s*\$([\d,]+\.?\d*)/i);
-            const totalRevenue = totalRevenueMatch ? parseFloat(totalRevenueMatch[1].replace(/,/g, '')) : 0;
-            
-            const avgOpenMatch = html.match(/📈\s*Avg open rate\s*([\d.]+)%/i);
-            const avgOpenRate = avgOpenMatch ? parseFloat(avgOpenMatch[1]) : 0;
-            
-            const avgClickMatch = html.match(/🎯\s*Avg click rate\s*([\d.]+)%/i);
-            const avgClickRate = avgClickMatch ? parseFloat(avgClickMatch[1]) : 0;
-            
-            // Find top campaign by scanning campaign rows in the table
-            let topCampaign = "N/A";
-            let maxRevenue = 0;
-            
-            // Look for the campaign table section
-            const tableMatch = html.match(/Campaign name.*?\n([\s\S]*?)\n\n|\n📋 JSON Data Source/i);
-            if (tableMatch) {
-                const tableSection = tableMatch[1];
-                const lines = tableSection.split('\n');
-                for (const line of lines) {
-                    if (line.includes('$') && (line.includes('Mar') || line.includes('The'))) {
-                        const revenueMatch = line.match(/\$([\d.]+)/);
-                        if (revenueMatch) {
-                            const rev = parseFloat(revenueMatch[1]);
-                            if (rev > maxRevenue) {
-                                maxRevenue = rev;
-                                // Extract campaign name (text before the first | or date)
-                                const nameMatch = line.match(/^([^|]+?)\s*\|/);
-                                if (nameMatch) {
-                                    topCampaign = nameMatch[1].trim().substring(0, 35);
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-            
-            return {
-                totalSends,
-                totalRevenue,
-                avgOpenRate,
-                avgClickRate,
-                topCampaign: topCampaign !== "N/A" ? topCampaign : "National Craft Month",
-                success: true
-            };
-        } catch (e) {
-            console.error('Error parsing daily data:', e);
-            return null;
+    function updateDashboard(data) {
+        if (!data) {
+            document.getElementById('monthlyPreview').innerHTML = '<div class="error-placeholder">⚠️ Could not load data.json. Ensure file exists at /data.json</div>';
+            document.getElementById('dailyPreview').innerHTML = '<div class="error-placeholder">⚠️ Could not load data.json</div>';
+            return;
         }
-    }
 
-    async function refreshAllData() {
-        // Set loading state
-        document.getElementById('monthlyStatus').innerText = 'updating...';
-        document.getElementById('dailyStatus').innerText = 'updating...';
-        document.getElementById('monthlyPreview').classList.add('loading');
-        document.getElementById('dailyPreview').classList.add('loading');
-        
-        // Fetch both pages
-        const monthlyHtml = await fetchPage('https://lovely-quilt.pages.dev/monthly-data');
-        const dailyHtml = await fetchPage('https://lovely-quilt.pages.dev/daily-data');
-        
-        let monthly = null;
-        let daily = null;
-        
-        // Parse monthly
-        if (monthlyHtml) {
-            monthly = parseMonthlyData(monthlyHtml);
-            document.getElementById('monthlyStatus').innerText = monthly?.success ? '✓ live' : 'parsed';
-        } else {
-            document.getElementById('monthlyStatus').innerText = 'unreachable';
-        }
-        
-        // Parse daily
-        if (dailyHtml) {
-            daily = parseDailyData(dailyHtml);
-            document.getElementById('dailyStatus').innerText = daily?.success ? '✓ live' : 'parsed';
-        } else {
-            document.getElementById('dailyStatus').innerText = 'unreachable';
-        }
-        
+        const monthly = data.monthly;
+        const daily = data.daily;
+
         // Update Monthly Preview
-        if (monthly && monthly.success) {
-            document.getElementById('monthlyPreview').innerHTML = `
-                <div class="stat-row"><span class="stat-label">📬 Omnisend revenue</span><span class="stat-value highlight">$${monthly.omnisend.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span></div>
-                <div class="stat-row"><span class="stat-label">🆕 New subscribers</span><span class="stat-value">${monthly.newSubs.toLocaleString()}</span></div>
-                <div class="stat-row"><span class="stat-label">🚫 Unsub rate</span><span class="stat-value ${monthly.unsubRate > 1.8 ? 'highlight' : ''}">${monthly.unsubRate}%</span></div>
-                <div class="stat-row"><span class="stat-label">👥 Engaged list</span><span class="stat-value">${monthly.engaged.toLocaleString()}</span></div>
-                <div class="stat-row"><span class="stat-label">📈 Net growth</span><span class="stat-value">${monthly.netGrowth >= 0 ? '+' : ''}${monthly.netGrowth}</span></div>
-                <div class="stat-row"><span class="stat-label">⚠️ Latest month</span><span class="stat-value">${monthly.month}</span></div>
-            `;
-        } else {
-            document.getElementById('monthlyPreview').innerHTML = `<div class="error-placeholder">⚠️ Could not parse monthly data. Ensure monthly-data page is accessible.</div>`;
-        }
-        
-        // Update Daily Preview
-        if (daily && daily.success) {
-            document.getElementById('dailyPreview').innerHTML = `
-                <div class="stat-row"><span class="stat-label">📧 Total sends</span><span class="stat-value">${daily.totalSends.toLocaleString()}</span></div>
-                <div class="stat-row"><span class="stat-label">💰 Total revenue</span><span class="stat-value highlight">$${daily.totalRevenue.toFixed(2)}</span></div>
-                <div class="stat-row"><span class="stat-label">📈 Avg open rate</span><span class="stat-value">${daily.avgOpenRate}%</span></div>
-                <div class="stat-row"><span class="stat-label">🎯 Avg click rate</span><span class="stat-value">${daily.avgClickRate}%</span></div>
-                <div class="stat-row"><span class="stat-label">🏆 Top campaign</span><span class="stat-value">${daily.topCampaign}</span></div>
-                <div class="stat-row"><span class="stat-label">📅 Data period</span><span class="stat-value">Mar 2026</span></div>
-            `;
-        } else {
-            document.getElementById('dailyPreview').innerHTML = `<div class="error-placeholder">⚠️ Could not parse daily data. Ensure daily-data page is accessible.</div>`;
-        }
-        
-        // Update KPI Grid
-        const kpiHtml = `
-            <div class="metric-block"><div class="metric-number">${monthly ? '$' + monthly.omnisend.toLocaleString(undefined, {minimumFractionDigits: 0, maximumFractionDigits: 0}) : '—'}</div><div class="metric-label">Latest Omnisend</div></div>
-            <div class="metric-block"><div class="metric-number">${monthly ? monthly.newSubs.toLocaleString() : '—'}</div><div class="metric-label">New Subs (latest)</div></div>
-            <div class="metric-block"><div class="metric-number">${monthly ? monthly.unsubRate + '%' : '—'}</div><div class="metric-label">Unsub Rate</div></div>
-            <div class="metric-block"><div class="metric-number">${daily ? '$' + Math.round(daily.totalRevenue) : '—'}</div><div class="metric-label">Campaign Revenue</div></div>
+        document.getElementById('monthlyPreview').innerHTML = `
+            <div class="stat-row"><span class="stat-label">📬 Omnisend revenue</span><span class="stat-value highlight">$${monthly.latestOmnisend.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span></div>
+            <div class="stat-row"><span class="stat-label">🆕 New subscribers</span><span class="stat-value">${monthly.newSubscribers.toLocaleString()}</span></div>
+            <div class="stat-row"><span class="stat-label">🚫 Unsub rate</span><span class="stat-value ${monthly.unsubRate > 1.8 ? 'highlight' : ''}">${monthly.unsubRate}%</span></div>
+            <div class="stat-row"><span class="stat-label">👥 Engaged list</span><span class="stat-value">${monthly.engagedList.toLocaleString()} / ${monthly.targetEngaged.toLocaleString()}</span></div>
+            <div class="stat-row"><span class="stat-label">📈 Net growth</span><span class="stat-value">${monthly.netGrowth >= 0 ? '+' : ''}${monthly.netGrowth}</span></div>
+            <div class="stat-row"><span class="stat-label">⚠️ Latest month</span><span class="stat-value">${monthly.latestMonth}</span></div>
         `;
-        document.getElementById('kpiGrid').innerHTML = kpiHtml;
-        
+
+        // Update Daily Preview
+        const topCampaign = findTopCampaign(daily.campaigns);
+        document.getElementById('dailyPreview').innerHTML = `
+            <div class="stat-row"><span class="stat-label">📧 Total sends</span><span class="stat-value">${daily.totalSends.toLocaleString()}</span></div>
+            <div class="stat-row"><span class="stat-label">💰 Total revenue</span><span class="stat-value highlight">$${daily.totalRevenue.toFixed(2)}</span></div>
+            <div class="stat-row"><span class="stat-label">📈 Avg open rate</span><span class="stat-value">${daily.avgOpenRate}%</span></div>
+            <div class="stat-row"><span class="stat-label">🎯 Avg click rate</span><span class="stat-value">${daily.avgClickRate}%</span></div>
+            <div class="stat-row"><span class="stat-label">🏆 Top campaign</span><span class="stat-value">${topCampaign}</span></div>
+            <div class="stat-row"><span class="stat-label">📅 Data period</span><span class="stat-value">${daily.period}</span></div>
+        `;
+
+        // Update KPI Grid
+        document.getElementById('kpiGrid').innerHTML = `
+            <div class="metric-block"><div class="metric-number">$${Math.round(monthly.latestOmnisend)}</div><div class="metric-label">Latest Omnisend</div></div>
+            <div class="metric-block"><div class="metric-number">${monthly.newSubscribers.toLocaleString()}</div><div class="metric-label">New Subs (latest)</div></div>
+            <div class="metric-block"><div class="metric-number">${monthly.unsubRate}%</div><div class="metric-label">Unsub Rate</div></div>
+            <div class="metric-block"><div class="metric-number">$${Math.round(daily.totalRevenue)}</div><div class="metric-label">Campaign Revenue</div></div>
+        `;
+
         // Update timestamp
         const now = new Date();
-        document.getElementById('lastUpdatedText').innerHTML = `✅ auto-updated: ${now.toLocaleTimeString()} · data from live pages`;
-        document.getElementById('dataNote').innerHTML = `📡 ${monthly ? 'Monthly: $' + monthly.omnisend + ' Omnisend' : 'Monthly: —'} · ${daily ? 'Daily: ' + daily.totalSends.toLocaleString() + ' sends' : 'Daily: —'}`;
-        
-        // Remove loading class
-        document.getElementById('monthlyPreview').classList.remove('loading');
-        document.getElementById('dailyPreview').classList.remove('loading');
+        document.getElementById('lastUpdatedText').innerHTML = `✅ updated: ${now.toLocaleTimeString()} · data from data.json`;
+        document.getElementById('dataNote').innerHTML = `📡 Monthly: $${monthly.latestOmnisend} Omnisend · Daily: ${daily.totalSends.toLocaleString()} sends`;
     }
-    
+
+    async function refreshAll() {
+        const data = await fetchData();
+        if (data) {
+            currentData = data;
+            updateDashboard(data);
+        } else {
+            updateDashboard(null);
+        }
+    }
+
     // Initial load + auto-refresh every 5 minutes
-    refreshAllData();
-    setInterval(refreshAllData, 5 * 60 * 1000);
-    document.getElementById('refreshBtn').addEventListener('click', () => refreshAllData());
+    refreshAll();
+    setInterval(refreshAll, 5 * 60 * 1000);
+    document.getElementById('refreshBtn').addEventListener('click', refreshAll);
 </script>
 </body>
 </html>
