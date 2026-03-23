@@ -2,545 +2,158 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
-    <title>Lovely Quilt · Email Health Dashboard | Unsubscribes Analysis</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🧵 Lovely Quilt · Email Health Dashboard</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
         body {
-            background: #f0f4f9;
-            font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, sans-serif;
-            padding: 1rem;
-            color: #1a2c3e;
-        }
-
-        @media (min-width: 768px) {
-            body {
-                padding: 2rem 1.5rem;
-            }
-        }
-
-        .report-container {
-            max-width: 1600px;
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+            max-width: 1400px;
             margin: 0 auto;
-            background: white;
-            border-radius: 1.5rem;
-            box-shadow: 0 20px 35px -12px rgba(0, 0, 0, 0.08);
-            padding: 1.2rem 1rem 1.8rem 1rem;
-            overflow-x: hidden;
+            padding: 2rem;
+            background: #faf7f2;
+            color: #2c2418;
         }
-
-        @media (min-width: 768px) {
-            .report-container {
-                padding: 1.8rem 2rem 2.5rem 2rem;
-                border-radius: 2rem;
-            }
-        }
-
-        .brand-header {
-            display: flex;
-            flex-direction: column;
-            gap: 0.8rem;
-            margin-bottom: 1.5rem;
-            border-bottom: 2px solid #e9edf2;
-            padding-bottom: 1rem;
-        }
-
-        @media (min-width: 640px) {
-            .brand-header {
-                flex-direction: row;
-                justify-content: space-between;
-                align-items: flex-end;
-            }
-        }
-
-        .title-section h1 {
-            font-size: 1.4rem;
-            font-weight: 700;
-            background: linear-gradient(135deg, #2c5a6e, #1e3b4a);
-            background-clip: text;
-            -webkit-background-clip: text;
-            color: transparent;
-        }
-
-        @media (min-width: 768px) {
-            .title-section h1 {
-                font-size: 1.9rem;
-            }
-        }
-
-        .title-section p {
-            color: #4a627a;
-            font-size: 0.75rem;
-            margin-top: 0.2rem;
-        }
-
-        .insight-badge {
-            background: #fef7e0;
-            padding: 0.4rem 0.8rem;
-            border-radius: 40px;
-            font-size: 0.7rem;
-            font-weight: 500;
-            border-left: 3px solid #e9b35f;
-            display: inline-block;
-            align-self: flex-start;
-        }
-
         .kpi-grid {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.8rem;
-            margin-bottom: 1.5rem;
-            background: #f8fafd;
-            border-radius: 1.2rem;
-            padding: 1rem;
-            justify-content: space-between;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin: 2rem 0;
         }
-
         .kpi-card {
-            flex: 1;
-            min-width: 120px;
+            background: white;
+            padding: 1.2rem;
+            border-radius: 1rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            text-align: center;
         }
-
-        .kpi-label {
-            font-size: 0.65rem;
-            text-transform: uppercase;
-            font-weight: 600;
-            color: #5f7f9a;
-            letter-spacing: 0.3px;
-        }
-
         .kpi-value {
-            font-size: 1.3rem;
-            font-weight: 800;
-            color: #1d4e6b;
-            line-height: 1.2;
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #b1622c;
         }
-
-        @media (min-width: 768px) {
-            .kpi-value {
-                font-size: 1.6rem;
-            }
+        .kpi-label {
+            font-size: 0.8rem;
+            color: #6b4f32;
+            text-transform: uppercase;
         }
-
-        .trend-up { color: #2b7e4a; }
-        .trend-down { color: #bc4742; }
-
-        .alert-box {
-            padding: 0.8rem 1rem;
-            margin-bottom: 1.5rem;
-            border-radius: 0.8rem;
-            font-size: 0.75rem;
-            line-height: 1.4;
-        }
-        .critical-alert { background: #f8d7da; border-left: 4px solid #bc4742; }
-        .good-alert { background: #d4edda; border-left: 4px solid #2b7e4a; }
-        .warning-alert { background: #fff3cd; border-left: 4px solid #e9b35f; }
-
-        .charts-row {
-            display: flex;
-            flex-direction: column;
-            gap: 1.5rem;
-            margin-bottom: 1.8rem;
-        }
-
-        @media (min-width: 768px) {
-            .charts-row {
-                flex-direction: row;
-                gap: 2rem;
-            }
-        }
-
-        .chart-card {
-            flex: 1;
-            background: white;
-            border-radius: 1rem;
-            border: 1px solid #eef2f8;
-            padding: 0.8rem;
-        }
-
-        .chart-card h3 {
-            font-size: 0.9rem;
-            font-weight: 600;
-            margin-bottom: 0.6rem;
-            border-left: 3px solid #7cb3cf;
-            padding-left: 10px;
-        }
-
-        canvas {
-            max-height: 220px;
-            width: 100%;
-        }
-
-        @media (min-width: 768px) {
-            canvas {
-                max-height: 260px;
-            }
-        }
-
-        /* TABLE WITH STICKY FIRST COLUMN */
-        .data-table-wrapper {
-            overflow-x: auto;
-            margin-top: 1.8rem;
-            border-radius: 1rem;
-            border: 1px solid #e2e8f0;
-            background: white;
-            position: relative;
-            -webkit-overflow-scrolling: touch;
-        }
-
         table {
             width: 100%;
-            border-collapse: separate;
-            border-spacing: 0;
-            font-size: 0.7rem;
-            min-width: 950px;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 1rem;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            margin: 1.5rem 0;
         }
-
-        @media (min-width: 768px) {
-            table {
-                font-size: 0.75rem;
-                min-width: 1100px;
-            }
-        }
-
-        th {
-            background: #f1f5f9;
-            padding: 10px 6px;
-            font-weight: 600;
-            color: #1f4662;
+        th, td {
+            padding: 0.75rem;
             text-align: right;
-            border-bottom: 1px solid #dce3ec;
-            white-space: nowrap;
+            border-bottom: 1px solid #eee;
         }
-
-        td {
-            padding: 8px 6px;
-            border-bottom: 1px solid #ecf1f6;
-            text-align: right;
-            white-space: nowrap;
-        }
-
-        th:first-child,
-        td:first-child {
-            position: sticky;
-            left: 0;
-            background-color: white;
-            z-index: 10;
+        th:first-child, td:first-child {
             text-align: left;
             font-weight: 600;
-            box-shadow: 2px 0 5px -2px rgba(0, 0, 0, 0.05);
         }
-
-        th:first-child {
-            background-color: #f1f5f9;
-            z-index: 11;
+        th {
+            background: #f5ede3;
+            color: #4a3729;
         }
-
-        tr:hover td {
-            background-color: #fafcff;
+        .warning {
+            background: #fff3e0;
+            padding: 1rem;
+            border-radius: 0.75rem;
+            margin: 1rem 0;
         }
-        tr:hover td:first-child {
-            background-color: #fafcff;
+        h1 {
+            color: #4a3729;
         }
-
-        .high-unsub td:first-child { background-color: #fff0f0; }
-        .high-unsub td { background-color: #fff0f0; }
-        .revival td:first-child { background-color: #e8f5e9; }
-        .revival td { background-color: #e8f5e9; }
-
-        .revenue-highlight { font-weight: 700; color: #1f6e43; }
-        .unsub-bad { color: #bc4742; font-weight: 600; }
-        .add-data-hint {
-            background: #eef2fa;
-            border-radius: 0.8rem;
-            padding: 0.6rem 0.8rem;
-            font-family: monospace;
-            font-size: 0.65rem;
+        .last-updated {
+            font-size: 0.75rem;
+            color: #9b846b;
             margin-top: 1rem;
-        }
-        .footer {
-            margin-top: 1.5rem;
-            font-size: 0.65rem;
-            text-align: center;
-            color: #7b96af;
-            padding-top: 1rem;
-            border-top: 1px solid #e4ebf2;
         }
     </style>
 </head>
 <body>
-<div class="report-container">
-    <div class="brand-header">
-        <div class="title-section">
-            <h1>🧵 Lovely Quilt · Email Health Dashboard</h1>
-            <p>New subscribers + Unsubscribes = Net Growth | Unsubscribes reveal list fatigue</p>
-        </div>
-        <div class="insight-badge">📊 Watch unsubscribe spikes → content fatigue signals</div>
-    </div>
+    <h1>🧵 Lovely Quilt · Email Health Dashboard</h1>
+    <div id="kpiContainer" class="kpi-grid">Loading data...</div>
+    <div id="tableContainer">Loading table...</div>
+    <div class="last-updated" id="lastUpdated"></div>
 
-    <div class="kpi-grid" id="kpiContainer"></div>
-    <div id="alertBox" class="alert-box"></div>
+    <script>
+        async function loadData() {
+            try {
+                const response = await fetch('/data.json?t=' + Date.now());
+                const data = await response.json();
+                const monthly = data.monthly;
+                const historical = monthly.historicalData;
 
-    <div class="charts-row">
-        <div class="chart-card">
-            <h3>💀 New Subs vs Engaged List</h3>
-            <canvas id="deathSpiralChart"></canvas>
-        </div>
-        <div class="chart-card">
-            <h3>📧 Campaigns vs Automation Revenue</h3>
-            <canvas id="campAutoChart"></canvas>
-        </div>
-    </div>
+                // Update KPIs
+                document.getElementById('kpiContainer').innerHTML = `
+                    <div class="kpi-card">
+                        <div class="kpi-value">$${monthly.latestOmnisend.toLocaleString()}</div>
+                        <div class="kpi-label">Latest Omnisend</div>
+                        <small>${monthly.latestOmnisendMoM}% MoM</small>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-value">${monthly.newSubscribers.toLocaleString()}</div>
+                        <div class="kpi-label">New Subs (latest)</div>
+                        <small>Avg 3m: ${monthly.avg3mNewSubs}</small>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-value">${monthly.unsubRate}%</div>
+                        <div class="kpi-label">Unsub Rate (latest)</div>
+                        <small>Avg 3m: ${monthly.avg3mUnsubRate}%</small>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-value">${monthly.engagedList.toLocaleString()}</div>
+                        <div class="kpi-label">Engaged List</div>
+                        <small>Target: ${monthly.targetEngaged.toLocaleString()}</small>
+                    </div>
+                `;
 
-    <div class="charts-row">
-        <div class="chart-card">
-            <h3>📈 Unsubscribe Rate Trend (Critical Insight)</h3>
-            <canvas id="unsubRateChart"></canvas>
-            <div style="font-size:0.65rem; text-align:center; margin-top:5px;">🚨 Spikes indicate list fatigue or content issues</div>
-        </div>
-        <div class="chart-card">
-            <h3>🎯 Engaged List → 5,000+ Target</h3>
-            <canvas id="engagedProjectionChart"></canvas>
-        </div>
-    </div>
+                // Build table
+                let tableHtml = `
+                    <table>
+                        <thead>
+                            <tr><th>Month</th><th>🆕 New Subs</th><th>🚫 Unsubs</th><th>📈 Net Growth</th><th>👥 Engaged</th><th>📧 Campaigns $</th><th>⚙️ Auto $</th><th>📬 Omnisend $</th><th>🏪 Store $</th><th>⚠️ Unsub Rate</th></tr>
+                        </thead>
+                        <tbody>
+                `;
 
-    <div class="data-table-wrapper">
-        <table>
-            <thead>
-                <tr>
-                    <th>📅 Month</th>
-                    <th>🆕 New Subs</th>
-                    <th>🚫 Unsubs</th>
-                    <th>📈 Net Growth</th>
-                    <th>👥 Engaged</th>
-                    <th>📧 Campaigns $</th>
-                    <th>⚙️ Auto $</th>
-                    <th>📬 Omnisend $</th>
-                    <th>🏪 Store $</th>
-                    <th>⚠️ Unsub Rate</th>
-                </tr>
-            </thead>
-            <tbody id="tableBody"></tbody>
-        </table>
-        <div class="add-data-hint">
-            ✨ <strong>Unsubscribes added:</strong> High unsubscribe rates (>2%) signal fatigue. Aug 2025 spike (167 unsubs) and Dec 2025 spike (93 unsubs) show campaign fatigue after periods of low new subscriber acquisition.
-        </div>
-    </div>
-    <div class="footer">
-        📊 <strong>Unsubscribes insight:</strong> When new subscribers drop, unsubscribes become more damaging. Aug 2025 had 167 unsubs (2.6% rate) — list was shrinking despite some new subs.<br>
-        🎯 <strong>Goal:</strong> Keep unsubscribe rate below 1% of total list. High unsubscribes + low new subs = death spiral.
-    </div>
-</div>
+                for (const row of historical) {
+                    tableHtml += `
+                        <tr>
+                            <td>${row.month}</td>
+                            <td>${row.newSubs.toLocaleString()}</td>
+                            <td>${row.unsubs.toLocaleString()}</td>
+                            <td>${row.netGrowth >= 0 ? '+' : ''}${row.netGrowth}</td>
+                            <td>${row.engaged.toLocaleString()}</td>
+                            <td>$${row.campaignsRevenue.toFixed(2)}</td>
+                            <td>$${row.autoRevenue.toFixed(2)}</td>
+                            <td>$${row.omnisendRevenue.toFixed(2)}</td>
+                            <td>$${row.storeRevenue.toFixed(2)}</td>
+                            <td>${row.unsubRate}%</td>
+                        </tr>
+                    `;
+                }
 
-<script>
-    // ==================== FULL DATASET WITH UNSUBSCRIBES ====================
-    // Based on provided unsubscribe data from Jan 2025 to Feb 2026
-    const monthlyData = [
-        { month:"Jan 2025", newEmail:96, unsubs:144, engaged:1500, campRev:544.15, autoRev:325.75, omniRev:869.90, storeRev:2400.35, totalEmail:4041 },
-        { month:"Feb 2025", newEmail:153, unsubs:55, engaged:1600, campRev:183.47, autoRev:371.38, omniRev:554.85, storeRev:2549.11, totalEmail:4139 },
-        { month:"Mar 2025", newEmail:970, unsubs:50, engaged:2800, campRev:0.00, autoRev:1675.66, omniRev:1675.66, storeRev:10813.85, totalEmail:5059 },
-        { month:"Apr 2025", newEmail:957, unsubs:71, engaged:3100, campRev:0.00, autoRev:1712.48, omniRev:1712.48, storeRev:8585.47, totalEmail:5945 },
-        { month:"May 2025", newEmail:98, unsubs:31, engaged:1900, campRev:0.00, autoRev:264.93, omniRev:264.93, storeRev:1714.60, totalEmail:6012 },
-        { month:"Jun 2025", newEmail:173, unsubs:19, engaged:2100, campRev:0.00, autoRev:531.58, omniRev:531.58, storeRev:2795.61, totalEmail:6166 },
-        { month:"Jul 2025", newEmail:338, unsubs:99, engaged:2400, campRev:223.39, autoRev:626.58, omniRev:849.97, storeRev:5519.43, totalEmail:6405 },
-        { month:"Aug 2025", newEmail:164, unsubs:167, engaged:2450, campRev:639.51, autoRev:430.09, omniRev:1069.60, storeRev:3092.30, totalEmail:6402 },
-        { month:"Sep 2025", newEmail:207, unsubs:115, engaged:2400, campRev:505.31, autoRev:525.30, omniRev:1030.61, storeRev:3720.29, totalEmail:6494 },
-        { month:"Oct 2025", newEmail:224, unsubs:123, engaged:2350, campRev:324.45, autoRev:715.35, omniRev:1039.80, storeRev:3366.56, totalEmail:6595 },
-        { month:"Nov 2025", newEmail:83, unsubs:104, engaged:1850, campRev:410.67, autoRev:204.97, omniRev:615.64, storeRev:1493.64, totalEmail:6574 },
-        { month:"Dec 2025", newEmail:33, unsubs:93, engaged:1500, campRev:603.24, autoRev:68.04, omniRev:671.28, storeRev:1100.88, totalEmail:6514 },
-        { month:"Jan 2026", newEmail:53, unsubs:91, engaged:1300, campRev:163.34, autoRev:115.46, omniRev:278.80, storeRev:987.64, totalEmail:6476 },
-        { month:"Feb 2026", newEmail:768, unsubs:114, engaged:2500, campRev:421.68, autoRev:1630.45, omniRev:2052.13, storeRev:12823.50, totalEmail:7130 }
-    ];
+                tableHtml += `</tbody></table>`;
+                document.getElementById('tableContainer').innerHTML = tableHtml;
 
-    // Calculate net growth and unsubscribe rate
-    monthlyData.forEach(d => {
-        d.netGrowth = d.newEmail - d.unsubs;
-        d.unsubRate = (d.unsubs / d.totalEmail * 100).toFixed(2);
-    });
+                const now = new Date();
+                document.getElementById('lastUpdated').innerHTML = `📅 Last updated: ${now.toLocaleString()} · Data from data.json`;
 
-    // Render KPIs with unsubscribe context
-    function renderKPIs() {
-        const latest = monthlyData[monthlyData.length-1];
-        const prev = monthlyData[monthlyData.length-2];
-        const growth = ((latest.omniRev - prev.omniRev) / prev.omniRev * 100).toFixed(1);
-        const avgNewSubsLast3 = monthlyData.slice(-3).reduce((s,d) => s + d.newEmail, 0) / 3;
-        const avgUnsubRateLast3 = monthlyData.slice(-3).reduce((s,d) => s + d.unsubs, 0) / monthlyData.slice(-3).reduce((s,d) => s + d.totalEmail, 0) * 100;
-        const autoPct = ((latest.autoRev / latest.omniRev) * 100).toFixed(0);
-        
-        document.getElementById('kpiContainer').innerHTML = `
-            <div class="kpi-card"><div class="kpi-label">📬 Latest Omnisend</div><div class="kpi-value">$${latest.omniRev.toLocaleString()}</div><div class="${growth >=0 ? 'trend-up' : 'trend-down'}">${growth}% MoM</div></div>
-            <div class="kpi-card"><div class="kpi-label">🆕 New Subs (latest)</div><div class="kpi-value">${latest.newEmail}</div><div>Avg 3m: ${avgNewSubsLast3.toFixed(0)}</div></div>
-            <div class="kpi-card"><div class="kpi-label">🚫 Unsub Rate (latest)</div><div class="kpi-value ${latest.unsubRate > 2 ? 'trend-down' : 'trend-up'}">${latest.unsubRate}%</div><div>Avg 3m: ${avgUnsubRateLast3.toFixed(2)}%</div></div>
-            <div class="kpi-card"><div class="kpi-label">👥 Engaged List</div><div class="kpi-value">${latest.engaged}</div><div>🎯 Target: 5,000</div></div>
-        `;
-    }
-
-    // Alert based on unsubscribe rate + new subs
-    function renderAlert() {
-        const last3AvgNew = monthlyData.slice(-3).reduce((s,d) => s + d.newEmail, 0) / 3;
-        const last3AvgUnsubRate = monthlyData.slice(-3).reduce((s,d) => s + d.unsubs, 0) / monthlyData.slice(-3).reduce((s,d) => s + d.totalEmail, 0) * 100;
-        const latestUnsubRate = monthlyData[monthlyData.length-1].unsubRate;
-        const latestEngaged = monthlyData[monthlyData.length-1].engaged;
-        const alertBox = document.getElementById('alertBox');
-        
-        let message = "";
-        let alertClass = "alert-box warning-alert";
-        
-        if (last3AvgNew < 100 && latestUnsubRate > 1.5) {
-            alertClass = "alert-box critical-alert";
-            message = `⚠️ <strong>CRITICAL DOUBLE WHAMMY:</strong> New subs avg ${last3AvgNew.toFixed(0)}/month (below 100) AND unsubscribe rate at ${latestUnsubRate}%. List is shrinking from both ends. Restart acquisition & review content quality.`;
-        } else if (last3AvgNew < 100) {
-            alertClass = "alert-box critical-alert";
-            message = `⚠️ <strong>CRITICAL ZONE:</strong> New subscribers avg ${last3AvgNew.toFixed(0)}/month (below 100). Without new subscribers, list decays. Unsubscribe rate: ${latestUnsubRate}%.`;
-        } else if (latestUnsubRate > 2) {
-            alertClass = "alert-box critical-alert";
-            message = `🚨 <strong>HIGH UNSUBSCRIBE RATE:</strong> ${latestUnsubRate}% of list unsubscribed. This indicates content fatigue or mismatch. Review campaign frequency & relevance.`;
-        } else if (latestUnsubRate > 1.2) {
-            alertClass = "alert-box warning-alert";
-            message = `⚠️ <strong>Elevated Unsubscribes:</strong> ${latestUnsubRate}% unsub rate. Monitor content quality and send frequency.`;
-        } else if (last3AvgNew < 300) {
-            alertClass = "alert-box warning-alert";
-            message = `⚠️ <strong>Moderate Risk:</strong> New subscribers avg ${last3AvgNew.toFixed(0)}/month. To reach 5,000 engaged, target 500+ new subs/month.`;
-        } else {
-            alertClass = "alert-box good-alert";
-            message = `✅ <strong>Healthy Metrics:</strong> New subs avg ${last3AvgNew.toFixed(0)}/month | Unsub rate ${latestUnsubRate}% within healthy range. Maintain momentum.`;
-        }
-        
-        if (latestEngaged < 2000 && !message.includes("CRITICAL")) {
-            message += `<br>📉 <strong>Engaged list at ${latestEngaged}</strong> — below healthy threshold. Run re-engagement campaigns.`;
-        }
-        
-        alertBox.className = alertClass;
-        alertBox.innerHTML = message;
-    }
-
-    // Render table with unsubscribe column
-    function renderTable() {
-        const tbody = document.getElementById('tableBody');
-        tbody.innerHTML = '';
-        monthlyData.forEach(row => {
-            const isHighUnsub = row.unsubRate > 2;
-            const isRevival = row.month === "Feb 2026";
-            
-            const tr = document.createElement('tr');
-            if (isHighUnsub) tr.classList.add('high-unsub');
-            if (isRevival) tr.classList.add('revival');
-            
-            tr.innerHTML = `
-                <td><strong>${row.month}</strong></td>
-                <td class="${row.newEmail < 100 ? 'trend-down' : 'trend-up'}">${row.newEmail}</td>
-                <td class="unsub-bad">${row.unsubs}</td>
-                <td class="${row.netGrowth >= 0 ? 'trend-up' : 'trend-down'}">${row.netGrowth >= 0 ? '+' : ''}${row.netGrowth}</td>
-                <td>${row.engaged}</td>
-                <td>$${row.campRev.toFixed(2)}</td>
-                <td>$${row.autoRev.toFixed(2)}</td>
-                <td class="revenue-highlight">$${row.omniRev.toFixed(2)}</td>
-                <td>$${row.storeRev.toFixed(2)}</td>
-                <td class="${row.unsubRate > 2 ? 'unsub-bad' : ''}">${row.unsubRate}%</td>
-            `;
-            tbody.appendChild(tr);
-        });
-    }
-
-    // ==================== CHARTS ====================
-    let deathChart, campAutoChart, unsubRateChart, engagedProjChart;
-
-    function initCharts() {
-        const months = monthlyData.map(d => d.month);
-        const newSubs = monthlyData.map(d => d.newEmail);
-        const engaged = monthlyData.map(d => d.engaged);
-        const campRev = monthlyData.map(d => d.campRev);
-        const autoRev = monthlyData.map(d => d.autoRev);
-        const unsubRate = monthlyData.map(d => parseFloat(d.unsubRate));
-        
-        // 1) Death spiral
-        const ctx1 = document.getElementById('deathSpiralChart').getContext('2d');
-        if (deathChart) deathChart.destroy();
-        deathChart = new Chart(ctx1, {
-            type: 'bar',
-            data: {
-                labels: months,
-                datasets: [
-                    { label: 'New Subscribers', data: newSubs, backgroundColor: '#6c9ebf', borderRadius: 5, yAxisID: 'y' },
-                    { label: 'Engaged List (30d)', data: engaged, type: 'line', borderColor: '#e9b35f', borderWidth: 3, backgroundColor: 'transparent', tension: 0.2, pointRadius: 3, yAxisID: 'y1', fill: false }
-                ]
-            },
-            options: {
-                responsive: true, maintainAspectRatio: true,
-                scales: { y: { title: { display: true, text: 'New Subscribers' }, beginAtZero: true }, y1: { position: 'right', title: { text: 'Engaged List' }, min: 1000, grid: { drawOnChartArea: false } } }
+            } catch (err) {
+                console.error('Error loading data:', err);
+                document.getElementById('kpiContainer').innerHTML = '<div class="warning">⚠️ Could not load data.json. Make sure the file exists at /data.json</div>';
             }
-        });
-        
-        // 2) Campaign vs Automation
-        const ctx2 = document.getElementById('campAutoChart').getContext('2d');
-        if (campAutoChart) campAutoChart.destroy();
-        campAutoChart = new Chart(ctx2, {
-            type: 'bar',
-            data: { labels: months, datasets: [
-                { label: 'Campaigns Revenue', data: campRev, backgroundColor: '#6c9ebf', stack: 'total', borderRadius: 4 },
-                { label: 'Automation Revenue', data: autoRev, backgroundColor: '#e9b35f', stack: 'total', borderRadius: 4 }
-            ] },
-            options: { responsive: true, maintainAspectRatio: true, scales: { y: { stacked: true, title: { text: 'Revenue (USD)' } } } }
-        });
-        
-        // 3) Unsubscribe Rate Chart (NEW!)
-        const ctx3 = document.getElementById('unsubRateChart').getContext('2d');
-        if (unsubRateChart) unsubRateChart.destroy();
-        unsubRateChart = new Chart(ctx3, {
-            type: 'line',
-            data: {
-                labels: months,
-                datasets: [
-                    { label: 'Unsubscribe Rate (%)', data: unsubRate, borderColor: '#bc4742', backgroundColor: 'rgba(188,71,66,0.1)', borderWidth: 2, fill: true, tension: 0.2, pointRadius: 4, pointBackgroundColor: '#bc4742' }
-                ]
-            },
-            options: {
-                responsive: true, maintainAspectRatio: true,
-                plugins: { tooltip: { callbacks: { label: (ctx) => `${ctx.raw}% unsubscribe rate` } } },
-                scales: { y: { title: { display: true, text: 'Unsubscribe Rate (%)' }, beginAtZero: true, max: 5, ticks: { callback: (val) => val + '%' } } }
-            }
-        });
-        
-        // 4) Engaged projection
-        const currentEngaged = monthlyData[monthlyData.length-1].engaged;
-        const futureMonths = ['Mar 2026', 'Apr 2026', 'May 2026', 'Jun 2026', 'Jul 2026', 'Aug 2026'];
-        const increments = (5000 - currentEngaged) / 6;
-        const projected = [];
-        for (let i = 1; i <= 6; i++) projected.push(Math.round(currentEngaged + increments * i));
-        
-        const ctx4 = document.getElementById('engagedProjectionChart').getContext('2d');
-        if (engagedProjChart) engagedProjChart.destroy();
-        engagedProjChart = new Chart(ctx4, {
-            type: 'line',
-            data: { labels: [...months, ...futureMonths], datasets: [{ label: 'Engaged Subscribers', data: [...engaged, ...projected], borderColor: '#2b7e4a', backgroundColor: 'rgba(43,126,74,0.1)', borderWidth: 3, fill: true }] },
-            options: { responsive: true, scales: { y: { title: { text: 'Engaged Subscribers' }, min: 1000 } } }
-        });
-    }
+        }
 
-    // Resize handler
-    let resizeTimer;
-    window.addEventListener('resize', function() {
-        if (resizeTimer) clearTimeout(resizeTimer);
-        resizeTimer = setTimeout(() => {
-            if (deathChart) deathChart.resize();
-            if (campAutoChart) campAutoChart.resize();
-            if (unsubRateChart) unsubRateChart.resize();
-            if (engagedProjChart) engagedProjChart.resize();
-        }, 150);
-    });
-
-    // INITIALIZE
-    renderKPIs();
-    renderAlert();
-    renderTable();
-    initCharts();
-</script>
+        loadData();
+        // Auto-refresh every 5 minutes
+        setInterval(loadData, 5 * 60 * 1000);
+    </script>
 
     <!-- ── FLOATING HOME BUTTON ── -->
 <style>
