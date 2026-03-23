@@ -5,13 +5,27 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>🧵 Lovely Quilt · daily campaign pulse</title>
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
         body {
-            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, monospace;
             max-width: 1400px;
             margin: 0 auto;
             padding: 2rem;
             background: #faf7f2;
             color: #2c2418;
+        }
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+            color: #4a3729;
+        }
+        .subhead {
+            color: #6b4f32;
+            margin-bottom: 2rem;
         }
         .kpi-grid {
             display: grid;
@@ -25,11 +39,17 @@
             border-radius: 1rem;
             text-align: center;
             box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            border: 1px solid #efe3d2;
         }
         .kpi-value {
             font-size: 1.8rem;
             font-weight: bold;
             color: #b1622c;
+        }
+        .kpi-label {
+            font-size: 0.8rem;
+            color: #6b4f32;
+            text-transform: uppercase;
         }
         table {
             width: 100%;
@@ -39,6 +59,7 @@
             overflow-x: auto;
             display: block;
             margin: 1.5rem 0;
+            font-size: 0.8rem;
         }
         th, td {
             padding: 0.75rem;
@@ -47,161 +68,250 @@
         }
         th:first-child, td:first-child {
             text-align: left;
+            font-weight: 600;
         }
         th {
             background: #f5ede3;
+            position: sticky;
+            top: 0;
         }
-        h1 {
-            color: #4a3729;
-        }
-        .last-updated {
-            font-size: 0.75rem;
-            color: #9b846b;
-            margin-top: 1rem;
-        }
-        .json-editor {
+        .json-section {
             background: #2c2418;
             color: #e5d5bf;
-            padding: 1rem;
-            border-radius: 0.75rem;
+            padding: 1.5rem;
+            border-radius: 1rem;
+            margin: 2rem 0;
+        }
+        .json-section h3 {
+            color: #e5d5bf;
+            margin-bottom: 0.5rem;
+        }
+        .json-section textarea {
+            width: 100%;
+            height: 400px;
             font-family: monospace;
-            font-size: 0.8rem;
+            font-size: 0.75rem;
+            background: #1e1912;
+            color: #e5d5bf;
+            border: 1px solid #5e4a34;
+            border-radius: 0.5rem;
+            padding: 1rem;
             margin: 1rem 0;
+        }
+        button {
+            background: #b1622c;
+            color: white;
+            border: none;
+            padding: 0.6rem 1.2rem;
+            border-radius: 2rem;
+            cursor: pointer;
+            font-weight: 600;
+            margin-right: 0.5rem;
+        }
+        button:hover {
+            background: #8b4a1e;
+        }
+        .last-updated {
+            font-size: 0.7rem;
+            color: #9b846b;
+            margin-top: 1rem;
+            text-align: right;
+        }
+        .note {
+            font-size: 0.7rem;
+            color: #9b846b;
+            margin: 1rem 0;
+        }
+        @media (max-width: 768px) {
+            body { padding: 1rem; }
+            table { font-size: 0.65rem; }
+            th, td { padding: 0.4rem; }
         }
     </style>
 </head>
 <body>
     <h1>🧵 Lovely Quilt · daily campaign pulse</h1>
+    <div class="subhead" id="periodDisplay">Loading...</div>
+
     <div id="kpiContainer" class="kpi-grid">Loading data...</div>
     <div id="tableContainer">Loading campaigns...</div>
+
+    <div class="json-section">
+        <h3>📋 JSON Data Source — edit campaigns directly</h3>
+        <p style="color: #c9b696; font-size: 0.8rem; margin-bottom: 0.5rem;">
+            💡 How to use: Edit the JSON below — add, remove, or modify campaigns. Each campaign requires: name, dateTime, channel, sent, openRate, opens, clickRate, clicks, revenue, orders.
+        </p>
+        <textarea id="jsonEditor" placeholder="Loading JSON data..."></textarea>
+        <div>
+            <button id="applyBtn">📌 Apply & Refresh Table</button>
+            <button id="saveToFileBtn">💾 Save to data.json (Download)</button>
+        </div>
+        <p style="font-size: 0.7rem; margin-top: 0.5rem;">
+            📌 Click "Apply & Refresh Table" to preview changes. Click "Save to data.json" to download the updated file — then upload it to your server.
+        </p>
+    </div>
+
     <div class="last-updated" id="lastUpdated"></div>
 
     <script>
+        let currentCampaigns = [];
+        let currentPeriod = "";
+
         async function loadData() {
             try {
                 const response = await fetch('/data.json?t=' + Date.now());
                 const data = await response.json();
                 const daily = data.daily;
+                currentCampaigns = daily.campaigns;
+                currentPeriod = daily.period;
 
-                // Update KPIs
-                document.getElementById('kpiContainer').innerHTML = `
-                    <div class="kpi-card">
-                        <div class="kpi-value">${daily.totalSends.toLocaleString()}</div>
-                        <div class="kpi-label">Total sends</div>
-                    </div>
-                    <div class="kpi-card">
-                        <div class="kpi-value">$${daily.totalRevenue.toFixed(2)}</div>
-                        <div class="kpi-label">Total revenue</div>
-                    </div>
-                    <div class="kpi-card">
-                        <div class="kpi-value">${daily.avgOpenRate}%</div>
-                        <div class="kpi-label">Avg open rate</div>
-                    </div>
-                    <div class="kpi-card">
-                        <div class="kpi-value">${daily.avgClickRate}%</div>
-                        <div class="kpi-label">Avg click rate</div>
-                    </div>
-                `;
-
-                // Build campaign table
-                let tableHtml = `
-                    <table>
-                        <thead>
-                            <tr><th>Campaign name</th><th>Date & time</th><th>Sent</th><th>Open rate</th><th>Opens</th><th>Click rate</th><th>Clicks</th><th>Revenue</th><th>Orders</th></tr>
-                        </thead>
-                        <tbody>
-                `;
-
-                for (const campaign of daily.campaigns) {
-                    tableHtml += `
-                        <tr>
-                            <td>${campaign.name}</td>
-                            <td>${campaign.dateTime}</td>
-                            <td>${campaign.sent.toLocaleString()}</td>
-                            <td>${campaign.openRate}%</td>
-                            <td>${campaign.opens.toLocaleString()}</td>
-                            <td>${campaign.clickRate}%</td>
-                            <td>${campaign.clicks.toLocaleString()}</td>
-                            <td>$${campaign.revenue.toFixed(2)}</td>
-                            <td>${campaign.orders}</td>
-                        </tr>
-                    `;
-                }
-
-                tableHtml += `</tbody></table>`;
-                document.getElementById('tableContainer').innerHTML = tableHtml;
-
-                const now = new Date();
-                document.getElementById('lastUpdated').innerHTML = `📅 Last updated: ${now.toLocaleString()} · Data from data.json · Period: ${daily.period}`;
-
+                updateUI(daily);
+                updateJsonEditor();
             } catch (err) {
                 console.error('Error loading data:', err);
                 document.getElementById('kpiContainer').innerHTML = '<div style="background:#fff0e6;padding:1rem;border-radius:1rem;">⚠️ Could not load data.json. Make sure the file exists at /data.json</div>';
             }
         }
 
+        function updateUI(daily) {
+            document.getElementById('periodDisplay').innerHTML = `📅 ${daily.period} · daily breakdown`;
+
+            // Update KPIs
+            document.getElementById('kpiContainer').innerHTML = `
+                <div class="kpi-card">
+                    <div class="kpi-value">${daily.totalSends.toLocaleString()}</div>
+                    <div class="kpi-label">Total sends</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-value">$${daily.totalRevenue.toFixed(2)}</div>
+                    <div class="kpi-label">Total revenue</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-value">${daily.avgOpenRate}%</div>
+                    <div class="kpi-label">Avg open rate</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-value">${daily.avgClickRate}%</div>
+                    <div class="kpi-label">Avg click rate</div>
+                </div>
+            `;
+
+            // Build campaign table
+            let tableHtml = `
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Campaign name</th>
+                            <th>Date & time</th>
+                            <th>Channel</th>
+                            <th>Sent</th>
+                            <th>Open rate</th>
+                            <th>Opens</th>
+                            <th>Click rate</th>
+                            <th>Clicks</th>
+                            <th>Revenue</th>
+                            <th>Orders</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            for (const campaign of daily.campaigns) {
+                tableHtml += `
+                    <tr>
+                        <td>${campaign.name}</td>
+                        <td>${campaign.dateTime}</td>
+                        <td>${campaign.channel || 'Email'}</td>
+                        <td>${campaign.sent.toLocaleString()}</td>
+                        <td>${campaign.openRate}%</td>
+                        <td>${campaign.opens.toLocaleString()}</td>
+                        <td>${campaign.clickRate}%</td>
+                        <td>${campaign.clicks.toLocaleString()}</td>
+                        <td>$${campaign.revenue.toFixed(2)}</td>
+                        <td>${campaign.orders}</td>
+                    </tr>
+                `;
+            }
+
+            tableHtml += `</tbody></table>`;
+            document.getElementById('tableContainer').innerHTML = tableHtml;
+
+            const now = new Date();
+            document.getElementById('lastUpdated').innerHTML = `📅 Last updated: ${now.toLocaleString()} · Data from data.json · ${daily.period}`;
+        }
+
+        function updateJsonEditor() {
+            const fullData = {
+                daily: {
+                    period: currentPeriod,
+                    totalSends: currentCampaigns.reduce((sum, c) => sum + c.sent, 0),
+                    totalRevenue: currentCampaigns.reduce((sum, c) => sum + c.revenue, 0),
+                    avgOpenRate: Math.round(currentCampaigns.reduce((sum, c) => sum + c.openRate, 0) / currentCampaigns.length * 10) / 10,
+                    avgClickRate: Math.round(currentCampaigns.reduce((sum, c) => sum + c.clickRate, 0) / currentCampaigns.length * 10) / 10,
+                    campaigns: currentCampaigns
+                }
+            };
+            document.getElementById('jsonEditor').value = JSON.stringify(fullData, null, 2);
+        }
+
+        function applyJsonEdit() {
+            try {
+                const editedData = JSON.parse(document.getElementById('jsonEditor').value);
+                if (editedData.daily && editedData.daily.campaigns) {
+                    currentCampaigns = editedData.daily.campaigns;
+                    currentPeriod = editedData.daily.period;
+                    
+                    // Recalculate totals
+                    const totalSends = currentCampaigns.reduce((sum, c) => sum + c.sent, 0);
+                    const totalRevenue = currentCampaigns.reduce((sum, c) => sum + c.revenue, 0);
+                    const avgOpenRate = Math.round(currentCampaigns.reduce((sum, c) => sum + c.openRate, 0) / currentCampaigns.length * 10) / 10;
+                    const avgClickRate = Math.round(currentCampaigns.reduce((sum, c) => sum + c.clickRate, 0) / currentCampaigns.length * 10) / 10;
+                    
+                    updateUI({
+                        period: currentPeriod,
+                        totalSends: totalSends,
+                        totalRevenue: totalRevenue,
+                        avgOpenRate: avgOpenRate,
+                        avgClickRate: avgClickRate,
+                        campaigns: currentCampaigns
+                    });
+                    
+                    alert('✅ Table updated! To permanently save, click "Save to data.json" and upload the file.');
+                } else {
+                    alert('❌ Invalid JSON structure. Make sure it has "daily" with "campaigns" array.');
+                }
+            } catch (e) {
+                alert('❌ Invalid JSON format: ' + e.message);
+            }
+        }
+
+        function saveToFile() {
+            try {
+                // First validate the JSON
+                JSON.parse(document.getElementById('jsonEditor').value);
+                
+                // Create download
+                const blob = new Blob([document.getElementById('jsonEditor').value], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'data.json';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                
+                alert('✅ data.json downloaded! Upload this file to your server to make the changes permanent.');
+            } catch (e) {
+                alert('❌ Cannot save: Invalid JSON format. Fix errors first.');
+            }
+        }
+
+        document.getElementById('applyBtn').addEventListener('click', applyJsonEdit);
+        document.getElementById('saveToFileBtn').addEventListener('click', saveToFile);
+        
         loadData();
         setInterval(loadData, 5 * 60 * 1000);
     </script>
-
-    <!-- ── FLOATING HOME BUTTON ── -->
-<style>
-  .home-fab {
-    position: fixed;
-    top: 1.75rem;
-    right: 1.75rem;
-    z-index: 9999;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 5px;
-    text-decoration: none;
-    cursor: pointer;
-  }
-  .home-fab-btn {
-    width: 48px;
-    height: 48px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, #2c1e14, #5c3d28);
-    box-shadow: 0 4px 18px rgba(44,30,20,0.35), 0 1px 4px rgba(44,30,20,0.2);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.15rem;
-    transition: transform 0.22s, box-shadow 0.22s, background 0.22s;
-    border: 1.5px solid rgba(232,221,208,0.15);
-  }
-  .home-fab:hover .home-fab-btn {
-    transform: translateY(-3px) scale(1.07);
-    box-shadow: 0 8px 28px rgba(44,30,20,0.4), 0 2px 6px rgba(44,30,20,0.2);
-    background: linear-gradient(135deg, #3e2718, #7a5236);
-  }
-  .home-fab-label {
-    font-family: 'DM Sans', 'Inter', system-ui, sans-serif;
-    font-size: 0.58rem;
-    font-weight: 700;
-    letter-spacing: 1.2px;
-    text-transform: uppercase;
-    color: #5c3d28;
-    background: rgba(255,252,247,0.92);
-    padding: 0.18rem 0.55rem;
-    border-radius: 100px;
-    border: 1px solid rgba(180,145,115,0.25);
-    box-shadow: 0 2px 8px rgba(44,30,20,0.08);
-    white-space: nowrap;
-    opacity: 0;
-    transform: translateY(4px);
-    transition: opacity 0.2s, transform 0.2s;
-    pointer-events: none;
-  }
-  .home-fab:hover .home-fab-label {
-    opacity: 1;
-    transform: translateY(0);
-  }
-</style>
-<a class="home-fab" href="/reports.html" title="Back to Home">
-  <div class="home-fab-btn">🏚️</div>
-  <span class="home-fab-label">Home</span>
-</a>
 </body>
 </html>
