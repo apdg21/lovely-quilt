@@ -1,0 +1,50 @@
+{
+  "monthly": {
+    "latestOmnisend": 2052.13,
+    "latestOmnisendMoM": 636.1,
+    "newSubscribers": 768,
+    "avg3mNewSubs": 285,
+    "unsubRate": 1.60,
+    "avg3mUnsubRate": 1.48,
+    "engagedList": 2500,
+    "targetEngaged": 5000,
+    "netGrowth": 654,
+    "latestMonth": "Feb 2026",
+    "historicalData": [
+      {"month": "Jan 2025", "newSubs": 96, "unsubs": 144, "netGrowth": -48, "engaged": 1500, "campaignsRevenue": 544.15, "autoRevenue": 325.75, "omnisendRevenue": 869.90, "storeRevenue": 2400.35, "unsubRate": 3.56},
+      {"month": "Feb 2025", "newSubs": 153, "unsubs": 55, "netGrowth": 98, "engaged": 1600, "campaignsRevenue": 183.47, "autoRevenue": 371.38, "omnisendRevenue": 554.85, "storeRevenue": 2549.11, "unsubRate": 1.33},
+      {"month": "Mar 2025", "newSubs": 970, "unsubs": 50, "netGrowth": 920, "engaged": 2800, "campaignsRevenue": 0.00, "autoRevenue": 1675.66, "omnisendRevenue": 1675.66, "storeRevenue": 10813.85, "unsubRate": 0.99},
+      {"month": "Apr 2025", "newSubs": 957, "unsubs": 71, "netGrowth": 886, "engaged": 3100, "campaignsRevenue": 0.00, "autoRevenue": 1712.48, "omnisendRevenue": 1712.48, "storeRevenue": 8585.47, "unsubRate": 1.19},
+      {"month": "May 2025", "newSubs": 98, "unsubs": 31, "netGrowth": 67, "engaged": 1900, "campaignsRevenue": 0.00, "autoRevenue": 264.93, "omnisendRevenue": 264.93, "storeRevenue": 1714.60, "unsubRate": 0.52},
+      {"month": "Jun 2025", "newSubs": 173, "unsubs": 19, "netGrowth": 154, "engaged": 2100, "campaignsRevenue": 0.00, "autoRevenue": 531.58, "omnisendRevenue": 531.58, "storeRevenue": 2795.61, "unsubRate": 0.31},
+      {"month": "Jul 2025", "newSubs": 338, "unsubs": 99, "netGrowth": 239, "engaged": 2400, "campaignsRevenue": 223.39, "autoRevenue": 626.58, "omnisendRevenue": 849.97, "storeRevenue": 5519.43, "unsubRate": 1.55},
+      {"month": "Aug 2025", "newSubs": 164, "unsubs": 167, "netGrowth": -3, "engaged": 2450, "campaignsRevenue": 639.51, "autoRevenue": 430.09, "omnisendRevenue": 1069.60, "storeRevenue": 3092.30, "unsubRate": 2.61},
+      {"month": "Sep 2025", "newSubs": 207, "unsubs": 115, "netGrowth": 92, "engaged": 2400, "campaignsRevenue": 505.31, "autoRevenue": 525.30, "omnisendRevenue": 1030.61, "storeRevenue": 3720.29, "unsubRate": 1.77},
+      {"month": "Oct 2025", "newSubs": 224, "unsubs": 123, "netGrowth": 101, "engaged": 2350, "campaignsRevenue": 324.45, "autoRevenue": 715.35, "omnisendRevenue": 1039.80, "storeRevenue": 3366.56, "unsubRate": 1.87},
+      {"month": "Nov 2025", "newSubs": 83, "unsubs": 104, "netGrowth": -21, "engaged": 1850, "campaignsRevenue": 410.67, "autoRevenue": 204.97, "omnisendRevenue": 615.64, "storeRevenue": 1493.64, "unsubRate": 1.58},
+      {"month": "Dec 2025", "newSubs": 33, "unsubs": 93, "netGrowth": -60, "engaged": 1500, "campaignsRevenue": 603.24, "autoRevenue": 68.04, "omnisendRevenue": 671.28, "storeRevenue": 1100.88, "unsubRate": 1.43},
+      {"month": "Jan 2026", "newSubs": 53, "unsubs": 91, "netGrowth": -38, "engaged": 1300, "campaignsRevenue": 163.34, "autoRevenue": 115.46, "omnisendRevenue": 278.80, "storeRevenue": 987.64, "unsubRate": 1.41},
+      {"month": "Feb 2026", "newSubs": 768, "unsubs": 114, "netGrowth": 654, "engaged": 2500, "campaignsRevenue": 421.68, "autoRevenue": 1630.45, "omnisendRevenue": 2052.13, "storeRevenue": 12823.50, "unsubRate": 1.60}
+    ]
+  },
+  "daily": {
+    "period": "Mar 2026",
+    "totalSends": 24882,
+    "totalRevenue": 288.19,
+    "avgOpenRate": 49.3,
+    "avgClickRate": 2.8,
+    "campaigns": [
+      {"name": "The National Quilting Day Celebration", "dateTime": "Mar 21, 2026 at 9:00 AM", "channel": "Email", "sent": 2433, "openRate": 40.7, "opens": 991, "clickRate": 5.1, "clicks": 126, "revenue": 35.80, "orders": 2},
+      {"name": "The National Quilting Day Teaser", "dateTime": "Mar 19, 2026 at 10:00 AM", "channel": "Email", "sent": 2419, "openRate": 41.7, "opens": 1011, "clickRate": 2.1, "clicks": 52, "revenue": 0.00, "orders": 0},
+      {"name": "Tools of the Trade - The Maker's Toolkit", "dateTime": "Mar 18, 2026 at 10:00 AM", "channel": "Email", "sent": 1736, "openRate": 59.3, "opens": 1031, "clickRate": 1.9, "clicks": 33, "revenue": 35.80, "orders": 1},
+      {"name": "Surprise Bloom Gift - Less Engaged", "dateTime": "Mar 16, 2026 at 10:00 AM", "channel": "Email", "sent": 5575, "openRate": 2.7, "opens": 154, "clickRate": 0.7, "clicks": 41, "revenue": 17.90, "orders": 1},
+      {"name": "Spring Garden Collection (Final Call)", "dateTime": "Mar 14, 2026 at 12:00 PM", "channel": "Email", "sent": 1615, "openRate": 61.3, "opens": 991, "clickRate": 3.6, "clicks": 59, "revenue": 17.90, "orders": 2},
+      {"name": "The Spring Garden Collection Launch", "dateTime": "Mar 12, 2026 at 10:00 AM", "channel": "Email", "sent": 1601, "openRate": 63.4, "opens": 1016, "clickRate": 5.5, "clicks": 89, "revenue": 53.70, "orders": 3},
+      {"name": "Behind the Seams (The Art of Texture)", "dateTime": "Mar 10, 2026 at 8:00 AM", "channel": "Email", "sent": 3965, "openRate": 5.5, "opens": 219, "clickRate": 0.2, "clicks": 8, "revenue": 0.00, "orders": 0},
+      {"name": "International Women's Day (Final Call)", "dateTime": "Mar 8, 2026 at 12:00 PM", "channel": "Email", "sent": 1384, "openRate": 64.3, "opens": 891, "clickRate": 3.1, "clicks": 44, "revenue": 35.80, "orders": 1},
+      {"name": "International Women's Day VIP Access", "dateTime": "Mar 6, 2026 at 10:00 AM", "channel": "Email", "sent": 1388, "openRate": 66.2, "opens": 919, "clickRate": 2.0, "clicks": 29, "revenue": 0.00, "orders": 0},
+      {"name": "Spring Petals Tutorial", "dateTime": "Mar 4, 2026 at 10:00 AM", "channel": "Email", "sent": 1384, "openRate": 68.4, "opens": 948, "clickRate": 4.6, "clicks": 64, "revenue": 17.90, "orders": 2},
+      {"name": "National Craft Month Kickoff (The Creative Spark)", "dateTime": "Mar 2, 2026 at 10:00 AM", "channel": "Email", "sent": 1382, "openRate": 69.3, "opens": 958, "clickRate": 2.4, "clicks": 34, "revenue": 73.39, "orders": 4}
+    ]
+  }
+}
