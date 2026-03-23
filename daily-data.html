@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>🧵 Lovely Quilt · daily campaign pulse</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         * {
             margin: 0;
@@ -51,6 +52,23 @@
             color: #6b4f32;
             text-transform: uppercase;
         }
+        .charts-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin: 1.5rem 0;
+        }
+        .chart-container {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 1rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        .chart-container h3 {
+            margin-bottom: 1rem;
+            color: #4a3729;
+            font-size: 1rem;
+        }
         table {
             width: 100%;
             border-collapse: collapse;
@@ -91,6 +109,7 @@
         }
         @media (max-width: 768px) {
             body { padding: 1rem; }
+            .charts-row { grid-template-columns: 1fr; }
             table { font-size: 0.65rem; }
             th, td { padding: 0.4rem; }
         }
@@ -101,19 +120,44 @@
     <div class="subhead" id="periodDisplay">Loading...</div>
 
     <div id="kpiContainer" class="kpi-grid">Loading data...</div>
+
+    <!-- Charts Row -->
+    <div class="charts-row">
+        <div class="chart-container">
+            <h3>📊 Revenue by Campaign</h3>
+            <canvas id="revenueChart" width="400" height="300"></canvas>
+        </div>
+        <div class="chart-container">
+            <h3>📈 Open Rate vs Click Rate</h3>
+            <canvas id="ratesChart" width="400" height="300"></canvas>
+        </div>
+    </div>
+
+    <div class="charts-row">
+        <div class="chart-container">
+            <h3>📧 Sent vs Opens</h3>
+            <canvas id="sentOpensChart" width="400" height="300"></canvas>
+        </div>
+        <div class="chart-container">
+            <h3>🎯 Click Rate Trend</h3>
+            <canvas id="clickRateChart" width="400" height="300"></canvas>
+        </div>
+    </div>
+
     <div id="tableContainer">Loading campaigns...</div>
 
     <div class="last-updated" id="lastUpdated"></div>
-    <div class="footer-home">
-        🏚️ <a href="/">Home</a>
-    </div>
-
+    
     <script>
+        let currentCampaigns = [];
+        let charts = {};
+
         async function loadData() {
             try {
                 const response = await fetch('/data.json?t=' + Date.now());
                 const data = await response.json();
                 const daily = data.daily;
+                currentCampaigns = daily.campaigns;
 
                 document.getElementById('periodDisplay').innerHTML = `📅 ${daily.period} · daily breakdown`;
 
@@ -137,6 +181,9 @@
                     </div>
                 `;
 
+                // Update all charts
+                updateCharts();
+
                 // Build campaign table
                 let tableHtml = `
                     <table>
@@ -157,7 +204,7 @@
                         <tbody>
                 `;
 
-                for (const campaign of daily.campaigns) {
+                for (const campaign of currentCampaigns) {
                     tableHtml += `
                         <tr>
                             <td>${campaign.name}</td>
@@ -183,8 +230,133 @@
             } catch (err) {
                 console.error('Error loading data:', err);
                 document.getElementById('kpiContainer').innerHTML = '<div style="background:#fff0e6;padding:1rem;border-radius:1rem;">⚠️ Could not load data.json. Make sure the file exists at /data.json</div>';
-                document.getElementById('tableContainer').innerHTML = '';
             }
+        }
+
+        function updateCharts() {
+            const campaignNames = currentCampaigns.map(c => {
+                let name = c.name;
+                return name.length > 20 ? name.substring(0, 17) + '...' : name;
+            });
+            const revenues = currentCampaigns.map(c => c.revenue);
+            const openRates = currentCampaigns.map(c => c.openRate);
+            const clickRates = currentCampaigns.map(c => c.clickRate);
+            const sends = currentCampaigns.map(c => c.sent);
+            const opens = currentCampaigns.map(c => c.opens);
+
+            // Chart 1: Revenue by Campaign (Bar)
+            if (charts.revenue) charts.revenue.destroy();
+            const ctx1 = document.getElementById('revenueChart').getContext('2d');
+            charts.revenue = new Chart(ctx1, {
+                type: 'bar',
+                data: {
+                    labels: campaignNames,
+                    datasets: [{
+                        label: 'Revenue ($)',
+                        data: revenues,
+                        backgroundColor: '#b1622c',
+                        borderRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: { position: 'top' }
+                    }
+                }
+            });
+
+            // Chart 2: Open Rate vs Click Rate (Line)
+            if (charts.rates) charts.rates.destroy();
+            const ctx2 = document.getElementById('ratesChart').getContext('2d');
+            charts.rates = new Chart(ctx2, {
+                type: 'line',
+                data: {
+                    labels: campaignNames,
+                    datasets: [
+                        {
+                            label: 'Open Rate (%)',
+                            data: openRates,
+                            borderColor: '#4a3729',
+                            backgroundColor: 'rgba(74, 55, 41, 0.1)',
+                            tension: 0.3,
+                            fill: true
+                        },
+                        {
+                            label: 'Click Rate (%)',
+                            data: clickRates,
+                            borderColor: '#b1622c',
+                            backgroundColor: 'rgba(177, 98, 44, 0.1)',
+                            tension: 0.3,
+                            fill: true
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true
+                }
+            });
+
+            // Chart 3: Sent vs Opens (Bar)
+            if (charts.sentOpens) charts.sentOpens.destroy();
+            const ctx3 = document.getElementById('sentOpensChart').getContext('2d');
+            charts.sentOpens = new Chart(ctx3, {
+                type: 'bar',
+                data: {
+                    labels: campaignNames,
+                    datasets: [
+                        {
+                            label: 'Sent',
+                            data: sends,
+                            backgroundColor: '#9b846b',
+                            borderRadius: 6
+                        },
+                        {
+                            label: 'Opens',
+                            data: opens,
+                            backgroundColor: '#b1622c',
+                            borderRadius: 6
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true
+                }
+            });
+
+            // Chart 4: Click Rate Trend (Line with markers)
+            if (charts.clickRate) charts.clickRate.destroy();
+            const ctx4 = document.getElementById('clickRateChart').getContext('2d');
+            charts.clickRate = new Chart(ctx4, {
+                type: 'line',
+                data: {
+                    labels: campaignNames,
+                    datasets: [{
+                        label: 'Click Rate (%)',
+                        data: clickRates,
+                        borderColor: '#e67e22',
+                        backgroundColor: 'rgba(230, 126, 34, 0.1)',
+                        tension: 0.3,
+                        fill: true,
+                        pointRadius: 5,
+                        pointBackgroundColor: '#e67e22',
+                        pointBorderColor: '#fff',
+                        pointBorderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    scales: {
+                        y: {
+                            title: { display: true, text: 'Click Rate (%)' }
+                        }
+                    }
+                }
+            });
         }
 
         loadData();
