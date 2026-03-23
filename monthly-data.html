@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>🧵 Lovely Quilt · Email Health Dashboard</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
@@ -11,159 +11,323 @@
             padding: 0;
             box-sizing: border-box;
         }
+        
         body {
-            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+            font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #faf7f2 0%, #f0e9e0 100%);
+            color: #2c2418;
+            min-height: 100vh;
+        }
+        
+        .container {
             max-width: 1400px;
             margin: 0 auto;
-            padding: 2rem;
-            background: #faf7f2;
-            color: #2c2418;
-            line-height: 1.4;
+            padding: 1.5rem;
         }
+        
+        /* Header */
+        .header {
+            text-align: center;
+            margin-bottom: 2rem;
+            padding: 1rem;
+        }
+        
         h1 {
-            font-size: 2rem;
-            margin-bottom: 0.5rem;
+            font-size: clamp(1.5rem, 5vw, 2rem);
             color: #4a3729;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            flex-wrap: wrap;
         }
+        
         .subhead {
             color: #6b4f32;
-            margin-bottom: 2rem;
-            font-size: 0.9rem;
+            font-size: clamp(0.8rem, 3vw, 0.9rem);
+            margin-top: 0.5rem;
         }
+        
+        /* KPI Grid */
         .kpi-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 1rem;
             margin: 2rem 0;
         }
+        
         .kpi-card {
             background: white;
             padding: 1.2rem;
             border-radius: 1rem;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
             text-align: center;
-            border: 1px solid #efe3d2;
+            border: 1px solid rgba(239, 227, 210, 0.5);
+            transition: transform 0.2s, box-shadow 0.2s;
         }
+        
+        .kpi-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+        }
+        
         .kpi-value {
-            font-size: 1.8rem;
+            font-size: clamp(1.5rem, 4vw, 1.8rem);
             font-weight: bold;
             color: #b1622c;
         }
+        
         .kpi-label {
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             color: #6b4f32;
             text-transform: uppercase;
             letter-spacing: 0.5px;
+            margin-top: 0.25rem;
         }
+        
         .kpi-sub {
             font-size: 0.7rem;
             color: #9b846b;
             margin-top: 0.25rem;
         }
+        
+        /* Warning Box */
         .warning-box {
-            background: #fff3e0;
+            background: linear-gradient(135deg, #fff3e0, #ffe8d4);
             border-left: 4px solid #e67e22;
             padding: 1rem;
             border-radius: 0.75rem;
             margin: 1.5rem 0;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            flex-wrap: wrap;
         }
-        .chart-container {
-            background: white;
-            padding: 1.5rem;
-            border-radius: 1rem;
-            margin: 1.5rem 0;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        
+        .warning-icon {
+            font-size: 1.5rem;
         }
+        
+        /* Chart Containers */
         .charts-row {
             display: grid;
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
             gap: 1.5rem;
             margin: 1.5rem 0;
         }
+        
+        .chart-container {
+            background: white;
+            padding: 1.2rem;
+            border-radius: 1rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            transition: transform 0.2s;
+        }
+        
+        .chart-container:hover {
+            transform: translateY(-2px);
+        }
+        
+        .chart-container h3 {
+            margin-bottom: 1rem;
+            color: #4a3729;
+            font-size: clamp(0.9rem, 3vw, 1rem);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        canvas {
+            max-height: 300px;
+            width: 100% !important;
+        }
+        
+        /* Table Container - Mobile Friendly */
+        .table-wrapper {
+            background: white;
+            border-radius: 1rem;
+            overflow-x: auto;
+            margin: 1.5rem 0;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            -webkit-overflow-scrolling: touch;
+        }
+        
         table {
             width: 100%;
             border-collapse: collapse;
-            background: white;
-            border-radius: 1rem;
-            overflow: hidden;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-            margin: 1.5rem 0;
-            font-size: 0.85rem;
+            font-size: 0.8rem;
+            min-width: 800px;
         }
+        
         th, td {
-            padding: 0.75rem;
+            padding: 0.85rem 1rem;
             text-align: right;
-            border-bottom: 1px solid #eee;
+            border-bottom: 1px solid #f0e5da;
         }
+        
         th:first-child, td:first-child {
             text-align: left;
+            position: sticky;
+            left: 0;
+            background: white;
             font-weight: 600;
         }
+        
         th {
             background: #f5ede3;
             color: #4a3729;
             font-weight: 600;
+            position: sticky;
+            top: 0;
         }
+        
         tr:hover {
             background: #fefaf5;
         }
+        
+        .negative-growth {
+            color: #e67e22;
+            font-weight: 600;
+        }
+        
+        .positive-growth {
+            color: #2c6e2c;
+        }
+        
+        /* Insight Note */
         .insight-note {
-            background: #f0e9e0;
-            padding: 1rem;
+            background: linear-gradient(135deg, #f0e9e0, #e8dfd3);
+            padding: 1rem 1.2rem;
             border-radius: 0.75rem;
             margin: 1rem 0;
             font-size: 0.85rem;
+            border-left: 4px solid #b1622c;
         }
+        
         .last-updated {
             font-size: 0.7rem;
             color: #9b846b;
             text-align: right;
-            margin-top: 1rem;
+            margin-top: 1.5rem;
+            padding-top: 1rem;
+            border-top: 1px solid #e5d5bf;
         }
+        
+        .home-link {
+            text-align: center;
+            margin-top: 2rem;
+        }
+        
+        .home-link a {
+            color: #b1622c;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+        
+        .home-link a:hover {
+            color: #8b4a1e;
+            text-decoration: underline;
+        }
+        
+        /* Mobile Adjustments */
         @media (max-width: 768px) {
-            body { padding: 1rem; }
-            .charts-row { grid-template-columns: 1fr; }
-            table { font-size: 0.7rem; }
-            th, td { padding: 0.4rem; }
+            .container {
+                padding: 1rem;
+            }
+            
+            .charts-row {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+            
+            .chart-container {
+                padding: 1rem;
+            }
+            
+            .kpi-card {
+                padding: 0.9rem;
+            }
+            
+            th, td {
+                padding: 0.6rem 0.8rem;
+                font-size: 0.7rem;
+            }
+            
+            .warning-box {
+                font-size: 0.85rem;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .kpi-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 0.75rem;
+            }
+            
+            .kpi-value {
+                font-size: 1.2rem;
+            }
+        }
+        
+        /* Loading State */
+        .loading {
+            text-align: center;
+            padding: 2rem;
+            color: #9b846b;
         }
     </style>
 </head>
 <body>
-    <h1>🧵 Lovely Quilt · Email Health Dashboard</h1>
-    <div class="subhead">New subscribers + Unsubscribes = Net Growth | Unsubscribes reveal list fatigue</div>
-    <div class="subhead">📊 Watch unsubscribe spikes → content fatigue signals</div>
-
-    <div id="kpiContainer" class="kpi-grid">Loading data...</div>
-
-    <div id="warningContainer"></div>
-
-    <!-- Charts -->
-    <div class="charts-row">
-        <div class="chart-container">
-            <h3>💀 New Subs vs Engaged List</h3>
-            <canvas id="subsEngagedChart" width="400" height="300"></canvas>
+    <div class="container">
+        <div class="header">
+            <h1>
+                <span>🧵</span>
+                Lovely Quilt · Email Health Dashboard
+            </h1>
+            <div class="subhead">New subscribers + Unsubscribes = Net Growth | Unsubscribes reveal list fatigue</div>
+            <div class="subhead">📊 Watch unsubscribe spikes → content fatigue signals</div>
         </div>
+
+        <div id="kpiContainer" class="kpi-grid">
+            <div class="loading">Loading data...</div>
+        </div>
+
+        <div id="warningContainer"></div>
+
+        <!-- Charts -->
+        <div class="charts-row">
+            <div class="chart-container">
+                <h3>💀 New Subs vs Engaged List</h3>
+                <canvas id="subsEngagedChart"></canvas>
+            </div>
+            <div class="chart-container">
+                <h3>📧 Campaigns vs Automation Revenue</h3>
+                <canvas id="revenueChart"></canvas>
+            </div>
+        </div>
+
         <div class="chart-container">
-            <h3>📧 Campaigns vs Automation Revenue</h3>
-            <canvas id="revenueChart" width="400" height="300"></canvas>
+            <h3>📈 Unsubscribe Rate Trend (Critical Insight)</h3>
+            <canvas id="unsubRateChart"></canvas>
+            <div class="insight-note" style="margin-top: 1rem;">🚨 Spikes indicate list fatigue or content issues</div>
+        </div>
+
+        <div class="chart-container">
+            <h3>🎯 Engaged List → 5,000+ Target</h3>
+            <canvas id="engagedListChart"></canvas>
+        </div>
+
+        <div class="table-wrapper" id="tableWrapper">
+            <div id="tableContainer" class="loading">Loading table...</div>
+        </div>
+
+        <div id="insightNote" class="insight-note"></div>
+        <div class="last-updated" id="lastUpdated"></div>
+        <div class="home-link">
+            🏚️ <a href="/">Home</a>
         </div>
     </div>
-
-    <div class="chart-container">
-        <h3>📈 Unsubscribe Rate Trend (Critical Insight)</h3>
-        <canvas id="unsubRateChart" width="800" height="300"></canvas>
-        <div class="insight-note" style="margin-top: 1rem;">🚨 Spikes indicate list fatigue or content issues</div>
-    </div>
-
-    <div class="chart-container">
-        <h3>🎯 Engaged List → 5,000+ Target</h3>
-        <canvas id="engagedListChart" width="800" height="300"></canvas>
-    </div>
-
-    <div id="tableContainer">Loading table...</div>
-
-    <div id="insightNote" class="insight-note"></div>
-    <div class="last-updated" id="lastUpdated"></div>
 
     <script>
         let historicalData = [];
@@ -172,6 +336,7 @@
         async function loadData() {
             try {
                 const response = await fetch('/data.json?t=' + Date.now());
+                if (!response.ok) throw new Error('Network response was not ok');
                 const data = await response.json();
                 const monthly = data.monthly;
                 historicalData = monthly.historicalData;
@@ -204,7 +369,8 @@
                 if (monthly.unsubRate > 1.5) {
                     document.getElementById('warningContainer').innerHTML = `
                         <div class="warning-box">
-                            ⚠️ Elevated Unsubscribes: ${monthly.unsubRate}% unsub rate. Monitor content quality and send frequency.
+                            <span class="warning-icon">⚠️</span>
+                            <span><strong>Elevated Unsubscribes:</strong> ${monthly.unsubRate}% unsub rate. Monitor content quality and send frequency.</span>
                         </div>
                     `;
                 } else {
@@ -235,13 +401,13 @@
                 `;
 
                 for (const row of historicalData) {
-                    const netGrowthClass = row.netGrowth < 0 ? 'style="color:#e67e22;"' : '';
+                    const growthClass = row.netGrowth < 0 ? 'negative-growth' : 'positive-growth';
                     tableHtml += `
                         <tr>
                             <td>${row.month}</td>
                             <td>${row.newSubs.toLocaleString()}</td>
                             <td>${row.unsubs.toLocaleString()}</td>
-                            <td ${netGrowthClass}>${row.netGrowth >= 0 ? '+' : ''}${row.netGrowth}</td>
+                            <td class="${growthClass}">${row.netGrowth >= 0 ? '+' : ''}${row.netGrowth}</td>
                             <td>${row.engaged.toLocaleString()}</td>
                             <td>$${row.campaignsRevenue.toFixed(2)}</td>
                             <td>$${row.autoRevenue.toFixed(2)}</td>
@@ -260,10 +426,10 @@
                 if (spikes.length > 0) {
                     const spikeMonths = spikes.map(s => `${s.month} (${s.unsubRate}%)`).join(', ');
                     document.getElementById('insightNote').innerHTML = `
-                        ✨ Unsubscribes added: High unsubscribe rates (>2%) signal fatigue. ${spikeMonths} show campaign fatigue after periods of low new subscriber acquisition.
+                        ✨ <strong>Unsubscribes insight:</strong> High unsubscribe rates (>2%) signal fatigue. ${spikeMonths} show campaign fatigue after periods of low new subscriber acquisition.
                     `;
                 } else {
-                    document.getElementById('insightNote').innerHTML = `✨ Unsubscribe rates are within healthy range. Continue monitoring for spikes.`;
+                    document.getElementById('insightNote').innerHTML = `✨ <strong>Unsubscribe rates</strong> are within healthy range. Continue monitoring for spikes.`;
                 }
 
                 const now = new Date();
@@ -271,7 +437,7 @@
 
             } catch (err) {
                 console.error('Error loading data:', err);
-                document.getElementById('kpiContainer').innerHTML = '<div class="warning-box">⚠️ Could not load data.json. Make sure the file exists at /data.json</div>';
+                document.getElementById('kpiContainer').innerHTML = '<div class="warning-box" style="grid-column:1/-1">⚠️ Could not load data.json. Make sure the file exists at /data.json</div>';
             }
         }
 
