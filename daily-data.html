@@ -54,6 +54,30 @@
             .kpi-grid { grid-template-columns: repeat(2, 1fr); gap: 0.75rem; }
             .kpi-value { font-size: 1rem; }
         }
+        .table-wrapper {
+    background: white;
+    border-radius: 1rem;
+    overflow-x: auto;
+    margin: 1.5rem 0;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+}
+
+.table-wrapper table {
+    min-width: 1200px;   /* Forces horizontal scroll on mobile */
+}
+
+@media (max-width: 768px) {
+    .table-wrapper {
+        margin: 1rem 0;
+    }
+    
+    th, td {
+        padding: 0.7rem 0.6rem;
+        font-size: 0.68rem;
+    }
+}
     </style>
 </head>
 <body>
@@ -92,14 +116,11 @@
     let currentCampaigns = [];
     let charts = {};
 
-    // ====================== HELPER FUNCTIONS ======================
+    // ====================== HELPERS ======================
     function formatDate(dateTimeStr) {
         if (!dateTimeStr) return 'Unknown';
         const atIndex = dateTimeStr.indexOf(' at ');
-        if (atIndex > -1) {
-            return dateTimeStr.substring(0, atIndex).trim();
-        }
-        return dateTimeStr.trim();
+        return atIndex > -1 ? dateTimeStr.substring(0, atIndex).trim() : dateTimeStr.trim();
     }
 
     function calculateConversionRate(orders, sent) {
@@ -114,23 +135,18 @@
         return sent > 0 ? revenue / sent : 0;
     }
 
-    // ====================== MAIN LOAD FUNCTION ======================
+    // ====================== LOAD & CALCULATE ======================
     async function loadData() {
         try {
             const response = await fetch('/data.json?t=' + Date.now());
-            if (!response.ok) throw new Error('Failed to load data.json');
+            if (!response.ok) throw new Error('Failed to load data');
 
             const data = await response.json();
             const daily = data.daily || { campaigns: [] };
-
             currentCampaigns = daily.campaigns || [];
 
-            // === AUTO CALCULATE ALL SUMMARY METRICS ===
-            let totalSends = 0;
-            let totalRevenue = 0;
-            let totalOpens = 0;
-            let totalClicks = 0;
-            let totalOrders = 0;
+            // Auto-calculate everything
+            let totalSends = 0, totalRevenue = 0, totalOpens = 0, totalClicks = 0, totalOrders = 0;
 
             currentCampaigns.forEach(c => {
                 totalSends += Number(c.sent) || 0;
@@ -143,49 +159,25 @@
             const avgOpenRate = totalSends > 0 ? (totalOpens / totalSends * 100).toFixed(1) : 0;
             const avgClickRate = totalSends > 0 ? (totalClicks / totalSends * 100).toFixed(1) : 0;
 
-            // Update period display
-            document.getElementById('periodDisplay').innerHTML = `📅 ${daily.period || 'March 2026'} · daily breakdown`;
+            document.getElementById('periodDisplay').innerHTML = `📅 ${daily.period || 'Mar 2026'} · daily breakdown`;
 
-            // === KPI CARDS (All calculated live) ===
+            // KPI Cards
             document.getElementById('kpiContainer').innerHTML = `
-                <div class="kpi-card">
-                    <div class="kpi-value">${totalSends.toLocaleString()}</div>
-                    <div class="kpi-label">Total sends</div>
-                </div>
-                <div class="kpi-card">
-                    <div class="kpi-value">$${totalRevenue.toFixed(2)}</div>
-                    <div class="kpi-label">Total revenue</div>
-                </div>
-                <div class="kpi-card">
-                    <div class="kpi-value">${avgOpenRate}%</div>
-                    <div class="kpi-label">Avg open rate</div>
-                </div>
-                <div class="kpi-card">
-                    <div class="kpi-value">${avgClickRate}%</div>
-                    <div class="kpi-label">Avg click rate</div>
-                </div>
-                <div class="kpi-card">
-                    <div class="kpi-value">${(totalSends > 0 ? (totalOrders / totalSends * 100).toFixed(2) : 0)}%</div>
-                    <div class="kpi-label">Conversion rate</div>
-                    <div class="kpi-sub">${totalOrders} orders</div>
-                </div>
-                <div class="kpi-card">
-                    <div class="kpi-value">$${(totalOrders > 0 ? (totalRevenue / totalOrders).toFixed(2) : 0)}</div>
-                    <div class="kpi-label">Avg order value</div>
-                </div>
-                <div class="kpi-card">
-                    <div class="kpi-value">$${(totalSends > 0 ? (totalRevenue / totalSends).toFixed(2) : 0)}</div>
-                    <div class="kpi-label">Revenue per send</div>
-                </div>
+                <div class="kpi-card"><div class="kpi-value">${totalSends.toLocaleString()}</div><div class="kpi-label">Total sends</div></div>
+                <div class="kpi-card"><div class="kpi-value">$${totalRevenue.toFixed(2)}</div><div class="kpi-label">Total revenue</div></div>
+                <div class="kpi-card"><div class="kpi-value">${avgOpenRate}%</div><div class="kpi-label">Avg open rate</div></div>
+                <div class="kpi-card"><div class="kpi-value">${avgClickRate}%</div><div class="kpi-label">Avg click rate</div></div>
+                <div class="kpi-card"><div class="kpi-value">${totalSends > 0 ? (totalOrders / totalSends * 100).toFixed(2) : 0}%</div><div class="kpi-label">Conversion rate</div><div class="kpi-sub">${totalOrders} orders</div></div>
+                <div class="kpi-card"><div class="kpi-value">$${(totalOrders > 0 ? (totalRevenue / totalOrders).toFixed(2) : 0)}</div><div class="kpi-label">Avg order value</div></div>
+                <div class="kpi-card"><div class="kpi-value">$${(totalSends > 0 ? (totalRevenue / totalSends).toFixed(2) : 0)}</div><div class="kpi-label">Revenue per send</div></div>
             `;
 
             updateCharts();
 
-            // === BUILD TABLE ===
-            let topRevenue = 0;
-            let topName = '';
+            // Build Table with improved mobile scrolling
+            let topRevenue = 0, topName = '';
             currentCampaigns.forEach(c => {
-                if (c.revenue > topRevenue) {
+                if ((c.revenue || 0) > topRevenue) {
                     topRevenue = c.revenue;
                     topName = c.name;
                 }
@@ -196,13 +188,13 @@
                     <thead>
                         <tr>
                             <th>📅 Date</th>
-                            <th>📧 Campaign name</th>
+                            <th>📧 Campaign</th>
                             <th>📤 Sent</th>
-                            <th>📈 Open rate</th>
+                            <th>📈 Open</th>
                             <th>👁️ Opens</th>
-                            <th>🎯 Click rate</th>
+                            <th>🎯 Click</th>
                             <th>🖱️ Clicks</th>
-                            <th>💰 Conv. rate</th>
+                            <th>💰 Conv.</th>
                             <th>📦 Orders</th>
                             <th>💵 Revenue</th>
                             <th>📊 AOV</th>
@@ -212,16 +204,15 @@
                     <tbody>
             `;
 
-            currentCampaigns.forEach(c => {
+            currentCampaigns.forEach((c, index) => {
                 const isTop = c.name === topName && topRevenue > 0;
                 const convRate = calculateConversionRate(c.orders || 0, c.sent || 0);
                 const aov = calculateAOV(c.revenue || 0, c.orders || 0);
                 const rps = calculateRPS(c.revenue || 0, c.sent || 0);
-                const datePart = formatDate(c.dateTime);
 
                 tableHtml += `
                     <tr class="${isTop ? 'top-campaign' : ''}">
-                        <td><strong>${datePart}</strong></td>
+                        <td><strong>${formatDate(c.dateTime)}</strong></td>
                         <td><strong>${c.name}</strong></td>
                         <td>${(c.sent || 0).toLocaleString()}</td>
                         <td>${c.openRate || 0}%</td>
@@ -240,28 +231,21 @@
             tableHtml += `</tbody></table>`;
             document.getElementById('tableContainer').innerHTML = tableHtml;
 
-            // Last updated
-            const now = new Date();
             document.getElementById('lastUpdated').innerHTML = 
-                `📅 Last updated: ${now.toLocaleString()} · Auto-calculated from campaigns`;
-
-            console.log(`✅ Loaded ${currentCampaigns.length} campaigns | Total sends: ${totalSends}`);
+                `📅 Last updated: ${new Date().toLocaleString()} · Auto-calculated`;
 
         } catch (err) {
             console.error(err);
-            document.getElementById('kpiContainer').innerHTML = `
-                <div style="grid-column:1/-1; padding:2rem; text-align:center; color:#c33;">
-                    ⚠️ Could not load /data.json<br>
-                    <small>Make sure you are running a local server (Live Server recommended)</small>
-                </div>`;
+            document.getElementById('kpiContainer').innerHTML = `<div style="grid-column:1/-1;padding:2rem;text-align:center;color:#c33;">⚠️ Could not load data.json</div>`;
         }
     }
 
-    // ====================== CHARTS ======================
+    // ====================== CHARTS (Clean - No long names) ======================
     function updateCharts() {
         if (!currentCampaigns.length) return;
 
-        const names = currentCampaigns.map(c => c.name.length > 22 ? c.name.substring(0, 19) + '...' : c.name);
+        const shortLabels = currentCampaigns.map((_, i) => `C${i+1}`);
+
         const revenues = currentCampaigns.map(c => c.revenue || 0);
         const openRates = currentCampaigns.map(c => c.openRate || 0);
         const clickRates = currentCampaigns.map(c => c.clickRate || 0);
@@ -272,22 +256,20 @@
         const rpsValues = currentCampaigns.map(c => calculateRPS(c.revenue || 0, c.sent || 0));
 
         // Destroy old charts
-        Object.keys(charts).forEach(key => {
-            if (charts[key]) charts[key].destroy();
-        });
+        Object.keys(charts).forEach(k => charts[k] && charts[k].destroy());
 
-        // Revenue Bar
+        // Revenue
         charts.revenue = new Chart(document.getElementById('revenueChart'), {
             type: 'bar',
-            data: { labels: names, datasets: [{ label: 'Revenue ($)', data: revenues, backgroundColor: '#b1622c', borderRadius: 6 }] },
-            options: { responsive: true, maintainAspectRatio: false }
+            data: { labels: shortLabels, datasets: [{ label: 'Revenue ($)', data: revenues, backgroundColor: '#b1622c', borderRadius: 6 }] },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: true } } }
         });
 
-        // Open vs Click Line
+        // Open vs Click
         charts.rates = new Chart(document.getElementById('ratesChart'), {
             type: 'line',
             data: {
-                labels: names,
+                labels: shortLabels,
                 datasets: [
                     { label: 'Open Rate (%)', data: openRates, borderColor: '#4a3729', tension: 0.3, fill: true },
                     { label: 'Click Rate (%)', data: clickRates, borderColor: '#b1622c', tension: 0.3, fill: true }
@@ -299,47 +281,41 @@
         // Sent vs Opens
         charts.sentOpens = new Chart(document.getElementById('sentOpensChart'), {
             type: 'bar',
-            data: {
-                labels: names,
-                datasets: [
-                    { label: 'Sent', data: sends, backgroundColor: '#9b846b' },
-                    { label: 'Opens', data: opens, backgroundColor: '#b1622c' }
-                ]
-            },
+            data: { labels: shortLabels, datasets: [
+                { label: 'Sent', data: sends, backgroundColor: '#9b846b' },
+                { label: 'Opens', data: opens, backgroundColor: '#b1622c' }
+            ]},
             options: { responsive: true, maintainAspectRatio: false }
         });
 
-        // Click Rate
+        // Click Rate Trend
         charts.clickRate = new Chart(document.getElementById('clickRateChart'), {
             type: 'line',
-            data: { labels: names, datasets: [{ label: 'Click Rate (%)', data: clickRates, borderColor: '#e67e22', tension: 0.3 }] },
+            data: { labels: shortLabels, datasets: [{ label: 'Click Rate (%)', data: clickRates, borderColor: '#e67e22', tension: 0.3 }] },
             options: { responsive: true, maintainAspectRatio: false }
         });
 
-        // Conversion Rate
+        // Conversion
         charts.conversion = new Chart(document.getElementById('conversionChart'), {
             type: 'bar',
-            data: { labels: names, datasets: [{ label: 'Conversion Rate (%)', data: convRates, backgroundColor: '#2c6e2c' }] },
+            data: { labels: shortLabels, datasets: [{ label: 'Conv. Rate (%)', data: convRates, backgroundColor: '#2c6e2c' }] },
             options: { responsive: true, maintainAspectRatio: false }
         });
 
         // AOV & RPS
         charts.aovRps = new Chart(document.getElementById('aovRpsChart'), {
             type: 'bar',
-            data: {
-                labels: names,
-                datasets: [
-                    { label: 'AOV ($)', data: aovs, backgroundColor: '#b1622c' },
-                    { label: 'RPS ($)', data: rpsValues, backgroundColor: '#e0b08a' }
-                ]
-            },
+            data: { labels: shortLabels, datasets: [
+                { label: 'AOV ($)', data: aovs, backgroundColor: '#b1622c' },
+                { label: 'RPS ($)', data: rpsValues, backgroundColor: '#e0b08a' }
+            ]},
             options: { responsive: true, maintainAspectRatio: false }
         });
     }
 
-    // ====================== INIT ======================
+    // Auto load + refresh
     loadData();
-    setInterval(loadData, 5 * 60 * 1000);   // Auto refresh every 5 minutes
+    setInterval(loadData, 5 * 60 * 1000);
 </script>
 </body>
 </html>
