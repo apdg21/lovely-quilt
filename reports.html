@@ -251,6 +251,45 @@
             body { padding: 1rem; }
             .card-header h2 { font-size: 1.2rem; }
         }
+        /* Styling for the converter button - matches your Lovely Quilt aesthetic */
+.converter-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: linear-gradient(135deg, #bc6c25, #b1622c);
+  color: white;
+  padding: 12px 24px;
+  border-radius: 100px;
+  text-decoration: none;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  font-weight: 600;
+  font-size: 0.9rem;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(44, 30, 20, 0.1);
+}
+
+.converter-btn:hover {
+  transform: translateY(-2px);
+  opacity: 0.92;
+  box-shadow: 0 6px 16px rgba(44, 30, 20, 0.15);
+}
+
+.converter-btn:active {
+  transform: translateY(0);
+}
+
+/* If you want a secondary/ghost version */
+.converter-btn-ghost {
+  background: transparent;
+  border: 2px solid #bc6c25;
+  color: #bc6c25;
+  box-shadow: none;
+}
+
+.converter-btn-ghost:hover {
+  background: #bc6c25;
+  color: white;
+}
     </style>
 </head>
 <body>
@@ -314,6 +353,14 @@
             </div>
         </div>
     </div>
+
+    <!-- Button to link to Data JSON Converter -->
+<a href="https://lovely-quilt.pages.dev/converter" 
+   class="converter-btn"
+   target="_blank" 
+   rel="noopener noreferrer">
+  📊 Data JSON Converter
+</a>
 
     <!-- KPI Snapshot -->
     <div class="insight-section">
