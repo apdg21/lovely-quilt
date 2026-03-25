@@ -955,6 +955,141 @@ Email subscribers
   // Keep all your other existing functions: copyJSON, copyFullPatch, clearAll, loadExample, switchTab, etc.
   // Only the convertData() and parseDateTime() were changed.
 
+  // ==================== MONTHLY CONVERTER FUNCTIONS ====================
+
+function parseMonthlyLive() {
+    const raw = document.getElementById('m_rawInput').value;
+    const lines = raw.split('\n').map(l => l.trim()).filter(l => l);
+
+    const setIfFound = (id, val) => {
+        if (val == null) return;
+        const el = document.getElementById(id);
+        if (el) {
+            el.value = val;
+            el.classList.add('parsed');
+            setTimeout(() => el.classList.remove('parsed'), 1200);
+        }
+    };
+
+    // Common patterns from Omnisend
+    lines.forEach((line, i) => {
+        if (/revenue from omnisend/i.test(line)) setIfFound('m_omni', cleanNum(lines[i+1]));
+        if (/^campaigns$/i.test(line)) setIfFound('m_camp', cleanNum(lines[i+1]));
+        if (/^automation$/i.test(line)) setIfFound('m_auto', cleanNum(lines[i+1]));
+        if (/total store revenue/i.test(line)) setIfFound('m_store', cleanNum(lines[i+1]));
+        
+        if (/email subscribers/i.test(line)) {
+            setIfFound('m_engaged', cleanInt(lines[i+1]));
+            // Look for +new subs
+            for (let j = i+1; j < i+8 && j < lines.length; j++) {
+                if (/^\+[\d,]+$/.test(lines[j])) {
+                    setIfFound('m_newSubs', cleanInt(lines[j]));
+                    break;
+                }
+            }
+            // Look for unsubscribed
+            for (let j = i+1; j < i+10 && j < lines.length; j++) {
+                const match = lines[j].match(/(\d[\d,]*)\s*unsubscribed/i);
+                if (match) {
+                    setIfFound('m_unsub', cleanInt(match[1]));
+                    break;
+                }
+            }
+        }
+    });
+}
+
+function convertMonthly() {
+    const month = document.getElementById('m_month').value.trim();
+    const omni = parseFloat(document.getElementById('m_omni').value) || 0;
+    const camp = parseFloat(document.getElementById('m_camp').value) || 0;
+    const auto = parseFloat(document.getElementById('m_auto').value) || 0;
+    const store = parseFloat(document.getElementById('m_store').value) || 0;
+    const engaged = parseInt(document.getElementById('m_engaged').value) || 0;
+    const newSubs = parseInt(document.getElementById('m_newSubs').value) || 0;
+    const unsubs = parseInt(document.getElementById('m_unsub').value) || 0;
+
+    if (!month) {
+        showToast('Month label is required', 'error');
+        return;
+    }
+
+    const netGrowth = newSubs - unsubs;
+    const unsubRate = engaged > 0 ? ((unsubs / engaged) * 100).toFixed(2) : 0;
+
+    const obj = {
+        month: month,
+        newSubs: newSubs,
+        unsubs: unsubs,
+        netGrowth: netGrowth,
+        engaged: engaged,
+        campaignsRevenue: camp,
+        autoRevenue: auto,
+        omnisendRevenue: omni,
+        storeRevenue: store,
+        unsubRate: parseFloat(unsubRate)
+    };
+
+    lastMonthly = obj;
+
+    document.getElementById('m_outputJson').innerHTML = highlight(JSON.stringify(obj, null, 2));
+    document.getElementById('m_statusBadge').className = 'output-badge success';
+    document.getElementById('m_statusBadge').textContent = `✅ ${month} ready`;
+
+    showToast(`Monthly object for ${month} created`, 'success');
+}
+
+function copyMonthlyObj() {
+    if (!lastMonthly) return showToast('Convert first', 'error');
+    navigator.clipboard.writeText(JSON.stringify(lastMonthly, null, 2))
+        .then(() => showToast('Monthly object copied!', 'success'));
+}
+
+function copyMonthlyPatch() {
+    if (!lastMonthly) return showToast('Convert first', 'error');
+    const patch = {
+        _meta: {
+            source: "Lovely Quilt Converter",
+            date: new Date().toISOString().slice(0,10)
+        },
+        historicalData_entry: lastMonthly
+    };
+    navigator.clipboard.writeText(JSON.stringify(patch, null, 2))
+        .then(() => showToast('Patch copied – add to historicalData array', 'success'));
+}
+
+function clearMonthly() {
+    document.getElementById('m_rawInput').value = '';
+    ['m_month','m_omni','m_camp','m_auto','m_store','m_engaged','m_newSubs','m_unsub'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.value = '';
+    });
+    document.getElementById('m_outputJson').innerHTML = '// Output will appear here';
+    document.getElementById('m_statusBadge').className = 'output-badge';
+    document.getElementById('m_statusBadge').textContent = 'Waiting for input';
+    lastMonthly = null;
+}
+
+function loadMonthlyExample() {
+    document.getElementById('m_rawInput').value = `Revenue from Omnisend
+$2052.13
+Campaigns
+$421.68
+Automation
+$1630.45
+Total store revenue
+$12823.50
+
+Email subscribers
+2500
++768
+114 unsubscribed`;
+    
+    document.getElementById('m_month').value = "Mar 2026";
+    parseMonthlyLive();
+    showToast('Example loaded', '');
+}
+
 </script>
 </body>
 </html>
