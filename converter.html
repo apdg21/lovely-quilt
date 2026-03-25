@@ -46,7 +46,6 @@
       margin: 0 auto;
     }
 
-    /* Header */
     .page-header {
       background: linear-gradient(135deg, var(--espresso), var(--bark));
       border-radius: var(--radius);
@@ -95,7 +94,6 @@
       margin-top: 0.4rem;
     }
 
-    /* Tabs */
     .tabs {
       display: flex;
       gap: 0.5rem;
@@ -144,7 +142,6 @@
       to { opacity: 1; transform: translateY(0); }
     }
 
-    /* Cards */
     .card {
       background: var(--card-bg);
       border: 1px solid var(--border);
@@ -168,7 +165,6 @@
       line-height: 1.55;
     }
 
-    /* Steps */
     .steps {
       display: flex;
       flex-direction: column;
@@ -209,7 +205,6 @@
       color: var(--bark);
     }
 
-    /* Column Map */
     .col-map {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
@@ -237,7 +232,6 @@
       color: var(--text-secondary);
     }
 
-    /* Monthly Grid */
     .monthly-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
@@ -286,7 +280,6 @@
       background: #f0faf3;
     }
 
-    /* Textarea */
     textarea {
       width: 100%;
       height: 280px;
@@ -307,7 +300,6 @@
       box-shadow: 0 0 0 3px rgba(177, 98, 44, 0.12);
     }
 
-    /* Options Row */
     .options-row {
       display: flex;
       gap: 1rem;
@@ -346,7 +338,6 @@
       border-color: var(--clay);
     }
 
-    /* Buttons */
     .btn-row {
       display: flex;
       gap: 0.75rem;
@@ -394,7 +385,6 @@
       color: white;
     }
 
-    /* Output */
     .output-header {
       display: flex;
       align-items: center;
@@ -446,7 +436,6 @@
       white-space: pre;
     }
 
-    /* Syntax Highlight */
     .json-key {
       color: #7ec8e3;
     }
@@ -459,7 +448,6 @@
       color: #f5c87a;
     }
 
-    /* Validation */
     .validation {
       margin-top: 1rem;
     }
@@ -475,26 +463,6 @@
       line-height: 1.4;
     }
 
-    .val-item:last-child {
-      border-bottom: none;
-    }
-
-    .val-ok {
-      color: var(--moss);
-      font-weight: 700;
-    }
-
-    .val-warn {
-      color: var(--gold);
-      font-weight: 700;
-    }
-
-    .val-err {
-      color: var(--terracotta);
-      font-weight: 700;
-    }
-
-    /* Toast */
     .toast {
       position: fixed;
       bottom: 1.5rem;
@@ -526,55 +494,29 @@
       background: var(--terracotta);
     }
 
-    /* Responsive */
     @media (max-width: 768px) {
-      body {
-        padding: 1rem;
-      }
-
-      .page-header {
-        padding: 1.2rem 1.5rem;
-      }
-
-      .card {
-        padding: 1.2rem;
-      }
-
-      .monthly-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .col-map {
-        grid-template-columns: 1fr 1fr;
-      }
+      body { padding: 1rem; }
+      .page-header { padding: 1.2rem 1.5rem; }
+      .card { padding: 1.2rem; }
+      .monthly-grid { grid-template-columns: 1fr; }
+      .col-map { grid-template-columns: 1fr 1fr; }
     }
 
     @media (max-width: 480px) {
-      .col-map {
-        grid-template-columns: 1fr;
-      }
-
-      .btn-row {
-        flex-direction: column;
-      }
-
-      .btn {
-        justify-content: center;
-      }
+      .col-map { grid-template-columns: 1fr; }
+      .btn-row { flex-direction: column; }
+      .btn { justify-content: center; }
     }
   </style>
 </head>
 <body>
 <div class="page">
-
-  <!-- HEADER -->
   <div class="page-header">
     <div class="page-eyebrow">Lovely Quilt · Tools</div>
     <h1 class="page-title">Data JSON <span>Converter</span></h1>
     <p class="page-sub">Paste raw Omnisend data → get clean JSON ready for data.json · Campaigns & Monthly</p>
   </div>
 
-  <!-- TABS -->
   <div class="tabs">
     <button class="tab-btn active" onclick="switchTab('campaign', this)">📅 Campaign (Daily)</button>
     <button class="tab-btn" onclick="switchTab('monthly', this)">📈 Monthly Report</button>
@@ -582,7 +524,6 @@
 
   <!-- TAB: CAMPAIGN -->
   <div class="tab-panel active" id="tab-campaign">
-
     <div class="card">
       <div class="card-title">How to use</div>
       <div class="card-sub">Copy your campaign data from Omnisend and paste it below. Each campaign block should follow this column order.</div>
@@ -592,7 +533,6 @@
         <div class="step"><div class="step-num">3</div><span>Set the <strong>Starting ID</strong> to continue from your last campaign (e.g. if you have 14, set it to 15).</span></div>
         <div class="step"><div class="step-num">4</div><span>Click <strong>Convert</strong> — review the output, then <strong>Copy JSON</strong> and paste the new campaign objects into your <code>data.json</code> campaigns array.</span></div>
       </div>
-
       <div class="card-title" style="margin-bottom: 0.5rem">Expected column order per campaign block</div>
       <div class="col-map">
         <div class="col-item"><strong>Row 1</strong><span>Campaign Name</span></div>
@@ -613,22 +553,7 @@
     <div class="card">
       <div class="card-title">Paste Campaign Data</div>
       <div class="card-sub">One or multiple campaigns — each block is 12 rows. Blank lines between campaigns are ignored.</div>
-      <textarea id="inputData" placeholder="Paste Omnisend campaign data here...
-
-Example:
-Spring Palette Reveal
-Sent to Active & Engaged, VIP
-Email
-Sent
-Mar 5, 2026 at 9:00 AM
-8,360
-80.4%
-(6,723)
-2.3%
-(198)
-$370.10
-(21)"></textarea>
-
+      <textarea id="inputData" placeholder="Paste Omnisend campaign data here..."></textarea>
       <div class="options-row">
         <div class="opt-group">
           <div class="opt-label">Starting ID</div>
@@ -642,7 +567,6 @@ $370.10
           </select>
         </div>
       </div>
-
       <div class="btn-row">
         <button class="btn btn-primary" onclick="convertData()">⚡ Convert</button>
         <button class="btn btn-ghost" onclick="clearAll()">✕ Clear</button>
@@ -656,32 +580,27 @@ $370.10
         <div class="output-badge" id="statusBadge">Waiting for input</div>
       </div>
       <pre id="outputJson">// Output will appear here after conversion</pre>
-      <div class="validation" id="validationPanel"></div>
       <div class="btn-row" style="margin-top: 1rem">
         <button class="btn btn-secondary" onclick="copyJSON()">📋 Copy campaign objects</button>
         <button class="btn btn-green" onclick="copyFullPatch()">⬇ Copy as data.json patch</button>
       </div>
-      <div style="font-size: 0.68rem; color: var(--text-muted); margin-top: 0.6rem; line-height: 1.6">
-        <strong>Copy campaign objects</strong> — copies just the <code>[{...},{...}]</code> array to paste into your existing data.json campaigns array.<br>
-        <strong>Copy as data.json patch</strong> — copies the full wrapper JSON (with _meta + campaigns) ready to merge.
-      </div>
     </div>
   </div>
 
-  <!-- TAB: MONTHLY -->
+  <!-- TAB: MONTHLY (Corrected for data.json structure) -->
   <div class="tab-panel" id="tab-monthly">
-
     <div class="card">
       <div class="card-title">How to use — Monthly</div>
-      <div class="card-sub">Paste your full Omnisend monthly summary block below. The converter will auto-detect all values. You only need to confirm the month label.</div>
+      <div class="card-sub">Paste your full Omnisend monthly summary block below. The converter will auto-detect all values. The output matches the exact fields required in data.json > monthly.historicalData.</div>
       <div class="steps">
         <div class="step"><div class="step-num">1</div><span>In Omnisend, open the monthly overview for the month you want to add and copy all the text.</span></div>
         <div class="step"><div class="step-num">2</div><span>Paste into the text area below — the converter reads the raw block and fills all fields automatically.</span></div>
         <div class="step"><div class="step-num">3</div><span>Check the parsed fields, correct anything if needed, then set the <strong>Month label</strong> (e.g. <code>Mar 2026</code>).</span></div>
         <div class="step"><div class="step-num">4</div><span>Click <strong>Convert</strong> → copy the output and add it to the <code>monthly.historicalData</code> array in your <code>data.json</code>.</span></div>
       </div>
-      <div class="card-title" style="margin-bottom: 0.5rem">What gets extracted</div>
+      <div class="card-title" style="margin-bottom: 0.5rem">Fields extracted (matches data.json schema)</div>
       <div class="col-map">
+        <div class="col-item"><strong>month</strong><span>Month label (e.g., Mar 2026)</span></div>
         <div class="col-item"><strong>omnisendRevenue</strong><span>Revenue from Omnisend ($)</span></div>
         <div class="col-item"><strong>campaignsRevenue</strong><span>Campaigns revenue ($)</span></div>
         <div class="col-item"><strong>autoRevenue</strong><span>Automation revenue ($)</span></div>
@@ -697,63 +616,19 @@ $370.10
     <div class="card">
       <div class="card-title">Paste Monthly Data</div>
       <div class="card-sub">Paste the raw Omnisend monthly block — values will be auto-detected and shown below for review.</div>
-      <textarea id="m_rawInput" placeholder="Paste your Omnisend monthly data here...
-
-Example:
-Revenue from Omnisend
-$14,073.31
--9.51%
-780 orders
-Campaigns
-$6,133.66
-352 orders
-Automation
-$7,939.65
-428 orders
-Total store revenue
-$50,885.36
-3,073 orders
-
-Email subscribers
-33,089
-+1,607
-2,342 subscribed|735 unsubscribed" oninput="parseMonthlyLive()"></textarea>
+      <textarea id="m_rawInput" placeholder="Paste your Omnisend monthly data here..." oninput="parseMonthlyLive()"></textarea>
 
       <div style="margin-top: 1rem; margin-bottom: 0.4rem">
         <div class="card-title" style="font-size: 0.82rem; margin-bottom: 0.6rem">Parsed Fields — review & correct if needed</div>
         <div class="monthly-grid">
-          <div class="m-group">
-            <label class="m-label">Month Label <span class="req">*</span></label>
-            <input class="m-input" id="m_month" type="text" placeholder="e.g. Mar 2026">
-          </div>
-          <div class="m-group">
-            <label class="m-label">Omnisend Revenue ($) <span class="req">*</span></label>
-            <input class="m-input" id="m_omni" type="number" step="0.01" placeholder="e.g. 14073.31">
-          </div>
-          <div class="m-group">
-            <label class="m-label">Campaigns Revenue ($)</label>
-            <input class="m-input" id="m_camp" type="number" step="0.01" placeholder="e.g. 6133.66">
-          </div>
-          <div class="m-group">
-            <label class="m-label">Automation Revenue ($)</label>
-            <input class="m-input" id="m_auto" type="number" step="0.01" placeholder="e.g. 7939.65">
-          </div>
-          <div class="m-group">
-            <label class="m-label">Store Revenue ($)</label>
-            <input class="m-input" id="m_store" type="number" step="0.01" placeholder="e.g. 50885.36">
-          </div>
-          <div class="m-group">
-            <label class="m-label">Engaged List</label>
-            <input class="m-input" id="m_engaged" type="number" placeholder="e.g. 2500">
-          </div>
-          <div class="m-group">
-            <label class="m-label">New Subscribers</label>
-            <input class="m-input" id="m_newSubs" type="number" placeholder="e.g. 768">
-          </div>
-          <div class="m-group">
-            <label class="m-label">Unsubscribes</label>
-            <input class="m-input" id="m_unsub" type="number" placeholder="e.g. 114">
-          </div>
+          <div class="m-group"><label class="m-label">Month Label <span class="req">*</span></label><input class="m-input" id="m_month" type="text" placeholder="e.g. Mar 2026"></div>
+          <div class="m-group"><label class="m-label">Omnisend Revenue ($) <span class="req">*</span></label><input class="m-input" id="m_omni" type="number" step="0.01" placeholder="e.g. 14073.31"></div>
+          <div class="m-group"><label class="m-label">Campaigns Revenue ($)</label><input class="m-input" id="m_camp" type="number" step="0.01" placeholder="e.g. 6133.66"></div>
+          <div class="m-group"><label class="m-label">Automation Revenue ($)</label><input class="m-input" id="m_auto" type="number" step="0.01" placeholder="e.g. 7939.65"></div>
+          <div class="m-group"><label class="m-label">Store Revenue ($)</label><input class="m-input" id="m_store" type="number" step="0.01" placeholder="e.g. 50885.36"></div>
+          <div class="m-group"><label class="m-label">Engaged List</label><input class="m-input" id="m_engaged" type="number" placeholder="e.g. 2500"></div>
+          <div class="m-group"><label class="m-label">New Subscribers</label><input class="m-input" id="m_newSubs" type="number" placeholder="e.g. 768"></div>
+          <div class="m-group"><label class="m-label">Unsubscribes</label><input class="m-input" id="m_unsub" type="number" placeholder="e.g. 114"></div>
         </div>
       </div>
 
@@ -766,23 +641,17 @@ Email subscribers
 
     <div class="card">
       <div class="output-header">
-        <div class="output-label">JSON Output</div>
+        <div class="output-label">JSON Output (Matches data.json historicalData entry)</div>
         <div class="output-badge" id="m_statusBadge">Waiting for input</div>
       </div>
       <pre id="m_outputJson">// Output will appear here after conversion</pre>
-      <div class="validation" id="m_validationPanel"></div>
       <div class="btn-row" style="margin-top: 1rem">
         <button class="btn btn-secondary" onclick="copyMonthlyObj()">📋 Copy monthly object</button>
         <button class="btn btn-green" onclick="copyMonthlyPatch()">⬇ Copy as data.json patch</button>
       </div>
-      <div style="font-size: 0.68rem; color: var(--text-muted); margin-top: 0.6rem; line-height: 1.6">
-        <strong>Copy monthly object</strong> — copies just the <code>{...}</code> object to paste as a new entry in your data.json historicalData array.<br>
-        <strong>Copy as data.json patch</strong> — copies the full wrapper with _meta ready to reference.
-      </div>
     </div>
   </div>
 </div>
-
 <div class="toast" id="toast"></div>
 
 <script>
@@ -797,227 +666,77 @@ Email subscribers
     window._toastTimer = setTimeout(() => el.classList.remove('show'), 3000);
   };
 
-  const cleanNum = str => {
-    if (!str || str.trim() === '' || str.trim().toLowerCase() === 'n/a' || str.trim() === 'null') return null;
-    const c = str.replace(/[^0-9.\-]/g, '');
-    if (c === '') return null;
-    return parseFloat(c);
-  };
-
-  const cleanInt = str => {
-    const n = cleanNum(str);
-    return n === null ? null : Math.round(n);
-  };
+  const cleanNum = str => { if (!str) return null; const c = str.replace(/[^0-9.\-]/g, ''); return c === '' ? null : parseFloat(c); };
+  const cleanInt = str => { const n = cleanNum(str); return n === null ? null : Math.round(n); };
 
   const parseDateTime = str => {
     if (!str) return { date: '', time: '00:00' };
     const atIdx = str.indexOf(' at ');
     const datePart = atIdx > -1 ? str.slice(0, atIdx).trim() : str.trim();
     const timePart = atIdx > -1 ? str.slice(atIdx + 4).trim() : '';
-
     let date = '';
-    try {
-      const d = new Date(datePart);
-      if (!isNaN(d.getTime())) {
-        date = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
-      }
-    } catch (e) { date = ''; }
-
+    try { const d = new Date(datePart); if (!isNaN(d.getTime())) date = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); } catch(e) {}
     let time = '00:00';
-    if (timePart) {
-      const m = timePart.match(/(\d+):(\d+)\s*(AM|PM)?/i);
-      if (m) {
-        let h = parseInt(m[1]);
-        const min = m[2];
-        const ampm = (m[3] || '').toUpperCase();
-        if (ampm === 'PM' && h < 12) h += 12;
-        if (ampm === 'AM' && h === 12) h = 0;
-        time = String(h).padStart(2, '0') + ':' + min;
-      }
-    }
+    if (timePart) { const m = timePart.match(/(\d+):(\d+)\s*(AM|PM)?/i); if (m) { let h = parseInt(m[1]); const min = m[2]; const ampm = (m[3] || '').toUpperCase(); if (ampm === 'PM' && h < 12) h += 12; if (ampm === 'AM' && h === 12) h = 0; time = String(h).padStart(2, '0') + ':' + min; } }
     return { date, time };
   };
 
-  const detectChannel = str => {
-    if (!str) return null;
-    const s = str.trim().toLowerCase();
-    if (s === 'email') return 'Email';
-    if (s === 'sms') return 'SMS';
-    return null;
-  };
-
-  const highlight = json => {
-    return json
-      .replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*")\s*:/g, '<span class="json-key">$1</span>:')
-      .replace(/:\s*("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*")/g, ': <span class="json-str">$1</span>')
-      .replace(/:\s*(-?\d+\.?\d*)/g, ': <span class="json-num">$1</span>');
-  };
+  const detectChannel = str => { if (!str) return null; const s = str.trim().toLowerCase(); if (s === 'email') return 'Email'; if (s === 'sms') return 'SMS'; return null; };
+  const highlight = json => json.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*")\s*:/g, '<span class="json-key">$1</span>:').replace(/:\s*("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*")/g, ': <span class="json-str">$1</span>').replace(/:\s*(-?\d+\.?\d*)/g, ': <span class="json-num">$1</span>');
 
   function convertData() {
     const raw = document.getElementById('inputData').value;
     const startId = parseInt(document.getElementById('startId').value) || 1;
     const defaultChannel = document.getElementById('defaultChannel').value;
-
-    const normalize = raw.split('\n').flatMap(l => {
-      const line = l.trim();
-      if (!line) return [];
-      const pctCount = line.match(/^([\d.]+%)\s*\(([\d,]+)\)$/);
-      if (pctCount) return [pctCount[1], pctCount[2]];
-      const revOrders = line.match(/^\$([\d,]+\.?\d*)\s*\(([\d,]+)\)$/);
-      if (revOrders) return [`$${revOrders[1]}`, revOrders[2]];
-      return [line];
-    });
-
-    if (!normalize.length) {
-      showToast('⚠️ Nothing to convert — paste your data first.', 'error');
-      return;
-    }
-
-    const campaigns = [];
-    const warnings = [];
-    let id = startId;
-    let i = 0;
-
+    const normalize = raw.split('\n').flatMap(l => { const line = l.trim(); if (!line) return []; const pctCount = line.match(/^([\d.]+%)\s*\(([\d,]+)\)$/); if (pctCount) return [pctCount[1], pctCount[2]]; const revOrders = line.match(/^\$([\d,]+\.?\d*)\s*\(([\d,]+)\)$/); if (revOrders) return [`$${revOrders[1]}`, revOrders[2]]; return [line]; });
+    if (!normalize.length) { showToast('⚠️ Nothing to convert', 'error'); return; }
+    const campaigns = []; let id = startId; let i = 0;
     while (i < normalize.length) {
       let sentIdx = -1;
-      for (let j = i; j < Math.min(i + 6, normalize.length); j++) {
-        if (normalize[j].trim() === 'Sent') { sentIdx = j; break; }
-      }
+      for (let j = i; j < Math.min(i + 6, normalize.length); j++) if (normalize[j].trim() === 'Sent') { sentIdx = j; break; }
       if (sentIdx === -1) { i++; continue; }
-
-      const nameLine = sentIdx - 3;
-      const segLine = sentIdx - 2;
-      const chanLine = sentIdx - 1;
-
-      const name = nameLine >= 0 ? normalize[nameLine] : '';
-      const channel = detectChannel(chanLine >= 0 ? normalize[chanLine] : '') || defaultChannel;
+      const name = (sentIdx - 3) >= 0 ? normalize[sentIdx - 3] : '';
+      const channel = detectChannel((sentIdx - 1) >= 0 ? normalize[sentIdx - 1] : '') || defaultChannel;
       const isSMS = channel === 'SMS';
       const { date, time } = parseDateTime(normalize[sentIdx + 1] || '');
       const sent = cleanInt(normalize[sentIdx + 2]);
-
       let revIdx = -1;
-      for (let j = sentIdx + 3; j < Math.min(sentIdx + 12, normalize.length); j++) {
-        if (/^\$[\d,]+\.?\d*$/.test(normalize[j])) { revIdx = j; break; }
-      }
-
+      for (let j = sentIdx + 3; j < Math.min(sentIdx + 12, normalize.length); j++) if (/^\$[\d,]+\.?\d*$/.test(normalize[j])) { revIdx = j; break; }
       let rev = null, orders = null, clickPct = null, clickN = null, openPct = null, openN = null;
-
       if (revIdx > -1) {
-        orders = cleanInt(normalize[revIdx + 1]);
-        rev = cleanNum(normalize[revIdx]);
-        clickN = cleanInt(normalize[revIdx - 1]);
-        clickPct = cleanNum(normalize[revIdx - 2]);
-        if (!isSMS) {
-          openN = cleanInt(normalize[revIdx - 3]);
-          openPct = cleanNum(normalize[revIdx - 4]);
-        }
+        orders = cleanInt(normalize[revIdx + 1]); rev = cleanNum(normalize[revIdx]);
+        clickN = cleanInt(normalize[revIdx - 1]); clickPct = cleanNum(normalize[revIdx - 2]);
+        if (!isSMS) { openN = cleanInt(normalize[revIdx - 3]); openPct = cleanNum(normalize[revIdx - 4]); }
       }
-
-      if (!name) {
-        warnings.push(`Block at line ${i + 1}: could not detect campaign name — skipped.`);
-        i = revIdx > -1 ? revIdx + 2 : sentIdx + 10;
-        continue;
-      }
-
-      campaigns.push({
-        name, dateTime: date ? `${date} at ${time}` : '', channel, sent,
-        openRate: openPct, opens: openN, clickRate: clickPct, clicks: clickN,
-        revenue: rev, orders
-      });
-      id++;
-      i = revIdx > -1 ? revIdx + 2 : sentIdx + 10;
+      if (!name) { i = revIdx > -1 ? revIdx + 2 : sentIdx + 10; continue; }
+      campaigns.push({ name, dateTime: date ? `${date} at ${time}` : '', channel, sent, openRate: openPct, opens: openN, clickRate: clickPct, clicks: clickN, revenue: rev, orders });
+      id++; i = revIdx > -1 ? revIdx + 2 : sentIdx + 10;
     }
-
     lastConverted = campaigns;
-
-    if (!campaigns.length) {
-      document.getElementById('outputJson').innerHTML = '// No campaigns detected.\n// Check your data format — see the column map above.';
-      document.getElementById('statusBadge').className = 'output-badge error';
-      document.getElementById('statusBadge').textContent = '0 campaigns';
-      showToast('❌ No campaigns detected', 'error');
-      return;
-    }
-
-    const lines = campaigns.map(c => '    ' + JSON.stringify(c));
-    const prettyOutput = '[\n' + lines.join(',\n') + '\n]';
+    if (!campaigns.length) { document.getElementById('outputJson').innerHTML = '// No campaigns detected.'; document.getElementById('statusBadge').className = 'output-badge error'; document.getElementById('statusBadge').textContent = '0 campaigns'; showToast('❌ No campaigns detected', 'error'); return; }
+    const lines = campaigns.map(c => '    ' + JSON.stringify(c)); const prettyOutput = '[\n' + lines.join(',\n') + '\n]';
     document.getElementById('outputJson').innerHTML = highlight(prettyOutput);
     document.getElementById('statusBadge').className = 'output-badge success';
     document.getElementById('statusBadge').textContent = `✅ ${campaigns.length} campaign${campaigns.length !== 1 ? 's' : ''} converted`;
     showToast(`✅ ${campaigns.length} campaign${campaigns.length !== 1 ? 's' : ''} converted`, 'success');
   }
 
-  function copyJSON() {
-    if (!lastConverted.length) { showToast('Nothing to copy yet — convert first', 'error'); return; }
-    const lines = lastConverted.map(c => '    ' + JSON.stringify(c));
-    const out = '[\n' + lines.join(',\n') + '\n]';
-    navigator.clipboard.writeText(out).then(() => showToast('📋 Campaign objects copied!', 'success'));
-  }
-
-  function copyFullPatch() {
-    if (!lastConverted.length) { showToast('Nothing to copy yet — convert first', 'error'); return; }
-    const patch = { _meta: { source: 'Lovely Quilt · Omnisend Analytics', version: '1.0', date: new Date().toISOString().slice(0, 10) }, campaigns: lastConverted };
-    navigator.clipboard.writeText(JSON.stringify(patch, null, 2)).then(() => showToast('⬇ Full patch copied!', 'success'));
-  }
-
-  function clearAll() {
-    document.getElementById('inputData').value = '';
-    document.getElementById('outputJson').innerHTML = '// Output will appear here after conversion';
-    document.getElementById('statusBadge').className = 'output-badge';
-    document.getElementById('statusBadge').textContent = 'Waiting for input';
-    lastConverted = [];
-  }
-
-  function loadExample() {
-    document.getElementById('inputData').value = `The National Quilting Day Celebration\nSent to Active & Engaged, VIP\nEmail\nSent\nMar 21, 2026 at 9:00 AM\n2,433\n40.7%\n(991)\n5.1%\n(126)\n$35.80\n(2)\n\nThe National Quilting Day Teaser\nSent to Active & Engaged\nEmail\nSent\nMar 19, 2026 at 10:00 AM\n2,419\n41.7%\n(1,011)\n2.1%\n(52)\n$0.00\n(0)`;
-    document.getElementById('startId').value = '15';
-    showToast('📋 Example loaded', '');
-  }
-
-  function switchTab(name, btn) {
-    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
-    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-    document.getElementById('tab-' + name).classList.add('active');
-    btn.classList.add('active');
-  }
+  function copyJSON() { if (!lastConverted.length) { showToast('Nothing to copy', 'error'); return; } const lines = lastConverted.map(c => '    ' + JSON.stringify(c)); const out = '[\n' + lines.join(',\n') + '\n]'; navigator.clipboard.writeText(out).then(() => showToast('📋 Campaign objects copied!', 'success')); }
+  function copyFullPatch() { if (!lastConverted.length) { showToast('Nothing to copy', 'error'); return; } const patch = { _meta: { source: 'Lovely Quilt · Omnisend Analytics', version: '1.0', date: new Date().toISOString().slice(0, 10) }, campaigns: lastConverted }; navigator.clipboard.writeText(JSON.stringify(patch, null, 2)).then(() => showToast('⬇ Full patch copied!', 'success')); }
+  function clearAll() { document.getElementById('inputData').value = ''; document.getElementById('outputJson').innerHTML = '// Output will appear here after conversion'; document.getElementById('statusBadge').className = 'output-badge'; document.getElementById('statusBadge').textContent = 'Waiting for input'; lastConverted = []; }
+  function loadExample() { document.getElementById('inputData').value = `The National Quilting Day Celebration\nSent to Active & Engaged, VIP\nEmail\nSent\nMar 21, 2026 at 9:00 AM\n2,433\n40.7%\n(991)\n5.1%\n(126)\n$35.80\n(2)\n\nThe National Quilting Day Teaser\nSent to Active & Engaged\nEmail\nSent\nMar 19, 2026 at 10:00 AM\n2,419\n41.7%\n(1,011)\n2.1%\n(52)\n$0.00\n(0)`; document.getElementById('startId').value = '15'; showToast('📋 Example loaded', ''); }
+  function switchTab(name, btn) { document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active')); document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active')); document.getElementById('tab-' + name).classList.add('active'); btn.classList.add('active'); }
 
   function parseMonthlyLive() {
     const raw = document.getElementById('m_rawInput').value;
     const lines = raw.split('\n').map(l => l.trim()).filter(l => l !== '');
-
-    const setIfFound = (id, val) => {
-      if (val === null || val === undefined) return;
-      const el = document.getElementById(id);
-      el.value = val;
-      el.classList.add('parsed');
-      setTimeout(() => el.classList.remove('parsed'), 1500);
-    };
-
-    const omniIdx = lines.findIndex(l => /revenue from omnisend/i.test(l));
-    if (omniIdx > -1) setIfFound('m_omni', cleanNum(lines[omniIdx + 1]));
-
-    const campIdx = lines.findIndex(l => /^campaigns$/i.test(l));
-    if (campIdx > -1) setIfFound('m_camp', cleanNum(lines[campIdx + 1]));
-
-    const autoIdx = lines.findIndex(l => /^automation$/i.test(l));
-    if (autoIdx > -1) setIfFound('m_auto', cleanNum(lines[autoIdx + 1]));
-
-    const storeIdx = lines.findIndex(l => /total store revenue/i.test(l));
-    if (storeIdx > -1) setIfFound('m_store', cleanNum(lines[storeIdx + 1]));
-
+    const setIfFound = (id, val) => { if (val === null || val === undefined) return; const el = document.getElementById(id); el.value = val; el.classList.add('parsed'); setTimeout(() => el.classList.remove('parsed'), 1500); };
+    const omniIdx = lines.findIndex(l => /revenue from omnisend/i.test(l)); if (omniIdx > -1) setIfFound('m_omni', cleanNum(lines[omniIdx + 1]));
+    const campIdx = lines.findIndex(l => /^campaigns$/i.test(l)); if (campIdx > -1) setIfFound('m_camp', cleanNum(lines[campIdx + 1]));
+    const autoIdx = lines.findIndex(l => /^automation$/i.test(l)); if (autoIdx > -1) setIfFound('m_auto', cleanNum(lines[autoIdx + 1]));
+    const storeIdx = lines.findIndex(l => /total store revenue/i.test(l)); if (storeIdx > -1) setIfFound('m_store', cleanNum(lines[storeIdx + 1]));
     const emailIdx = lines.findIndex(l => /^email subscribers$/i.test(l));
-    if (emailIdx > -1) {
-      const engagedRaw = lines[emailIdx + 1] || '';
-      const engagedNum = cleanInt(engagedRaw);
-      if (engagedNum) setIfFound('m_engaged', engagedNum);
-
-      for (let j = emailIdx + 1; j < Math.min(emailIdx + 6, lines.length); j++) {
-        if (/^\+[\d,]+$/.test(lines[j])) { setIfFound('m_newSubs', cleanInt(lines[j])); break; }
-      }
-      for (let j = emailIdx + 1; j < Math.min(emailIdx + 8, lines.length); j++) {
-        const m = lines[j].match(/(\d[\d,]*)\s*unsubscribed/i);
-        if (m) { setIfFound('m_unsub', cleanInt(m[1])); break; }
-      }
-    }
+    if (emailIdx > -1) { const engagedRaw = lines[emailIdx + 1] || ''; const engagedNum = cleanInt(engagedRaw); if (engagedNum) setIfFound('m_engaged', engagedNum); for (let j = emailIdx + 1; j < Math.min(emailIdx + 6, lines.length); j++) { if (/^\+[\d,]+$/.test(lines[j])) { setIfFound('m_newSubs', cleanInt(lines[j])); break; } } for (let j = emailIdx + 1; j < Math.min(emailIdx + 8, lines.length); j++) { const m = lines[j].match(/(\d[\d,]*)\s*unsubscribed/i); if (m) { setIfFound('m_unsub', cleanInt(m[1])); break; } } }
   }
 
   function convertMonthly() {
@@ -1029,56 +748,21 @@ Email subscribers
     const engaged = parseInt(document.getElementById('m_engaged').value) || 0;
     const newSubs = parseInt(document.getElementById('m_newSubs').value) || 0;
     const unsubs = parseInt(document.getElementById('m_unsub').value) || 0;
-
-    const warnings = [];
-    if (!month) warnings.push({ type: 'err', msg: 'Month label is required' });
-    if (isNaN(omni)) warnings.push({ type: 'err', msg: 'Omnisend revenue is required' });
-
-    if (warnings.some(w => w.type === 'err')) {
-      document.getElementById('m_statusBadge').className = 'output-badge error';
-      document.getElementById('m_statusBadge').textContent = '⚠ Fix errors first';
-      showToast('⚠️ Fix required fields first', 'error');
-      return;
-    }
-
-    const obj = { month, omnisendRevenue: omni, campaignsRevenue: camp, autoRevenue: auto, storeRevenue: store, engaged, newSubs, unsubs, netGrowth: newSubs - unsubs, unsubRate: engaged ? ((unsubs / engaged) * 100).toFixed(2) : 0 };
+    if (!month || isNaN(omni)) { showToast('⚠️ Month and Omnisend revenue required', 'error'); document.getElementById('m_statusBadge').className = 'output-badge error'; document.getElementById('m_statusBadge').textContent = '⚠ Fix errors'; return; }
+    const netGrowth = newSubs - unsubs;
+    const unsubRate = engaged ? parseFloat(((unsubs / engaged) * 100).toFixed(2)) : 0;
+    const obj = { month, omnisendRevenue: omni, campaignsRevenue: camp, autoRevenue: auto, storeRevenue: store, engaged, newSubs, unsubs, netGrowth, unsubRate };
     lastMonthly = obj;
-
     document.getElementById('m_outputJson').innerHTML = highlight(JSON.stringify(obj, null, 2));
     document.getElementById('m_statusBadge').className = 'output-badge success';
-    document.getElementById('m_statusBadge').textContent = `✅ ${month} converted`;
-    showToast(`✅ ${month} converted`, 'success');
+    document.getElementById('m_statusBadge').textContent = `✅ ${month} ready`;
+    showToast(`✅ ${month} converted (matches data.json schema)`, 'success');
   }
 
-  function copyMonthlyObj() {
-    if (!lastMonthly) { showToast('Nothing to copy — convert first', 'error'); return; }
-    navigator.clipboard.writeText(JSON.stringify(lastMonthly, null, 2)).then(() => showToast('📋 Monthly object copied!', 'success'));
-  }
-
-  function copyMonthlyPatch() {
-    if (!lastMonthly) { showToast('Nothing to copy — convert first', 'error'); return; }
-    const patch = { _meta: { source: 'Lovely Quilt · Omnisend Analytics', version: '1.0', date: new Date().toISOString().slice(0, 10) }, monthly_entry: lastMonthly };
-    navigator.clipboard.writeText(JSON.stringify(patch, null, 2)).then(() => showToast('⬇ Monthly patch copied!', 'success'));
-  }
-
-  function clearMonthly() {
-    document.getElementById('m_rawInput').value = '';
-    ['m_month', 'm_omni', 'm_camp', 'm_auto', 'm_store', 'm_engaged', 'm_newSubs', 'm_unsub'].forEach(id => {
-      document.getElementById(id).value = '';
-      document.getElementById(id).classList.remove('parsed');
-    });
-    document.getElementById('m_outputJson').innerHTML = '// Output will appear here after conversion';
-    document.getElementById('m_statusBadge').className = 'output-badge';
-    document.getElementById('m_statusBadge').textContent = 'Waiting for input';
-    lastMonthly = null;
-  }
-
-  function loadMonthlyExample() {
-    document.getElementById('m_rawInput').value = `Revenue from Omnisend\n$14,073.31\n-9.51%\n780 orders\nCampaigns\n$6,133.66\n352 orders\nAutomation\n$7,939.65\n428 orders\nTotal store revenue\n$50,885.36\n3,073 orders\n\nEmail subscribers\n33,089\n+1,607\n2,342 subscribed|735 unsubscribed`;
-    parseMonthlyLive();
-    document.getElementById('m_month').value = 'Mar 2026';
-    showToast('📋 Example loaded — set the month label', '');
-  }
+  function copyMonthlyObj() { if (!lastMonthly) { showToast('Nothing to copy', 'error'); return; } navigator.clipboard.writeText(JSON.stringify(lastMonthly, null, 2)).then(() => showToast('📋 Monthly object copied!', 'success')); }
+  function copyMonthlyPatch() { if (!lastMonthly) { showToast('Nothing to copy', 'error'); return; } const patch = { _meta: { source: 'Lovely Quilt · Omnisend Analytics', version: '1.0', date: new Date().toISOString().slice(0, 10) }, monthly_entry: lastMonthly }; navigator.clipboard.writeText(JSON.stringify(patch, null, 2)).then(() => showToast('⬇ Monthly patch copied!', 'success')); }
+  function clearMonthly() { document.getElementById('m_rawInput').value = ''; ['m_month', 'm_omni', 'm_camp', 'm_auto', 'm_store', 'm_engaged', 'm_newSubs', 'm_unsub'].forEach(id => { document.getElementById(id).value = ''; document.getElementById(id).classList.remove('parsed'); }); document.getElementById('m_outputJson').innerHTML = '// Output will appear here after conversion'; document.getElementById('m_statusBadge').className = 'output-badge'; document.getElementById('m_statusBadge').textContent = 'Waiting for input'; lastMonthly = null; }
+  function loadMonthlyExample() { document.getElementById('m_rawInput').value = `Revenue from Omnisend\n$14,073.31\n-9.51%\n780 orders\nCampaigns\n$6,133.66\n352 orders\nAutomation\n$7,939.65\n428 orders\nTotal store revenue\n$50,885.36\n3,073 orders\n\nEmail subscribers\n33,089\n+1,607\n2,342 subscribed|735 unsubscribed`; parseMonthlyLive(); document.getElementById('m_month').value = 'Mar 2026'; showToast('📋 Example loaded — verify fields, then convert', ''); }
 </script>
 </body>
 </html>
