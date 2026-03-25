@@ -88,136 +88,111 @@
         <div class="debug-info" id="debugInfo">🔍 Debug: Initializing...</div>
     </div>
 
-    <script>
-        let currentCampaigns = [];
-        let charts = {};
+   <script>
+    let currentCampaigns = [];
+    let charts = {};
 
-        function formatDate(dateTimeStr) {
-            if (!dateTimeStr) return 'Unknown';
-            const atIndex = dateTimeStr.indexOf(' at ');
-            if (atIndex > -1) {
-                return dateTimeStr.substring(0, atIndex);
-            }
-            return dateTimeStr;
+    // ====================== HELPER FUNCTIONS ======================
+    function formatDate(dateTimeStr) {
+        if (!dateTimeStr) return 'Unknown';
+        const atIndex = dateTimeStr.indexOf(' at ');
+        if (atIndex > -1) {
+            return dateTimeStr.substring(0, atIndex).trim();
         }
+        return dateTimeStr.trim();
+    }
 
-        function calculateConversionRate(orders, sent) { 
-            return (sent && sent > 0) ? (orders / sent) * 100 : 0; 
-        }
-        
-        function calculateAOV(revenue, orders) { 
-            return (orders && orders > 0) ? revenue / orders : 0; 
-        }
-        
-        function calculateRPS(revenue, sent) { 
-            return (sent && sent > 0) ? revenue / sent : 0; 
-        }
+    function calculateConversionRate(orders, sent) {
+        return sent > 0 ? (orders / sent) * 100 : 0;
+    }
 
-        async function loadData() {
-            const debugEl = document.getElementById('debugInfo');
-            debugEl.innerHTML = '🔍 Fetching /data.json...';
-            
-            try {
-                // Add timestamp to prevent caching
-                const url = '/data.json?t=' + Date.now();
-                debugEl.innerHTML = `🔍 Fetching: ${url}`;
-                
-                const response = await fetch(url);
-                debugEl.innerHTML = `🔍 Response status: ${response.status}`;
-                
-                if (!response.ok) {
-                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+    function calculateAOV(revenue, orders) {
+        return orders > 0 ? revenue / orders : 0;
+    }
+
+    function calculateRPS(revenue, sent) {
+        return sent > 0 ? revenue / sent : 0;
+    }
+
+    // ====================== MAIN LOAD FUNCTION ======================
+    async function loadData() {
+        try {
+            const response = await fetch('/data.json?t=' + Date.now());
+            if (!response.ok) throw new Error('Failed to load data.json');
+
+            const data = await response.json();
+            const daily = data.daily || { campaigns: [] };
+
+            currentCampaigns = daily.campaigns || [];
+
+            // === AUTO CALCULATE ALL SUMMARY METRICS ===
+            let totalSends = 0;
+            let totalRevenue = 0;
+            let totalOpens = 0;
+            let totalClicks = 0;
+            let totalOrders = 0;
+
+            currentCampaigns.forEach(c => {
+                totalSends += Number(c.sent) || 0;
+                totalRevenue += Number(c.revenue) || 0;
+                totalOpens += Number(c.opens) || 0;
+                totalClicks += Number(c.clicks) || 0;
+                totalOrders += Number(c.orders) || 0;
+            });
+
+            const avgOpenRate = totalSends > 0 ? (totalOpens / totalSends * 100).toFixed(1) : 0;
+            const avgClickRate = totalSends > 0 ? (totalClicks / totalSends * 100).toFixed(1) : 0;
+
+            // Update period display
+            document.getElementById('periodDisplay').innerHTML = `📅 ${daily.period || 'March 2026'} · daily breakdown`;
+
+            // === KPI CARDS (All calculated live) ===
+            document.getElementById('kpiContainer').innerHTML = `
+                <div class="kpi-card">
+                    <div class="kpi-value">${totalSends.toLocaleString()}</div>
+                    <div class="kpi-label">Total sends</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-value">$${totalRevenue.toFixed(2)}</div>
+                    <div class="kpi-label">Total revenue</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-value">${avgOpenRate}%</div>
+                    <div class="kpi-label">Avg open rate</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-value">${avgClickRate}%</div>
+                    <div class="kpi-label">Avg click rate</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-value">${(totalSends > 0 ? (totalOrders / totalSends * 100).toFixed(2) : 0)}%</div>
+                    <div class="kpi-label">Conversion rate</div>
+                    <div class="kpi-sub">${totalOrders} orders</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-value">$${(totalOrders > 0 ? (totalRevenue / totalOrders).toFixed(2) : 0)}</div>
+                    <div class="kpi-label">Avg order value</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-value">$${(totalSends > 0 ? (totalRevenue / totalSends).toFixed(2) : 0)}</div>
+                    <div class="kpi-label">Revenue per send</div>
+                </div>
+            `;
+
+            updateCharts();
+
+            // === BUILD TABLE ===
+            let topRevenue = 0;
+            let topName = '';
+            currentCampaigns.forEach(c => {
+                if (c.revenue > topRevenue) {
+                    topRevenue = c.revenue;
+                    topName = c.name;
                 }
-                
-                const rawText = await response.text();
-                debugEl.innerHTML = `🔍 Received ${rawText.length} bytes, parsing JSON...`;
-                
-                let data;
-                try {
-                    data = JSON.parse(rawText);
-                    debugEl.innerHTML = `✅ JSON parsed successfully!`;
-                } catch (e) {
-                    throw new Error(`JSON parse error: ${e.message}`);
-                }
-                
-                // Check if daily data exists
-                if (!data.daily) {
-                    throw new Error('Missing "daily" object in data.json');
-                }
-                
-                const daily = data.daily;
-                
-                if (!daily.campaigns || !Array.isArray(daily.campaigns)) {
-                    throw new Error('Missing or invalid "campaigns" array in daily data');
-                }
-                
-                currentCampaigns = daily.campaigns;
-                debugEl.innerHTML = `✅ Loaded ${currentCampaigns.length} campaigns, period: ${daily.period}`;
+            });
 
-                document.getElementById('periodDisplay').innerHTML = `📅 ${daily.period} · daily breakdown`;
-                document.getElementById('errorDisplay').innerHTML = '';
-
-                // Calculate summary metrics
-                let totalOrders = 0;
-                let totalRevenueWithOrders = 0;
-                for (const c of currentCampaigns) {
-                    totalOrders += (c.orders || 0);
-                    if (c.orders > 0) {
-                        totalRevenueWithOrders += (c.revenue || 0);
-                    }
-                }
-                
-                const overallConversionRate = (totalOrders / (daily.totalSends || 1)) * 100;
-                const overallAOV = totalOrders > 0 ? totalRevenueWithOrders / totalOrders : 0;
-                const overallRPS = (daily.totalRevenue || 0) / (daily.totalSends || 1);
-
-                // Update KPI Cards
-                document.getElementById('kpiContainer').innerHTML = `
-                    <div class="kpi-card">
-                        <div class="kpi-value">${(daily.totalSends || 0).toLocaleString()}</div>
-                        <div class="kpi-label">Total sends</div>
-                    </div>
-                    <div class="kpi-card">
-                        <div class="kpi-value">$${(daily.totalRevenue || 0).toFixed(2)}</div>
-                        <div class="kpi-label">Total revenue</div>
-                    </div>
-                    <div class="kpi-card">
-                        <div class="kpi-value">${(daily.avgOpenRate || 0)}%</div>
-                        <div class="kpi-label">Avg open rate</div>
-                    </div>
-                    <div class="kpi-card">
-                        <div class="kpi-value">${(daily.avgClickRate || 0)}%</div>
-                        <div class="kpi-label">Avg click rate</div>
-                    </div>
-                    <div class="kpi-card">
-                        <div class="kpi-value">${overallConversionRate.toFixed(2)}%</div>
-                        <div class="kpi-label">Conversion rate</div>
-                        <div class="kpi-sub">${totalOrders} orders</div>
-                    </div>
-                    <div class="kpi-card">
-                        <div class="kpi-value">$${overallAOV.toFixed(2)}</div>
-                        <div class="kpi-label">Avg order value</div>
-                    </div>
-                    <div class="kpi-card">
-                        <div class="kpi-value">$${overallRPS.toFixed(2)}</div>
-                        <div class="kpi-label">Revenue per sub</div>
-                    </div>
-                `;
-
-                // Update charts
-                updateCharts();
-
-                // Find top campaign
-                let topRevenue = 0, topRevenueName = '';
-                for (const c of currentCampaigns) {
-                    if ((c.revenue || 0) > topRevenue) {
-                        topRevenue = c.revenue;
-                        topRevenueName = c.name;
-                    }
-                }
-
-                // Build table
-                let tableHtml = ``
+            let tableHtml = `
+                <table>
                     <thead>
                         <tr>
                             <th>📅 Date</th>
@@ -235,159 +210,136 @@
                         </tr>
                     </thead>
                     <tbody>
+            `;
+
+            currentCampaigns.forEach(c => {
+                const isTop = c.name === topName && topRevenue > 0;
+                const convRate = calculateConversionRate(c.orders || 0, c.sent || 0);
+                const aov = calculateAOV(c.revenue || 0, c.orders || 0);
+                const rps = calculateRPS(c.revenue || 0, c.sent || 0);
+                const datePart = formatDate(c.dateTime);
+
+                tableHtml += `
+                    <tr class="${isTop ? 'top-campaign' : ''}">
+                        <td><strong>${datePart}</strong></td>
+                        <td><strong>${c.name}</strong></td>
+                        <td>${(c.sent || 0).toLocaleString()}</td>
+                        <td>${c.openRate || 0}%</td>
+                        <td>${(c.opens || 0).toLocaleString()}</td>
+                        <td>${c.clickRate || 0}%</td>
+                        <td>${(c.clicks || 0).toLocaleString()}</td>
+                        <td class="metric-highlight">${convRate.toFixed(2)}%</td>
+                        <td>${c.orders || 0}</td>
+                        <td><strong>$${(c.revenue || 0).toFixed(2)}</strong></td>
+                        <td>$${aov.toFixed(2)}</td>
+                        <td>$${rps.toFixed(2)}</td>
+                    </tr>
                 `;
+            });
 
-                for (const c of currentCampaigns) {
-                    const isTop = c.name === topRevenueName && topRevenue > 0;
-                    const conversionRate = calculateConversionRate(c.orders || 0, c.sent || 0);
-                    const aov = calculateAOV(c.revenue || 0, c.orders || 0);
-                    const rps = calculateRPS(c.revenue || 0, c.sent || 0);
-                    const datePart = formatDate(c.dateTime);
-                    
-                    tableHtml += `
-                        <tr class="${isTop ? 'top-campaign' : ''}">
-                            <td><strong>${datePart}</strong></td>
-                            <td><strong>${c.name || 'Unknown'}</strong></td>
-                            <td>${(c.sent || 0).toLocaleString()}</td>
-                            <td>${c.openRate || 0}%</td>
-                            <td>${(c.opens || 0).toLocaleString()}</td>
-                            <td>${c.clickRate || 0}%</td>
-                            <td>${(c.clicks || 0).toLocaleString()}</td>
-                            <td class="metric-highlight">${conversionRate.toFixed(2)}%</td>
-                            <td>${c.orders || 0}</td>
-                            <td><strong>$${(c.revenue || 0).toFixed(2)}</strong></td>
-                            <td>$${aov.toFixed(2)}</td>
-                            <td>$${rps.toFixed(2)}</td>
-                        </tr>
-                    `;
-                }
-                tableHtml += `</tbody>${'`'};
-                document.getElementById('tableContainer').innerHTML = tableHtml;
+            tableHtml += `</tbody></table>`;
+            document.getElementById('tableContainer').innerHTML = tableHtml;
 
-                const now = new Date();
-                document.getElementById('lastUpdated').innerHTML = `📅 Last updated: ${now.toLocaleString()} · Data from data.json · ${daily.period}`;
-                
-                debugEl.innerHTML = `✅ Success! Loaded ${currentCampaigns.length} campaigns. Last update: ${now.toLocaleTimeString()}`;
-                
-            } catch (err) {
-                console.error('Error loading data:', err);
-                debugEl.innerHTML = `❌ Error: ${err.message}`;
-                document.getElementById('errorDisplay').innerHTML = `
-                    <div class="error-box">
-                        <strong>⚠️ Failed to load data.json</strong><br>
-                        Error: ${err.message}<br><br>
-                        <strong>Troubleshooting:</strong><br>
-                        • Make sure <code>data.json</code> exists in the same directory as this page<br>
-                        • Check that the file has valid JSON syntax<br>
-                        • Verify the file is accessible at: <code>/data.json</code><br>
-                        • Try opening <a href="/data.json" target="_blank">/data.json</a> directly to check if it loads
-                    </div>
-                `;
-                document.getElementById('kpiContainer').innerHTML = '<div class="loading">⚠️ Could not load data. Check debug info below.</div>';
-                document.getElementById('tableContainer').innerHTML = '';
-            }
+            // Last updated
+            const now = new Date();
+            document.getElementById('lastUpdated').innerHTML = 
+                `📅 Last updated: ${now.toLocaleString()} · Auto-calculated from campaigns`;
+
+            console.log(`✅ Loaded ${currentCampaigns.length} campaigns | Total sends: ${totalSends}`);
+
+        } catch (err) {
+            console.error(err);
+            document.getElementById('kpiContainer').innerHTML = `
+                <div style="grid-column:1/-1; padding:2rem; text-align:center; color:#c33;">
+                    ⚠️ Could not load /data.json<br>
+                    <small>Make sure you are running a local server (Live Server recommended)</small>
+                </div>`;
         }
+    }
 
-        function updateCharts() {
-            if (!currentCampaigns.length) {
-                console.log('No campaigns to render charts');
-                return;
-            }
-            
-            const names = currentCampaigns.map(c => {
-                let name = c.name || 'Unknown';
-                return name.length > 20 ? name.substring(0, 17) + '...' : name;
-            });
-            
-            const revenues = currentCampaigns.map(c => c.revenue || 0);
-            const openRates = currentCampaigns.map(c => c.openRate || 0);
-            const clickRates = currentCampaigns.map(c => c.clickRate || 0);
-            const sends = currentCampaigns.map(c => c.sent || 0);
-            const opens = currentCampaigns.map(c => c.opens || 0);
-            const convRates = currentCampaigns.map(c => calculateConversionRate(c.orders || 0, c.sent || 0));
-            const aovs = currentCampaigns.map(c => calculateAOV(c.revenue || 0, c.orders || 0));
-            const rpsValues = currentCampaigns.map(c => calculateRPS(c.revenue || 0, c.sent || 0));
+    // ====================== CHARTS ======================
+    function updateCharts() {
+        if (!currentCampaigns.length) return;
 
-            // Chart 1: Revenue
-            if (charts.revenue) charts.revenue.destroy();
-            const ctx1 = document.getElementById('revenueChart').getContext('2d');
-            charts.revenue = new Chart(ctx1, {
-                type: 'bar',
-                data: { labels: names, datasets: [{ label: 'Revenue ($)', data: revenues, backgroundColor: '#b1622c', borderRadius: 6 }] },
-                options: { responsive: true, maintainAspectRatio: true }
-            });
+        const names = currentCampaigns.map(c => c.name.length > 22 ? c.name.substring(0, 19) + '...' : c.name);
+        const revenues = currentCampaigns.map(c => c.revenue || 0);
+        const openRates = currentCampaigns.map(c => c.openRate || 0);
+        const clickRates = currentCampaigns.map(c => c.clickRate || 0);
+        const sends = currentCampaigns.map(c => c.sent || 0);
+        const opens = currentCampaigns.map(c => c.opens || 0);
+        const convRates = currentCampaigns.map(c => calculateConversionRate(c.orders || 0, c.sent || 0));
+        const aovs = currentCampaigns.map(c => calculateAOV(c.revenue || 0, c.orders || 0));
+        const rpsValues = currentCampaigns.map(c => calculateRPS(c.revenue || 0, c.sent || 0));
 
-            // Chart 2: Open vs Click Rates
-            if (charts.rates) charts.rates.destroy();
-            const ctx2 = document.getElementById('ratesChart').getContext('2d');
-            charts.rates = new Chart(ctx2, {
-                type: 'line',
-                data: {
-                    labels: names,
-                    datasets: [
-                        { label: 'Open Rate (%)', data: openRates, borderColor: '#4a3729', backgroundColor: 'rgba(74, 55, 41, 0.1)', tension: 0.3, fill: true },
-                        { label: 'Click Rate (%)', data: clickRates, borderColor: '#b1622c', backgroundColor: 'rgba(177, 98, 44, 0.1)', tension: 0.3, fill: true }
-                    ]
-                },
-                options: { responsive: true, maintainAspectRatio: true }
-            });
+        // Destroy old charts
+        Object.keys(charts).forEach(key => {
+            if (charts[key]) charts[key].destroy();
+        });
 
-            // Chart 3: Sent vs Opens
-            if (charts.sentOpens) charts.sentOpens.destroy();
-            const ctx3 = document.getElementById('sentOpensChart').getContext('2d');
-            charts.sentOpens = new Chart(ctx3, {
-                type: 'bar',
-                data: {
-                    labels: names,
-                    datasets: [
-                        { label: 'Sent', data: sends, backgroundColor: '#9b846b', borderRadius: 6 },
-                        { label: 'Opens', data: opens, backgroundColor: '#b1622c', borderRadius: 6 }
-                    ]
-                },
-                options: { responsive: true, maintainAspectRatio: true }
-            });
+        // Revenue Bar
+        charts.revenue = new Chart(document.getElementById('revenueChart'), {
+            type: 'bar',
+            data: { labels: names, datasets: [{ label: 'Revenue ($)', data: revenues, backgroundColor: '#b1622c', borderRadius: 6 }] },
+            options: { responsive: true, maintainAspectRatio: false }
+        });
 
-            // Chart 4: Click Rate Trend
-            if (charts.clickRate) charts.clickRate.destroy();
-            const ctx4 = document.getElementById('clickRateChart').getContext('2d');
-            charts.clickRate = new Chart(ctx4, {
-                type: 'line',
-                data: {
-                    labels: names,
-                    datasets: [{ label: 'Click Rate (%)', data: clickRates, borderColor: '#e67e22', backgroundColor: 'rgba(230, 126, 34, 0.1)', tension: 0.3, fill: true, pointRadius: 5, pointBackgroundColor: '#e67e22' }]
-                },
-                options: { responsive: true, maintainAspectRatio: true }
-            });
+        // Open vs Click Line
+        charts.rates = new Chart(document.getElementById('ratesChart'), {
+            type: 'line',
+            data: {
+                labels: names,
+                datasets: [
+                    { label: 'Open Rate (%)', data: openRates, borderColor: '#4a3729', tension: 0.3, fill: true },
+                    { label: 'Click Rate (%)', data: clickRates, borderColor: '#b1622c', tension: 0.3, fill: true }
+                ]
+            },
+            options: { responsive: true, maintainAspectRatio: false }
+        });
 
-            // Chart 5: Conversion Rate
-            if (charts.conversion) charts.conversion.destroy();
-            const ctx5 = document.getElementById('conversionChart').getContext('2d');
-            charts.conversion = new Chart(ctx5, {
-                type: 'bar',
-                data: { labels: names, datasets: [{ label: 'Conversion Rate (%)', data: convRates, backgroundColor: '#2c6e2c', borderRadius: 6 }] },
-                options: { responsive: true, maintainAspectRatio: true }
-            });
+        // Sent vs Opens
+        charts.sentOpens = new Chart(document.getElementById('sentOpensChart'), {
+            type: 'bar',
+            data: {
+                labels: names,
+                datasets: [
+                    { label: 'Sent', data: sends, backgroundColor: '#9b846b' },
+                    { label: 'Opens', data: opens, backgroundColor: '#b1622c' }
+                ]
+            },
+            options: { responsive: true, maintainAspectRatio: false }
+        });
 
-            // Chart 6: AOV & RPS
-            if (charts.aovRps) charts.aovRps.destroy();
-            const ctx6 = document.getElementById('aovRpsChart').getContext('2d');
-            charts.aovRps = new Chart(ctx6, {
-                type: 'bar',
-                data: {
-                    labels: names,
-                    datasets: [
-                        { label: 'AOV ($)', data: aovs, backgroundColor: '#b1622c', borderRadius: 6 },
-                        { label: 'RPS ($)', data: rpsValues, backgroundColor: '#e0b08a', borderRadius: 6 }
-                    ]
-                },
-                options: { responsive: true, maintainAspectRatio: true }
-            });
-        }
+        // Click Rate
+        charts.clickRate = new Chart(document.getElementById('clickRateChart'), {
+            type: 'line',
+            data: { labels: names, datasets: [{ label: 'Click Rate (%)', data: clickRates, borderColor: '#e67e22', tension: 0.3 }] },
+            options: { responsive: true, maintainAspectRatio: false }
+        });
 
-        // Initial load
-        loadData();
-        // Auto-refresh every 5 minutes
-        setInterval(loadData, 5 * 60 * 1000);
-    </script>
+        // Conversion Rate
+        charts.conversion = new Chart(document.getElementById('conversionChart'), {
+            type: 'bar',
+            data: { labels: names, datasets: [{ label: 'Conversion Rate (%)', data: convRates, backgroundColor: '#2c6e2c' }] },
+            options: { responsive: true, maintainAspectRatio: false }
+        });
+
+        // AOV & RPS
+        charts.aovRps = new Chart(document.getElementById('aovRpsChart'), {
+            type: 'bar',
+            data: {
+                labels: names,
+                datasets: [
+                    { label: 'AOV ($)', data: aovs, backgroundColor: '#b1622c' },
+                    { label: 'RPS ($)', data: rpsValues, backgroundColor: '#e0b08a' }
+                ]
+            },
+            options: { responsive: true, maintainAspectRatio: false }
+        });
+    }
+
+    // ====================== INIT ======================
+    loadData();
+    setInterval(loadData, 5 * 60 * 1000);   // Auto refresh every 5 minutes
+</script>
 </body>
 </html>
