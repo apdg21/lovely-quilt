@@ -798,9 +798,10 @@ Email subscribers
   };
 
   const cleanNum = str => {
-    if (!str || str.trim() === '' || str.trim().toLowerCase() === 'n/a') return null;
+    if (!str || str.trim() === '' || str.trim().toLowerCase() === 'n/a' || str.trim() === 'null') return null;
     const c = str.replace(/[^0-9.\-]/g, '');
-    return c === '' ? null : parseFloat(c);
+    if (c === '') return null;
+    return parseFloat(c);
   };
 
   const cleanInt = str => {
@@ -808,52 +809,41 @@ Email subscribers
     return n === null ? null : Math.round(n);
   };
 
-  // FIXED: Better dateTime formatting for the dashboard
   const parseDateTime = str => {
-    if (!str) return "Unknown date";
-
+    if (!str) return { date: '', time: '00:00' };
     const atIdx = str.indexOf(' at ');
-    let datePart = atIdx > -1 ? str.slice(0, atIdx).trim() : str.trim();
-    let timePart = atIdx > -1 ? str.slice(atIdx + 4).trim() : '';
+    const datePart = atIdx > -1 ? str.slice(0, atIdx).trim() : str.trim();
+    const timePart = atIdx > -1 ? str.slice(atIdx + 4).trim() : '';
 
-    // Convert to nice readable format that your dashboard likes: "Mar 23, 2026 at 09:00 AM"
-    let formattedDate = datePart;
+    let date = '';
     try {
       const d = new Date(datePart);
       if (!isNaN(d.getTime())) {
-        formattedDate = d.toLocaleDateString('en-US', { 
-          month: 'short', 
-          day: 'numeric', 
-          year: 'numeric' 
-        });
+        date = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
       }
-    } catch (e) {}
+    } catch (e) { date = ''; }
 
-    // Format time nicely with AM/PM and leading zero
-    let formattedTime = '09:00 AM';
+    let time = '00:00';
     if (timePart) {
       const m = timePart.match(/(\d+):(\d+)\s*(AM|PM)?/i);
       if (m) {
         let h = parseInt(m[1]);
-        const min = m[2].padStart(2, '0');
-        let ampm = (m[3] || 'AM').toUpperCase();
-
+        const min = m[2];
+        const ampm = (m[3] || '').toUpperCase();
         if (ampm === 'PM' && h < 12) h += 12;
         if (ampm === 'AM' && h === 12) h = 0;
-
-        formattedTime = `${String(h).padStart(2, '0')}:${min} ${ampm}`;
+        time = String(h).padStart(2, '0') + ':' + min;
       }
     }
-
-    return `${formattedDate} at ${formattedTime}`;
+    return { date, time };
   };
 
   const detectChannel = str => {
-    if (!str) return 'Email';
+    if (!str) return null;
     const s = str.trim().toLowerCase();
     if (s === 'email') return 'Email';
     if (s === 'sms') return 'SMS';
-    return 'Email';
+    return null;
   };
 
   const highlight = json => {
@@ -864,144 +854,175 @@ Email subscribers
   };
 
   function convertData() {
-    const raw = document.getElementById('inputData').value.trim();
+    const raw = document.getElementById('inputData').value;
     const startId = parseInt(document.getElementById('startId').value) || 1;
     const defaultChannel = document.getElementById('defaultChannel').value;
 
-    if (!raw) {
-      showToast('Please paste some data first', 'error');
+    const normalize = raw.split('\n').flatMap(l => {
+      const line = l.trim();
+      if (!line) return [];
+      const pctCount = line.match(/^([\d.]+%)\s*\(([\d,]+)\)$/);
+      if (pctCount) return [pctCount[1], pctCount[2]];
+      const revOrders = line.match(/^\$([\d,]+\.?\d*)\s*\(([\d,]+)\)$/);
+      if (revOrders) return [`$${revOrders[1]}`, revOrders[2]];
+      return [line];
+    });
+
+    if (!normalize.length) {
+      showToast('⚠️ Nothing to convert — paste your data first.', 'error');
       return;
     }
 
-    const lines = raw.split('\n').map(l => l.trim()).filter(l => l !== '');
-
     const campaigns = [];
+    const warnings = [];
+    let id = startId;
     let i = 0;
-    let idCounter = startId;
 
-    while (i < lines.length) {
-      // Look for "Sent" marker
-      if (lines[i] !== 'Sent') {
-        i++;
+    while (i < normalize.length) {
+      let sentIdx = -1;
+      for (let j = i; j < Math.min(i + 6, normalize.length); j++) {
+        if (normalize[j].trim() === 'Sent') { sentIdx = j; break; }
+      }
+      if (sentIdx === -1) { i++; continue; }
+
+      const nameLine = sentIdx - 3;
+      const segLine = sentIdx - 2;
+      const chanLine = sentIdx - 1;
+
+      const name = nameLine >= 0 ? normalize[nameLine] : '';
+      const channel = detectChannel(chanLine >= 0 ? normalize[chanLine] : '') || defaultChannel;
+      const isSMS = channel === 'SMS';
+      const { date, time } = parseDateTime(normalize[sentIdx + 1] || '');
+      const sent = cleanInt(normalize[sentIdx + 2]);
+
+      let revIdx = -1;
+      for (let j = sentIdx + 3; j < Math.min(sentIdx + 12, normalize.length); j++) {
+        if (/^\$[\d,]+\.?\d*$/.test(normalize[j])) { revIdx = j; break; }
+      }
+
+      let rev = null, orders = null, clickPct = null, clickN = null, openPct = null, openN = null;
+
+      if (revIdx > -1) {
+        orders = cleanInt(normalize[revIdx + 1]);
+        rev = cleanNum(normalize[revIdx]);
+        clickN = cleanInt(normalize[revIdx - 1]);
+        clickPct = cleanNum(normalize[revIdx - 2]);
+        if (!isSMS) {
+          openN = cleanInt(normalize[revIdx - 3]);
+          openPct = cleanNum(normalize[revIdx - 4]);
+        }
+      }
+
+      if (!name) {
+        warnings.push(`Block at line ${i + 1}: could not detect campaign name — skipped.`);
+        i = revIdx > -1 ? revIdx + 2 : sentIdx + 10;
         continue;
       }
 
-      const sentIdx = i;
-      const name = lines[sentIdx - 3] || '';
-      const channel = detectChannel(lines[sentIdx - 1]);
-      const dateTimeRaw = lines[sentIdx + 1] || '';
-      const sent = cleanInt(lines[sentIdx + 2]);
-
-      // Find revenue line
-      let revIdx = -1;
-      for (let j = sentIdx + 3; j < Math.min(sentIdx + 15, lines.length); j++) {
-        if (lines[j].startsWith('$')) {
-          revIdx = j;
-          break;
-        }
-      }
-
-      let revenue = 0, orders = 0, openRate = 0, opens = 0, clickRate = 0, clicks = 0;
-
-      if (revIdx > -1) {
-        revenue = cleanNum(lines[revIdx]) || 0;
-        orders = cleanInt(lines[revIdx + 1]) || 0;
-        clickRate = cleanNum(lines[revIdx - 2]) || 0;
-        clicks = cleanInt(lines[revIdx - 1]) || 0;
-        if (channel === 'Email') {
-          openRate = cleanNum(lines[revIdx - 4]) || 0;
-          opens = cleanInt(lines[revIdx - 3]) || 0;
-        }
-      }
-
-      if (name) {
-        campaigns.push({
-          name: name.trim(),
-          dateTime: parseDateTime(dateTimeRaw),   // ← Fixed formatting here
-          channel,
-          sent: sent || 0,
-          openRate: openRate,
-          opens: opens,
-          clickRate: clickRate,
-          clicks: clicks,
-          revenue: parseFloat(revenue.toFixed(2)),
-          orders: orders
-        });
-      }
-
+      campaigns.push({
+        name, dateTime: date ? `${date} at ${time}` : '', channel, sent,
+        openRate: openPct, opens: openN, clickRate: clickPct, clicks: clickN,
+        revenue: rev, orders
+      });
+      id++;
       i = revIdx > -1 ? revIdx + 2 : sentIdx + 10;
     }
 
     lastConverted = campaigns;
 
-    if (campaigns.length === 0) {
-      document.getElementById('outputJson').innerHTML = '// No campaigns detected. Check your paste format.';
-      showToast('No campaigns detected', 'error');
+    if (!campaigns.length) {
+      document.getElementById('outputJson').innerHTML = '// No campaigns detected.\n// Check your data format — see the column map above.';
+      document.getElementById('statusBadge').className = 'output-badge error';
+      document.getElementById('statusBadge').textContent = '0 campaigns';
+      showToast('❌ No campaigns detected', 'error');
       return;
     }
 
-    const output = '[\n' + campaigns.map(c => '  ' + JSON.stringify(c, null, 0)).join(',\n') + '\n]';
-
-    document.getElementById('outputJson').innerHTML = highlight(output);
+    const lines = campaigns.map(c => '    ' + JSON.stringify(c));
+    const prettyOutput = '[\n' + lines.join(',\n') + '\n]';
+    document.getElementById('outputJson').innerHTML = highlight(prettyOutput);
     document.getElementById('statusBadge').className = 'output-badge success';
-    document.getElementById('statusBadge').textContent = `✅ ${campaigns.length} campaign${campaigns.length > 1 ? 's' : ''}`;
-
-    showToast(`✅ Converted ${campaigns.length} campaigns successfully`, 'success');
+    document.getElementById('statusBadge').textContent = `✅ ${campaigns.length} campaign${campaigns.length !== 1 ? 's' : ''} converted`;
+    showToast(`✅ ${campaigns.length} campaign${campaigns.length !== 1 ? 's' : ''} converted`, 'success');
   }
 
-  // Rest of your functions (copyJSON, copyFullPatch, clearAll, etc.) remain the same
-  // ... (I kept them unchanged for brevity — just replace up to here)
+  function copyJSON() {
+    if (!lastConverted.length) { showToast('Nothing to copy yet — convert first', 'error'); return; }
+    const lines = lastConverted.map(c => '    ' + JSON.stringify(c));
+    const out = '[\n' + lines.join(',\n') + '\n]';
+    navigator.clipboard.writeText(out).then(() => showToast('📋 Campaign objects copied!', 'success'));
+  }
 
-  // Keep all your other existing functions: copyJSON, copyFullPatch, clearAll, loadExample, switchTab, etc.
-  // Only the convertData() and parseDateTime() were changed.
+  function copyFullPatch() {
+    if (!lastConverted.length) { showToast('Nothing to copy yet — convert first', 'error'); return; }
+    const patch = { _meta: { source: 'Lovely Quilt · Omnisend Analytics', version: '1.0', date: new Date().toISOString().slice(0, 10) }, campaigns: lastConverted };
+    navigator.clipboard.writeText(JSON.stringify(patch, null, 2)).then(() => showToast('⬇ Full patch copied!', 'success'));
+  }
 
-  // ==================== MONTHLY CONVERTER FUNCTIONS ====================
+  function clearAll() {
+    document.getElementById('inputData').value = '';
+    document.getElementById('outputJson').innerHTML = '// Output will appear here after conversion';
+    document.getElementById('statusBadge').className = 'output-badge';
+    document.getElementById('statusBadge').textContent = 'Waiting for input';
+    lastConverted = [];
+  }
 
-function parseMonthlyLive() {
+  function loadExample() {
+    document.getElementById('inputData').value = `The National Quilting Day Celebration\nSent to Active & Engaged, VIP\nEmail\nSent\nMar 21, 2026 at 9:00 AM\n2,433\n40.7%\n(991)\n5.1%\n(126)\n$35.80\n(2)\n\nThe National Quilting Day Teaser\nSent to Active & Engaged\nEmail\nSent\nMar 19, 2026 at 10:00 AM\n2,419\n41.7%\n(1,011)\n2.1%\n(52)\n$0.00\n(0)`;
+    document.getElementById('startId').value = '15';
+    showToast('📋 Example loaded', '');
+  }
+
+  function switchTab(name, btn) {
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('tab-' + name).classList.add('active');
+    btn.classList.add('active');
+  }
+
+  function parseMonthlyLive() {
     const raw = document.getElementById('m_rawInput').value;
-    const lines = raw.split('\n').map(l => l.trim()).filter(l => l);
+    const lines = raw.split('\n').map(l => l.trim()).filter(l => l !== '');
 
     const setIfFound = (id, val) => {
-        if (val == null) return;
-        const el = document.getElementById(id);
-        if (el) {
-            el.value = val;
-            el.classList.add('parsed');
-            setTimeout(() => el.classList.remove('parsed'), 1200);
-        }
+      if (val === null || val === undefined) return;
+      const el = document.getElementById(id);
+      el.value = val;
+      el.classList.add('parsed');
+      setTimeout(() => el.classList.remove('parsed'), 1500);
     };
 
-    // Common patterns from Omnisend
-    lines.forEach((line, i) => {
-        if (/revenue from omnisend/i.test(line)) setIfFound('m_omni', cleanNum(lines[i+1]));
-        if (/^campaigns$/i.test(line)) setIfFound('m_camp', cleanNum(lines[i+1]));
-        if (/^automation$/i.test(line)) setIfFound('m_auto', cleanNum(lines[i+1]));
-        if (/total store revenue/i.test(line)) setIfFound('m_store', cleanNum(lines[i+1]));
-        
-        if (/email subscribers/i.test(line)) {
-            setIfFound('m_engaged', cleanInt(lines[i+1]));
-            // Look for +new subs
-            for (let j = i+1; j < i+8 && j < lines.length; j++) {
-                if (/^\+[\d,]+$/.test(lines[j])) {
-                    setIfFound('m_newSubs', cleanInt(lines[j]));
-                    break;
-                }
-            }
-            // Look for unsubscribed
-            for (let j = i+1; j < i+10 && j < lines.length; j++) {
-                const match = lines[j].match(/(\d[\d,]*)\s*unsubscribed/i);
-                if (match) {
-                    setIfFound('m_unsub', cleanInt(match[1]));
-                    break;
-                }
-            }
-        }
-    });
-}
+    const omniIdx = lines.findIndex(l => /revenue from omnisend/i.test(l));
+    if (omniIdx > -1) setIfFound('m_omni', cleanNum(lines[omniIdx + 1]));
 
-function convertMonthly() {
+    const campIdx = lines.findIndex(l => /^campaigns$/i.test(l));
+    if (campIdx > -1) setIfFound('m_camp', cleanNum(lines[campIdx + 1]));
+
+    const autoIdx = lines.findIndex(l => /^automation$/i.test(l));
+    if (autoIdx > -1) setIfFound('m_auto', cleanNum(lines[autoIdx + 1]));
+
+    const storeIdx = lines.findIndex(l => /total store revenue/i.test(l));
+    if (storeIdx > -1) setIfFound('m_store', cleanNum(lines[storeIdx + 1]));
+
+    const emailIdx = lines.findIndex(l => /^email subscribers$/i.test(l));
+    if (emailIdx > -1) {
+      const engagedRaw = lines[emailIdx + 1] || '';
+      const engagedNum = cleanInt(engagedRaw);
+      if (engagedNum) setIfFound('m_engaged', engagedNum);
+
+      for (let j = emailIdx + 1; j < Math.min(emailIdx + 6, lines.length); j++) {
+        if (/^\+[\d,]+$/.test(lines[j])) { setIfFound('m_newSubs', cleanInt(lines[j])); break; }
+      }
+      for (let j = emailIdx + 1; j < Math.min(emailIdx + 8, lines.length); j++) {
+        const m = lines[j].match(/(\d[\d,]*)\s*unsubscribed/i);
+        if (m) { setIfFound('m_unsub', cleanInt(m[1])); break; }
+      }
+    }
+  }
+
+  function convertMonthly() {
     const month = document.getElementById('m_month').value.trim();
-    const omni = parseFloat(document.getElementById('m_omni').value) || 0;
+    const omni = parseFloat(document.getElementById('m_omni').value);
     const camp = parseFloat(document.getElementById('m_camp').value) || 0;
     const auto = parseFloat(document.getElementById('m_auto').value) || 0;
     const store = parseFloat(document.getElementById('m_store').value) || 0;
@@ -1009,87 +1030,55 @@ function convertMonthly() {
     const newSubs = parseInt(document.getElementById('m_newSubs').value) || 0;
     const unsubs = parseInt(document.getElementById('m_unsub').value) || 0;
 
-    if (!month) {
-        showToast('Month label is required', 'error');
-        return;
+    const warnings = [];
+    if (!month) warnings.push({ type: 'err', msg: 'Month label is required' });
+    if (isNaN(omni)) warnings.push({ type: 'err', msg: 'Omnisend revenue is required' });
+
+    if (warnings.some(w => w.type === 'err')) {
+      document.getElementById('m_statusBadge').className = 'output-badge error';
+      document.getElementById('m_statusBadge').textContent = '⚠ Fix errors first';
+      showToast('⚠️ Fix required fields first', 'error');
+      return;
     }
 
-    const netGrowth = newSubs - unsubs;
-    const unsubRate = engaged > 0 ? ((unsubs / engaged) * 100).toFixed(2) : 0;
-
-    const obj = {
-        month: month,
-        newSubs: newSubs,
-        unsubs: unsubs,
-        netGrowth: netGrowth,
-        engaged: engaged,
-        campaignsRevenue: camp,
-        autoRevenue: auto,
-        omnisendRevenue: omni,
-        storeRevenue: store,
-        unsubRate: parseFloat(unsubRate)
-    };
-
+    const obj = { month, omnisendRevenue: omni, campaignsRevenue: camp, autoRevenue: auto, storeRevenue: store, engaged, newSubs, unsubs, netGrowth: newSubs - unsubs, unsubRate: engaged ? ((unsubs / engaged) * 100).toFixed(2) : 0 };
     lastMonthly = obj;
 
     document.getElementById('m_outputJson').innerHTML = highlight(JSON.stringify(obj, null, 2));
     document.getElementById('m_statusBadge').className = 'output-badge success';
-    document.getElementById('m_statusBadge').textContent = `✅ ${month} ready`;
+    document.getElementById('m_statusBadge').textContent = `✅ ${month} converted`;
+    showToast(`✅ ${month} converted`, 'success');
+  }
 
-    showToast(`Monthly object for ${month} created`, 'success');
-}
+  function copyMonthlyObj() {
+    if (!lastMonthly) { showToast('Nothing to copy — convert first', 'error'); return; }
+    navigator.clipboard.writeText(JSON.stringify(lastMonthly, null, 2)).then(() => showToast('📋 Monthly object copied!', 'success'));
+  }
 
-function copyMonthlyObj() {
-    if (!lastMonthly) return showToast('Convert first', 'error');
-    navigator.clipboard.writeText(JSON.stringify(lastMonthly, null, 2))
-        .then(() => showToast('Monthly object copied!', 'success'));
-}
+  function copyMonthlyPatch() {
+    if (!lastMonthly) { showToast('Nothing to copy — convert first', 'error'); return; }
+    const patch = { _meta: { source: 'Lovely Quilt · Omnisend Analytics', version: '1.0', date: new Date().toISOString().slice(0, 10) }, monthly_entry: lastMonthly };
+    navigator.clipboard.writeText(JSON.stringify(patch, null, 2)).then(() => showToast('⬇ Monthly patch copied!', 'success'));
+  }
 
-function copyMonthlyPatch() {
-    if (!lastMonthly) return showToast('Convert first', 'error');
-    const patch = {
-        _meta: {
-            source: "Lovely Quilt Converter",
-            date: new Date().toISOString().slice(0,10)
-        },
-        historicalData_entry: lastMonthly
-    };
-    navigator.clipboard.writeText(JSON.stringify(patch, null, 2))
-        .then(() => showToast('Patch copied – add to historicalData array', 'success'));
-}
-
-function clearMonthly() {
+  function clearMonthly() {
     document.getElementById('m_rawInput').value = '';
-    ['m_month','m_omni','m_camp','m_auto','m_store','m_engaged','m_newSubs','m_unsub'].forEach(id => {
-        const el = document.getElementById(id);
-        if (el) el.value = '';
+    ['m_month', 'm_omni', 'm_camp', 'm_auto', 'm_store', 'm_engaged', 'm_newSubs', 'm_unsub'].forEach(id => {
+      document.getElementById(id).value = '';
+      document.getElementById(id).classList.remove('parsed');
     });
-    document.getElementById('m_outputJson').innerHTML = '// Output will appear here';
+    document.getElementById('m_outputJson').innerHTML = '// Output will appear here after conversion';
     document.getElementById('m_statusBadge').className = 'output-badge';
     document.getElementById('m_statusBadge').textContent = 'Waiting for input';
     lastMonthly = null;
-}
+  }
 
-function loadMonthlyExample() {
-    document.getElementById('m_rawInput').value = `Revenue from Omnisend
-$2052.13
-Campaigns
-$421.68
-Automation
-$1630.45
-Total store revenue
-$12823.50
-
-Email subscribers
-2500
-+768
-114 unsubscribed`;
-    
-    document.getElementById('m_month').value = "Mar 2026";
+  function loadMonthlyExample() {
+    document.getElementById('m_rawInput').value = `Revenue from Omnisend\n$14,073.31\n-9.51%\n780 orders\nCampaigns\n$6,133.66\n352 orders\nAutomation\n$7,939.65\n428 orders\nTotal store revenue\n$50,885.36\n3,073 orders\n\nEmail subscribers\n33,089\n+1,607\n2,342 subscribed|735 unsubscribed`;
     parseMonthlyLive();
-    showToast('Example loaded', '');
-}
-
+    document.getElementById('m_month').value = 'Mar 2026';
+    showToast('📋 Example loaded — set the month label', '');
+  }
 </script>
 </body>
 </html>
