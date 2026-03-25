@@ -2,13 +2,13 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes">
     <title>🧵 Lovely Quilt · daily campaign pulse</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
-            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
             background: linear-gradient(135deg, #faf7f2 0%, #f0e9e0 100%);
             color: #2c2418;
             min-height: 100vh;
@@ -27,57 +27,173 @@
         .chart-container { background: white; padding: 1.2rem; border-radius: 1rem; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
         .chart-container h3 { margin-bottom: 1rem; color: #4a3729; font-size: clamp(0.9rem, 3vw, 1rem); display: flex; align-items: center; gap: 0.5rem; }
         canvas { max-height: 280px; width: 100% !important; }
-        .table-wrapper { background: white; border-radius: 1rem; overflow-x: auto; margin: 1.5rem 0; box-shadow: 0 4px 12px rgba(0,0,0,0.05); -webkit-overflow-scrolling: touch; }
-        table { width: 100%; border-collapse: collapse; font-size: 0.75rem; min-width: 1100px; }
-        th, td { padding: 0.85rem 1rem; text-align: right; border-bottom: 1px solid #f0e5da; }
-        th:first-child, td:first-child { text-align: left; position: sticky; left: 0; background: white; font-weight: 600; z-index: 1; min-width: 100px; }
-        th:nth-child(2), td:nth-child(2) { text-align: left; position: sticky; left: 100px; background: white; z-index: 1; min-width: 200px; }
-        th { background: #f5ede3; color: #4a3729; position: sticky; top: 0; z-index: 2; }
-        tr:hover { background: #fefaf5; }
-        .top-campaign { background: linear-gradient(90deg, #fff3e0, transparent); }
-        .metric-highlight { font-weight: 700; color: #b1622c; }
-        .last-updated { font-size: 0.7rem; color: #9b846b; text-align: right; margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid #e5d5bf; }
-        .home-link { text-align: center; margin-top: 2rem; }
-        .home-link a { color: #b1622c; text-decoration: none; font-weight: 500; }
-        .error-box { background: #fde0d5; border-left: 4px solid #a33820; padding: 1rem; border-radius: 0.75rem; margin: 1rem 0; color: #a33820; font-size: 0.85rem; }
-        .debug-info { background: #f0e9e0; padding: 0.5rem; border-radius: 0.5rem; font-size: 0.7rem; font-family: monospace; margin-top: 1rem; }
-        .loading { text-align: center; padding: 2rem; color: #9b846b; }
-        @media (max-width: 768px) {
-            .container { padding: 1rem; }
-            .charts-row { grid-template-columns: 1fr; gap: 1rem; }
-            .kpi-card { padding: 0.8rem; }
-            th, td { padding: 0.6rem 0.8rem; font-size: 0.65rem; }
-            th:first-child, td:first-child { min-width: 85px; }
-            th:nth-child(2), td:nth-child(2) { left: 85px; min-width: 160px; }
-        }
-        @media (max-width: 480px) {
-            .kpi-grid { grid-template-columns: repeat(2, 1fr); gap: 0.75rem; }
-            .kpi-value { font-size: 1rem; }
-        }
+        
+        /* ========== FIXED TABLE STICKY: ONLY FIRST COLUMN ========== */
         .table-wrapper {
-    background: white;
-    border-radius: 1rem;
-    overflow-x: auto;
-    margin: 1.5rem 0;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: thin;
-}
-
-.table-wrapper table {
-    min-width: 1200px;   /* Forces horizontal scroll on mobile */
-}
-
-@media (max-width: 768px) {
-    .table-wrapper {
-        margin: 1rem 0;
-    }
-    
-    th, td {
-        padding: 0.7rem 0.6rem;
-        font-size: 0.68rem;
-    }
-}
+            background: white;
+            border-radius: 1rem;
+            overflow-x: auto;
+            margin: 1.5rem 0;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: thin;
+            position: relative;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.75rem;
+            min-width: 1100px;
+        }
+        th, td {
+            padding: 0.85rem 1rem;
+            text-align: right;
+            border-bottom: 1px solid #f0e5da;
+        }
+        /* ONLY the first column (Date) is sticky - both in header and body */
+        th:first-child, td:first-child {
+            text-align: left;
+            position: sticky;
+            left: 0;
+            background: white;
+            font-weight: 600;
+            z-index: 10;
+            min-width: 100px;
+            box-shadow: 2px 0 5px -2px rgba(0,0,0,0.05);
+        }
+        /* REMOVED the second column sticky entirely */
+        th:nth-child(2), td:nth-child(2) {
+            text-align: left;
+            position: static;        /* NOT sticky anymore */
+            background: transparent;  /* no forced background */
+            z-index: auto;
+            min-width: 200px;
+        }
+        th {
+            background: #f5ede3;
+            color: #4a3729;
+            position: sticky;
+            top: 0;
+            z-index: 20;
+        }
+        /* Ensure first column header also stays above regular cells when scrolling horizontally */
+        th:first-child {
+            background: #f5ede3;
+            z-index: 30;
+            box-shadow: 2px 0 5px -2px rgba(0,0,0,0.1);
+        }
+        tr:hover {
+            background: #fefaf5;
+        }
+        .top-campaign {
+            background: linear-gradient(90deg, #fff3e0, transparent);
+        }
+        .metric-highlight {
+            font-weight: 700;
+            color: #b1622c;
+        }
+        .last-updated {
+            font-size: 0.7rem;
+            color: #9b846b;
+            text-align: right;
+            margin-top: 1.5rem;
+            padding-top: 1rem;
+            border-top: 1px solid #e5d5bf;
+        }
+        .home-link {
+            text-align: center;
+            margin-top: 2rem;
+        }
+        .home-link a {
+            color: #b1622c;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        .error-box {
+            background: #fde0d5;
+            border-left: 4px solid #a33820;
+            padding: 1rem;
+            border-radius: 0.75rem;
+            margin: 1rem 0;
+            color: #a33820;
+            font-size: 0.85rem;
+        }
+        .debug-info {
+            background: #f0e9e0;
+            padding: 0.5rem;
+            border-radius: 0.5rem;
+            font-size: 0.7rem;
+            font-family: monospace;
+            margin-top: 1rem;
+        }
+        .loading {
+            text-align: center;
+            padding: 2rem;
+            color: #9b846b;
+        }
+        
+        /* Mobile-specific refinements: better touch scrolling and no double sticky */
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+            .charts-row {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+            .kpi-card {
+                padding: 0.8rem;
+            }
+            th, td {
+                padding: 0.7rem 0.8rem;
+                font-size: 0.68rem;
+            }
+            /* First column min-width slightly reduced but still sticky */
+            th:first-child, td:first-child {
+                min-width: 85px;
+                left: 0;
+                background: white;
+            }
+            /* Second column - no sticky, regular scroll */
+            th:nth-child(2), td:nth-child(2) {
+                min-width: 180px;
+                left: auto;
+                position: static;
+            }
+            /* Ensure table wrapper gets proper overflow */
+            .table-wrapper {
+                margin: 1rem 0;
+                border-radius: 0.9rem;
+            }
+            table {
+                min-width: 1050px;   /* ensures horizontal scroll on narrow phones */
+            }
+            /* Header background remains for first column */
+            th:first-child {
+                background: #f5ede3;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .kpi-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 0.75rem;
+            }
+            .kpi-value {
+                font-size: 1rem;
+            }
+            th:first-child, td:first-child {
+                min-width: 80px;
+            }
+            table {
+                min-width: 1000px;
+            }
+        }
+        
+        /* Fix for high-resolution screens where shadow might overlap */
+        td:first-child {
+            box-shadow: 1px 0 3px rgba(0,0,0,0.05);
+        }
     </style>
 </head>
 <body>
@@ -162,19 +278,23 @@
             document.getElementById('periodDisplay').innerHTML = `📅 ${daily.period || 'Mar 2026'} · daily breakdown`;
 
             // KPI Cards
+            const conversionOverall = totalSends > 0 ? (totalOrders / totalSends * 100).toFixed(2) : 0;
+            const avgOrderValue = totalOrders > 0 ? (totalRevenue / totalOrders).toFixed(2) : 0;
+            const revPerSend = totalSends > 0 ? (totalRevenue / totalSends).toFixed(2) : 0;
+            
             document.getElementById('kpiContainer').innerHTML = `
                 <div class="kpi-card"><div class="kpi-value">${totalSends.toLocaleString()}</div><div class="kpi-label">Total sends</div></div>
                 <div class="kpi-card"><div class="kpi-value">$${totalRevenue.toFixed(2)}</div><div class="kpi-label">Total revenue</div></div>
                 <div class="kpi-card"><div class="kpi-value">${avgOpenRate}%</div><div class="kpi-label">Avg open rate</div></div>
                 <div class="kpi-card"><div class="kpi-value">${avgClickRate}%</div><div class="kpi-label">Avg click rate</div></div>
-                <div class="kpi-card"><div class="kpi-value">${totalSends > 0 ? (totalOrders / totalSends * 100).toFixed(2) : 0}%</div><div class="kpi-label">Conversion rate</div><div class="kpi-sub">${totalOrders} orders</div></div>
-                <div class="kpi-card"><div class="kpi-value">$${(totalOrders > 0 ? (totalRevenue / totalOrders).toFixed(2) : 0)}</div><div class="kpi-label">Avg order value</div></div>
-                <div class="kpi-card"><div class="kpi-value">$${(totalSends > 0 ? (totalRevenue / totalSends).toFixed(2) : 0)}</div><div class="kpi-label">Revenue per send</div></div>
+                <div class="kpi-card"><div class="kpi-value">${conversionOverall}%</div><div class="kpi-label">Conversion rate</div><div class="kpi-sub">${totalOrders} orders</div></div>
+                <div class="kpi-card"><div class="kpi-value">$${avgOrderValue}</div><div class="kpi-label">Avg order value</div></div>
+                <div class="kpi-card"><div class="kpi-value">$${revPerSend}</div><div class="kpi-label">Revenue per send</div></div>
             `;
 
             updateCharts();
 
-            // Build Table with improved mobile scrolling
+            // Build Table with improved mobile scrolling & ONLY first column sticky
             let topRevenue = 0, topName = '';
             currentCampaigns.forEach(c => {
                 if ((c.revenue || 0) > topRevenue) {
@@ -190,11 +310,11 @@
                             <th>📅 Date</th>
                             <th>📧 Campaign</th>
                             <th>📤 Sent</th>
-                            <th>📈 Open</th>
+                            <th>📈 Open%</th>
                             <th>👁️ Opens</th>
-                            <th>🎯 Click</th>
+                            <th>🎯 Click%</th>
                             <th>🖱️ Clicks</th>
-                            <th>💰 Conv.</th>
+                            <th>💰 Conv.%</th>
                             <th>📦 Orders</th>
                             <th>💵 Revenue</th>
                             <th>📊 AOV</th>
@@ -213,7 +333,7 @@
                 tableHtml += `
                     <tr class="${isTop ? 'top-campaign' : ''}">
                         <td><strong>${formatDate(c.dateTime)}</strong></td>
-                        <td><strong>${c.name}</strong></td>
+                        <td><strong>${escapeHtml(c.name)}</strong></td>
                         <td>${(c.sent || 0).toLocaleString()}</td>
                         <td>${c.openRate || 0}%</td>
                         <td>${(c.opens || 0).toLocaleString()}</td>
@@ -232,12 +352,28 @@
             document.getElementById('tableContainer').innerHTML = tableHtml;
 
             document.getElementById('lastUpdated').innerHTML = 
-                `📅 Last updated: ${new Date().toLocaleString()} · Auto-calculated`;
+                `📅 Last updated: ${new Date().toLocaleString()} · Auto-calculated · Only Date column sticky on scroll`;
+
+            document.getElementById('debugInfo').innerHTML = `🔍 Debug: Loaded ${currentCampaigns.length} campaigns | Sticky fix: only first column (Date) remains pinned horizontally.`;
 
         } catch (err) {
             console.error(err);
-            document.getElementById('kpiContainer').innerHTML = `<div style="grid-column:1/-1;padding:2rem;text-align:center;color:#c33;">⚠️ Could not load data.json</div>`;
+            document.getElementById('kpiContainer').innerHTML = `<div style="grid-column:1/-1;padding:2rem;text-align:center;color:#c33;">⚠️ Could not load data.json. Make sure file exists in root.</div>`;
+            document.getElementById('debugInfo').innerHTML = `❌ Error: ${err.message}`;
         }
+    }
+
+    // simple XSS protection
+    function escapeHtml(str) {
+        if (!str) return '';
+        return str.replace(/[&<>]/g, function(m) {
+            if (m === '&') return '&amp;';
+            if (m === '<') return '&lt;';
+            if (m === '>') return '&gt;';
+            return m;
+        }).replace(/[\uD800-\uDBFF][\uDC00-\uDFFF]/g, function(c) {
+            return c;
+        });
     }
 
     // ====================== CHARTS (Clean - No long names) ======================
@@ -258,28 +394,31 @@
         // Destroy old charts
         Object.keys(charts).forEach(k => charts[k] && charts[k].destroy());
 
-        // Revenue
-        charts.revenue = new Chart(document.getElementById('revenueChart'), {
+        // Revenue bar
+        const revCtx = document.getElementById('revenueChart')?.getContext('2d');
+        if (revCtx) charts.revenue = new Chart(revCtx, {
             type: 'bar',
             data: { labels: shortLabels, datasets: [{ label: 'Revenue ($)', data: revenues, backgroundColor: '#b1622c', borderRadius: 6 }] },
             options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: true } } }
         });
 
-        // Open vs Click
-        charts.rates = new Chart(document.getElementById('ratesChart'), {
+        // Open vs Click line
+        const ratesCtx = document.getElementById('ratesChart')?.getContext('2d');
+        if (ratesCtx) charts.rates = new Chart(ratesCtx, {
             type: 'line',
             data: {
                 labels: shortLabels,
                 datasets: [
-                    { label: 'Open Rate (%)', data: openRates, borderColor: '#4a3729', tension: 0.3, fill: true },
-                    { label: 'Click Rate (%)', data: clickRates, borderColor: '#b1622c', tension: 0.3, fill: true }
+                    { label: 'Open Rate (%)', data: openRates, borderColor: '#4a3729', backgroundColor: 'rgba(74,55,41,0.05)', tension: 0.3, fill: true },
+                    { label: 'Click Rate (%)', data: clickRates, borderColor: '#b1622c', backgroundColor: 'rgba(177,98,44,0.05)', tension: 0.3, fill: true }
                 ]
             },
             options: { responsive: true, maintainAspectRatio: false }
         });
 
         // Sent vs Opens
-        charts.sentOpens = new Chart(document.getElementById('sentOpensChart'), {
+        const sentCtx = document.getElementById('sentOpensChart')?.getContext('2d');
+        if (sentCtx) charts.sentOpens = new Chart(sentCtx, {
             type: 'bar',
             data: { labels: shortLabels, datasets: [
                 { label: 'Sent', data: sends, backgroundColor: '#9b846b' },
@@ -289,21 +428,24 @@
         });
 
         // Click Rate Trend
-        charts.clickRate = new Chart(document.getElementById('clickRateChart'), {
+        const clickTrendCtx = document.getElementById('clickRateChart')?.getContext('2d');
+        if (clickTrendCtx) charts.clickRate = new Chart(clickTrendCtx, {
             type: 'line',
-            data: { labels: shortLabels, datasets: [{ label: 'Click Rate (%)', data: clickRates, borderColor: '#e67e22', tension: 0.3 }] },
+            data: { labels: shortLabels, datasets: [{ label: 'Click Rate (%)', data: clickRates, borderColor: '#e67e22', tension: 0.3, pointBackgroundColor: '#b1622c' }] },
             options: { responsive: true, maintainAspectRatio: false }
         });
 
-        // Conversion
-        charts.conversion = new Chart(document.getElementById('conversionChart'), {
+        // Conversion Rate
+        const convCtx = document.getElementById('conversionChart')?.getContext('2d');
+        if (convCtx) charts.conversion = new Chart(convCtx, {
             type: 'bar',
-            data: { labels: shortLabels, datasets: [{ label: 'Conv. Rate (%)', data: convRates, backgroundColor: '#2c6e2c' }] },
+            data: { labels: shortLabels, datasets: [{ label: 'Conv. Rate (%)', data: convRates, backgroundColor: '#2c6e2c', borderRadius: 6 }] },
             options: { responsive: true, maintainAspectRatio: false }
         });
 
-        // AOV & RPS
-        charts.aovRps = new Chart(document.getElementById('aovRpsChart'), {
+        // AOV & RPS combo
+        const aovRpsCtx = document.getElementById('aovRpsChart')?.getContext('2d');
+        if (aovRpsCtx) charts.aovRps = new Chart(aovRpsCtx, {
             type: 'bar',
             data: { labels: shortLabels, datasets: [
                 { label: 'AOV ($)', data: aovs, backgroundColor: '#b1622c' },
@@ -313,9 +455,16 @@
         });
     }
 
-    // Auto load + refresh
+    // Auto load + refresh every 5 minutes
     loadData();
     setInterval(loadData, 5 * 60 * 1000);
+    
+    // Additional onload to ensure any chart resize handles
+    window.addEventListener('resize', () => {
+        if (charts) {
+            Object.values(charts).forEach(chart => chart && chart.resize && chart.resize());
+        }
+    });
 </script>
 </body>
 </html>
