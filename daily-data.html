@@ -48,10 +48,10 @@
             margin-top: 0.5rem;
         }
         
-        /* KPI Grid */
+        /* KPI Grid - Expanded for new metrics */
         .kpi-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
             gap: 1rem;
             margin: 2rem 0;
         }
@@ -72,17 +72,23 @@
         }
         
         .kpi-value {
-            font-size: clamp(1.3rem, 4vw, 1.8rem);
+            font-size: clamp(1.1rem, 4vw, 1.6rem);
             font-weight: bold;
             color: #b1622c;
         }
         
         .kpi-label {
-            font-size: 0.7rem;
+            font-size: 0.65rem;
             color: #6b4f32;
             text-transform: uppercase;
             letter-spacing: 0.5px;
             margin-top: 0.25rem;
+        }
+        
+        .kpi-sub {
+            font-size: 0.6rem;
+            color: #9b846b;
+            margin-top: 0.2rem;
         }
         
         /* Charts */
@@ -133,7 +139,7 @@
             width: 100%;
             border-collapse: collapse;
             font-size: 0.75rem;
-            min-width: 900px;
+            min-width: 1100px;
         }
         
         th, td {
@@ -142,6 +148,7 @@
             border-bottom: 1px solid #f0e5da;
         }
         
+        /* Date column - first column, sticky for mobile */
         th:first-child, td:first-child {
             text-align: left;
             position: sticky;
@@ -149,6 +156,29 @@
             background: white;
             font-weight: 600;
             z-index: 1;
+            min-width: 130px;
+        }
+        
+        /* Campaign name column - second column, also sticky for better context */
+        th:nth-child(2), td:nth-child(2) {
+            text-align: left;
+            position: sticky;
+            left: 130px;
+            background: white;
+            z-index: 1;
+            min-width: 200px;
+        }
+        
+        /* Shadow effect for sticky columns */
+        td:first-child::after,
+        th:first-child::after {
+            content: '';
+            position: absolute;
+            right: -5px;
+            top: 0;
+            height: 100%;
+            width: 5px;
+            box-shadow: inset -5px 0 5px -5px rgba(0,0,0,0.1);
         }
         
         th {
@@ -160,13 +190,23 @@
             z-index: 2;
         }
         
+        th:first-child, th:nth-child(2) {
+            z-index: 3;
+        }
+        
         tr:hover {
             background: #fefaf5;
         }
         
-        /* Campaign highlight */
+        /* Highlight top campaign */
         .top-campaign {
             background: linear-gradient(90deg, #fff3e0, transparent);
+        }
+        
+        /* New metric highlights */
+        .metric-highlight {
+            font-weight: 700;
+            color: #b1622c;
         }
         
         /* Last Updated */
@@ -203,6 +243,12 @@
             color: #9b846b;
         }
         
+        /* Tooltip for column headers */
+        .col-tooltip {
+            cursor: help;
+            border-bottom: 1px dotted #b1622c;
+        }
+        
         /* Mobile Adjustments */
         @media (max-width: 768px) {
             .container {
@@ -219,12 +265,21 @@
             }
             
             .kpi-card {
-                padding: 0.9rem;
+                padding: 0.8rem;
             }
             
             th, td {
                 padding: 0.6rem 0.8rem;
                 font-size: 0.65rem;
+            }
+            
+            th:first-child, td:first-child {
+                min-width: 100px;
+            }
+            
+            th:nth-child(2), td:nth-child(2) {
+                left: 100px;
+                min-width: 160px;
             }
         }
         
@@ -235,7 +290,17 @@
             }
             
             .kpi-value {
-                font-size: 1.1rem;
+                font-size: 1rem;
+            }
+            
+            th:first-child, td:first-child {
+                min-width: 85px;
+                font-size: 0.6rem;
+            }
+            
+            th:nth-child(2), td:nth-child(2) {
+                left: 85px;
+                min-width: 140px;
             }
         }
     </style>
@@ -278,18 +343,50 @@
             </div>
         </div>
 
-        <!-- Campaign Table -->
+        <!-- Charts Row 3 - New metrics -->
+        <div class="charts-row">
+            <div class="chart-container">
+                <h3>💰 Conversion Rate by Campaign</h3>
+                <canvas id="conversionChart"></canvas>
+            </div>
+            <div class="chart-container">
+                <h3>📊 AOV & Revenue per Subscriber</h3>
+                <canvas id="aovRpsChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Campaign Table with new columns -->
         <div class="table-wrapper" id="tableWrapper">
             <div id="tableContainer" class="loading">Loading campaigns...</div>
         </div>
 
         <div class="last-updated" id="lastUpdated"></div>
-        
+        <div class="home-link">
+            🏚️ <a href="/">Home</a>
+        </div>
     </div>
 
     <script>
         let currentCampaigns = [];
         let charts = {};
+
+        // Helper function to calculate conversion rate
+        function calculateConversionRate(orders, sent) {
+            if (!sent || sent === 0) return 0;
+            return (orders / sent) * 100;
+        }
+
+        // Helper function to calculate AOV (Average Order Value)
+        function calculateAOV(revenue, orders) {
+            if (!orders || orders === 0) return 0;
+            return revenue / orders;
+        }
+
+        // Helper function to calculate Revenue per Subscriber (RPS)
+        function calculateRPS(revenue, sent) {
+            if (!sent || sent === 0) return 0;
+            return revenue / sent;
+        }
 
         async function loadData() {
             try {
@@ -301,7 +398,24 @@
 
                 document.getElementById('periodDisplay').innerHTML = `📅 ${daily.period} · daily breakdown`;
 
-                // Update KPIs
+                // Calculate summary metrics for KPI cards
+                let totalOrders = 0;
+                let totalRevenueWithOrders = 0;
+                let totalSentWithOrders = 0;
+                
+                for (const campaign of currentCampaigns) {
+                    totalOrders += campaign.orders;
+                    if (campaign.orders > 0) {
+                        totalRevenueWithOrders += campaign.revenue;
+                        totalSentWithOrders += campaign.sent;
+                    }
+                }
+                
+                const overallConversionRate = (totalOrders / daily.totalSends) * 100;
+                const overallAOV = totalOrders > 0 ? totalRevenueWithOrders / totalOrders : 0;
+                const overallRPS = daily.totalRevenue / daily.totalSends;
+
+                // Update KPIs with new metrics
                 document.getElementById('kpiContainer').innerHTML = `
                     <div class="kpi-card">
                         <div class="kpi-value">${daily.totalSends.toLocaleString()}</div>
@@ -319,6 +433,21 @@
                         <div class="kpi-value">${daily.avgClickRate}%</div>
                         <div class="kpi-label">Avg click rate</div>
                     </div>
+                    <div class="kpi-card">
+                        <div class="kpi-value">${overallConversionRate.toFixed(2)}%</div>
+                        <div class="kpi-label">Conversion rate</div>
+                        <div class="kpi-sub">${totalOrders} total orders</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-value">$${overallAOV.toFixed(2)}</div>
+                        <div class="kpi-label">Avg order value</div>
+                        <div class="kpi-sub">per purchasing customer</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-value">$${overallRPS.toFixed(2)}</div>
+                        <div class="kpi-label">Revenue per sub</div>
+                        <div class="kpi-sub">per email sent</div>
+                    </div>
                 `;
 
                 // Update all charts
@@ -334,21 +463,23 @@
                     }
                 }
 
-                // Build campaign table with proper structure
+                // Build campaign table with new columns
                 let tableHtml = `
                     <table>
                         <thead>
                             <tr>
-                                <th>Campaign name</th>
-                                <th>Date & time</th>
-                                <th>Channel</th>
-                                <th>Sent</th>
-                                <th>Open rate</th>
-                                <th>Opens</th>
-                                <th>Click rate</th>
-                                <th>Clicks</th>
-                                <th>Revenue</th>
-                                <th>Orders</th>
+                                <th title="Campaign send date">📅 Date</th>
+                                <th title="Campaign name">📧 Campaign name</th>
+                                <th title="Number of emails sent">📤 Sent</th>
+                                <th title="Percentage of recipients who opened">📈 Open rate</th>
+                                <th title="Number of unique opens">👁️ Opens</th>
+                                <th title="Percentage of recipients who clicked">🎯 Click rate</th>
+                                <th title="Number of unique clicks">🖱️ Clicks</th>
+                                <th title="Percentage of recipients who purchased">💰 Conv. rate</th>
+                                <th title="Number of orders">📦 Orders</th>
+                                <th title="Total revenue from campaign">💵 Revenue</th>
+                                <th title="Average order value = Revenue / Orders">📊 AOV</th>
+                                <th title="Revenue per subscriber = Revenue / Sent">💎 RPS</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -356,18 +487,27 @@
 
                 for (const campaign of currentCampaigns) {
                     const isTop = campaign.name === topRevenueName && topRevenue > 0;
+                    const conversionRate = calculateConversionRate(campaign.orders, campaign.sent);
+                    const aov = calculateAOV(campaign.revenue, campaign.orders);
+                    const rps = calculateRPS(campaign.revenue, campaign.sent);
+                    
+                    // Extract just the date part from dateTime (Mar 21, 2026)
+                    const datePart = campaign.dateTime.split(' at ')[0];
+                    
                     tableHtml += `
                         <tr class="${isTop ? 'top-campaign' : ''}">
+                            <td><strong>${datePart}</strong></td>
                             <td><strong>${campaign.name}</strong></td>
-                            <td>${campaign.dateTime}</td>
-                            <td>${campaign.channel || 'Email'}</td>
                             <td>${campaign.sent.toLocaleString()}</td>
                             <td>${campaign.openRate}%</td>
                             <td>${campaign.opens.toLocaleString()}</td>
                             <td>${campaign.clickRate}%</td>
                             <td>${campaign.clicks.toLocaleString()}</td>
-                            <td><strong>$${campaign.revenue.toFixed(2)}</strong></td>
+                            <td class="metric-highlight">${conversionRate.toFixed(2)}%</td>
                             <td>${campaign.orders}</td>
+                            <td><strong>$${campaign.revenue.toFixed(2)}</strong></td>
+                            <td>$${aov.toFixed(2)}</td>
+                            <td>$${rps.toFixed(2)}</td>
                         </tr>
                     `;
                 }
@@ -398,6 +538,9 @@
             const clickRates = currentCampaigns.map(c => c.clickRate);
             const sends = currentCampaigns.map(c => c.sent);
             const opens = currentCampaigns.map(c => c.opens);
+            const conversionRates = currentCampaigns.map(c => calculateConversionRate(c.orders, c.sent));
+            const aovs = currentCampaigns.map(c => calculateAOV(c.revenue, c.orders));
+            const rpsValues = currentCampaigns.map(c => calculateRPS(c.revenue, c.sent));
 
             // Chart 1: Revenue by Campaign (Bar)
             if (charts.revenue) charts.revenue.destroy();
@@ -512,70 +655,68 @@
                     }
                 }
             });
+
+            // Chart 5: Conversion Rate by Campaign (New)
+            if (charts.conversion) charts.conversion.destroy();
+            const ctx5 = document.getElementById('conversionChart').getContext('2d');
+            charts.conversion = new Chart(ctx5, {
+                type: 'bar',
+                data: {
+                    labels: campaignNames,
+                    datasets: [{
+                        label: 'Conversion Rate (%)',
+                        data: conversionRates,
+                        backgroundColor: '#2c6e2c',
+                        borderRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    scales: {
+                        y: {
+                            title: { display: true, text: 'Conversion Rate (%)' }
+                        }
+                    }
+                }
+            });
+
+            // Chart 6: AOV & Revenue per Subscriber (New)
+            if (charts.aovRps) charts.aovRps.destroy();
+            const ctx6 = document.getElementById('aovRpsChart').getContext('2d');
+            charts.aovRps = new Chart(ctx6, {
+                type: 'bar',
+                data: {
+                    labels: campaignNames,
+                    datasets: [
+                        {
+                            label: 'AOV ($)',
+                            data: aovs,
+                            backgroundColor: '#b1622c',
+                            borderRadius: 6
+                        },
+                        {
+                            label: 'RPS ($)',
+                            data: rpsValues,
+                            backgroundColor: '#e0b08a',
+                            borderRadius: 6
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    scales: {
+                        y: {
+                            title: { display: true, text: 'Amount ($)' }
+                        }
+                    }
+                }
+            });
         }
 
         loadData();
         setInterval(loadData, 5 * 60 * 1000);
     </script>
-
-    <!-- ── FLOATING HOME BUTTON ── -->
-<style>
-  .home-fab {
-    position: fixed;
-    top: 1.75rem;
-    right: 1.75rem;
-    z-index: 9999;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 5px;
-    text-decoration: none;
-    cursor: pointer;
-  }
-  .home-fab-btn {
-    width: 48px;
-    height: 48px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, #2c1e14, #5c3d28);
-    box-shadow: 0 4px 18px rgba(44,30,20,0.35), 0 1px 4px rgba(44,30,20,0.2);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.15rem;
-    transition: transform 0.22s, box-shadow 0.22s, background 0.22s;
-    border: 1.5px solid rgba(232,221,208,0.15);
-  }
-  .home-fab:hover .home-fab-btn {
-    transform: translateY(-3px) scale(1.07);
-    box-shadow: 0 8px 28px rgba(44,30,20,0.4), 0 2px 6px rgba(44,30,20,0.2);
-    background: linear-gradient(135deg, #3e2718, #7a5236);
-  }
-  .home-fab-label {
-    font-family: 'DM Sans', 'Inter', system-ui, sans-serif;
-    font-size: 0.58rem;
-    font-weight: 700;
-    letter-spacing: 1.2px;
-    text-transform: uppercase;
-    color: #5c3d28;
-    background: rgba(255,252,247,0.92);
-    padding: 0.18rem 0.55rem;
-    border-radius: 100px;
-    border: 1px solid rgba(180,145,115,0.25);
-    box-shadow: 0 2px 8px rgba(44,30,20,0.08);
-    white-space: nowrap;
-    opacity: 0;
-    transform: translateY(4px);
-    transition: opacity 0.2s, transform 0.2s;
-    pointer-events: none;
-  }
-  .home-fab:hover .home-fab-label {
-    opacity: 1;
-    transform: translateY(0);
-  }
-</style>
-<a class="home-fab" href="/reports.html" title="Back to Home">
-  <div class="home-fab-btn">🏚️</div>
-  <span class="home-fab-label">Home</span>
-</a>
 </body>
 </html>
