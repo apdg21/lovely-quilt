@@ -33,14 +33,14 @@
         th:first-child, td:first-child { text-align: left; position: sticky; left: 0; background: white; font-weight: 600; z-index: 1; min-width: 100px; }
         th:nth-child(2), td:nth-child(2) { text-align: left; position: sticky; left: 100px; background: white; z-index: 1; min-width: 200px; }
         th { background: #f5ede3; color: #4a3729; position: sticky; top: 0; z-index: 2; }
-        th:first-child, th:nth-child(2) { z-index: 3; }
         tr:hover { background: #fefaf5; }
         .top-campaign { background: linear-gradient(90deg, #fff3e0, transparent); }
         .metric-highlight { font-weight: 700; color: #b1622c; }
         .last-updated { font-size: 0.7rem; color: #9b846b; text-align: right; margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid #e5d5bf; }
         .home-link { text-align: center; margin-top: 2rem; }
         .home-link a { color: #b1622c; text-decoration: none; font-weight: 500; }
-        .home-link a:hover { color: #8b4a1e; text-decoration: underline; }
+        .error-box { background: #fde0d5; border-left: 4px solid #a33820; padding: 1rem; border-radius: 0.75rem; margin: 1rem 0; color: #a33820; font-size: 0.85rem; }
+        .debug-info { background: #f0e9e0; padding: 0.5rem; border-radius: 0.5rem; font-size: 0.7rem; font-family: monospace; margin-top: 1rem; }
         .loading { text-align: center; padding: 2rem; color: #9b846b; }
         @media (max-width: 768px) {
             .container { padding: 1rem; }
@@ -63,7 +63,9 @@
             <div class="subhead" id="periodDisplay">Loading...</div>
         </div>
 
-        <div id="kpiContainer" class="kpi-grid"><div class="loading">Loading data...</div></div>
+        <div id="errorDisplay"></div>
+
+        <div id="kpiContainer" class="kpi-grid"><div class="loading">⏳ Loading data...</div></div>
 
         <div class="charts-row">
             <div class="chart-container"><h3>📊 Revenue by Campaign</h3><canvas id="revenueChart"></canvas></div>
@@ -80,19 +82,18 @@
             <div class="chart-container"><h3>📊 AOV & Revenue per Subscriber</h3><canvas id="aovRpsChart"></canvas></div>
         </div>
 
-        <div class="table-wrapper"><div id="tableContainer" class="loading">Loading campaigns...</div></div>
+        <div class="table-wrapper"><div id="tableContainer" class="loading">⏳ Loading campaigns...</div></div>
         <div class="last-updated" id="lastUpdated"></div>
-        
+        <div class="home-link">🏚️ <a href="/">Home</a></div>
+        <div class="debug-info" id="debugInfo">🔍 Debug: Initializing...</div>
     </div>
 
     <script>
         let currentCampaigns = [];
         let charts = {};
 
-        // Helper functions
         function formatDate(dateTimeStr) {
             if (!dateTimeStr) return 'Unknown';
-            // Handle both "Mar 19, 2026 at 10:00 AM" and "2026-03-23 at 09: 00" formats
             const atIndex = dateTimeStr.indexOf(' at ');
             if (atIndex > -1) {
                 return dateTimeStr.substring(0, atIndex);
@@ -101,57 +102,91 @@
         }
 
         function calculateConversionRate(orders, sent) { 
-            return sent && sent > 0 ? (orders / sent) * 100 : 0; 
+            return (sent && sent > 0) ? (orders / sent) * 100 : 0; 
         }
         
         function calculateAOV(revenue, orders) { 
-            return orders && orders > 0 ? revenue / orders : 0; 
+            return (orders && orders > 0) ? revenue / orders : 0; 
         }
         
         function calculateRPS(revenue, sent) { 
-            return sent && sent > 0 ? revenue / sent : 0; 
+            return (sent && sent > 0) ? revenue / sent : 0; 
         }
 
         async function loadData() {
+            const debugEl = document.getElementById('debugInfo');
+            debugEl.innerHTML = '🔍 Fetching /data.json...';
+            
             try {
-                const response = await fetch('/data.json?t=' + Date.now());
-                if (!response.ok) throw new Error('Network response was not ok');
-                const data = await response.json();
+                // Add timestamp to prevent caching
+                const url = '/data.json?t=' + Date.now();
+                debugEl.innerHTML = `🔍 Fetching: ${url}`;
+                
+                const response = await fetch(url);
+                debugEl.innerHTML = `🔍 Response status: ${response.status}`;
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const rawText = await response.text();
+                debugEl.innerHTML = `🔍 Received ${rawText.length} bytes, parsing JSON...`;
+                
+                let data;
+                try {
+                    data = JSON.parse(rawText);
+                    debugEl.innerHTML = `✅ JSON parsed successfully!`;
+                } catch (e) {
+                    throw new Error(`JSON parse error: ${e.message}`);
+                }
+                
+                // Check if daily data exists
+                if (!data.daily) {
+                    throw new Error('Missing "daily" object in data.json');
+                }
+                
                 const daily = data.daily;
+                
+                if (!daily.campaigns || !Array.isArray(daily.campaigns)) {
+                    throw new Error('Missing or invalid "campaigns" array in daily data');
+                }
+                
                 currentCampaigns = daily.campaigns;
+                debugEl.innerHTML = `✅ Loaded ${currentCampaigns.length} campaigns, period: ${daily.period}`;
 
                 document.getElementById('periodDisplay').innerHTML = `📅 ${daily.period} · daily breakdown`;
+                document.getElementById('errorDisplay').innerHTML = '';
 
-                // Calculate summary metrics from campaigns
+                // Calculate summary metrics
                 let totalOrders = 0;
                 let totalRevenueWithOrders = 0;
                 for (const c of currentCampaigns) {
-                    totalOrders += c.orders;
+                    totalOrders += (c.orders || 0);
                     if (c.orders > 0) {
-                        totalRevenueWithOrders += c.revenue;
+                        totalRevenueWithOrders += (c.revenue || 0);
                     }
                 }
                 
-                const overallConversionRate = (totalOrders / daily.totalSends) * 100;
+                const overallConversionRate = (totalOrders / (daily.totalSends || 1)) * 100;
                 const overallAOV = totalOrders > 0 ? totalRevenueWithOrders / totalOrders : 0;
-                const overallRPS = daily.totalRevenue / daily.totalSends;
+                const overallRPS = (daily.totalRevenue || 0) / (daily.totalSends || 1);
 
-                // KPI Cards - ALL DYNAMIC from data.json
+                // Update KPI Cards
                 document.getElementById('kpiContainer').innerHTML = `
                     <div class="kpi-card">
-                        <div class="kpi-value">${daily.totalSends.toLocaleString()}</div>
+                        <div class="kpi-value">${(daily.totalSends || 0).toLocaleString()}</div>
                         <div class="kpi-label">Total sends</div>
                     </div>
                     <div class="kpi-card">
-                        <div class="kpi-value">$${daily.totalRevenue.toFixed(2)}</div>
+                        <div class="kpi-value">$${(daily.totalRevenue || 0).toFixed(2)}</div>
                         <div class="kpi-label">Total revenue</div>
                     </div>
                     <div class="kpi-card">
-                        <div class="kpi-value">${daily.avgOpenRate}%</div>
+                        <div class="kpi-value">${(daily.avgOpenRate || 0)}%</div>
                         <div class="kpi-label">Avg open rate</div>
                     </div>
                     <div class="kpi-card">
-                        <div class="kpi-value">${daily.avgClickRate}%</div>
+                        <div class="kpi-value">${(daily.avgClickRate || 0)}%</div>
                         <div class="kpi-label">Avg click rate</div>
                     </div>
                     <div class="kpi-card">
@@ -169,18 +204,19 @@
                     </div>
                 `;
 
+                // Update charts
                 updateCharts();
 
-                // Find top campaign by revenue
+                // Find top campaign
                 let topRevenue = 0, topRevenueName = '';
                 for (const c of currentCampaigns) {
-                    if (c.revenue > topRevenue) {
+                    if ((c.revenue || 0) > topRevenue) {
                         topRevenue = c.revenue;
                         topRevenueName = c.name;
                     }
                 }
 
-                // Build campaign table with all metrics
+                // Build table
                 let tableHtml = ``
                     <thead>
                         <tr>
@@ -203,23 +239,23 @@
 
                 for (const c of currentCampaigns) {
                     const isTop = c.name === topRevenueName && topRevenue > 0;
-                    const conversionRate = calculateConversionRate(c.orders, c.sent);
-                    const aov = calculateAOV(c.revenue, c.orders);
-                    const rps = calculateRPS(c.revenue, c.sent);
+                    const conversionRate = calculateConversionRate(c.orders || 0, c.sent || 0);
+                    const aov = calculateAOV(c.revenue || 0, c.orders || 0);
+                    const rps = calculateRPS(c.revenue || 0, c.sent || 0);
                     const datePart = formatDate(c.dateTime);
                     
                     tableHtml += `
                         <tr class="${isTop ? 'top-campaign' : ''}">
                             <td><strong>${datePart}</strong></td>
-                            <td><strong>${c.name}</strong></td>
-                            <td>${c.sent.toLocaleString()}</td>
-                            <td>${c.openRate}%</td>
-                            <td>${c.opens.toLocaleString()}</td>
-                            <td>${c.clickRate}%</td>
-                            <td>${c.clicks.toLocaleString()}</td>
+                            <td><strong>${c.name || 'Unknown'}</strong></td>
+                            <td>${(c.sent || 0).toLocaleString()}</td>
+                            <td>${c.openRate || 0}%</td>
+                            <td>${(c.opens || 0).toLocaleString()}</td>
+                            <td>${c.clickRate || 0}%</td>
+                            <td>${(c.clicks || 0).toLocaleString()}</td>
                             <td class="metric-highlight">${conversionRate.toFixed(2)}%</td>
-                            <td>${c.orders}</td>
-                            <td><strong>$${c.revenue.toFixed(2)}</strong></td>
+                            <td>${c.orders || 0}</td>
+                            <td><strong>$${(c.revenue || 0).toFixed(2)}</strong></td>
                             <td>$${aov.toFixed(2)}</td>
                             <td>$${rps.toFixed(2)}</td>
                         </tr>
@@ -231,44 +267,60 @@
                 const now = new Date();
                 document.getElementById('lastUpdated').innerHTML = `📅 Last updated: ${now.toLocaleString()} · Data from data.json · ${daily.period}`;
                 
-                console.log('✅ Daily data loaded:', currentCampaigns.length, 'campaigns');
+                debugEl.innerHTML = `✅ Success! Loaded ${currentCampaigns.length} campaigns. Last update: ${now.toLocaleTimeString()}`;
                 
             } catch (err) {
                 console.error('Error loading data:', err);
-                document.getElementById('kpiContainer').innerHTML = '<div class="loading" style="grid-column:1/-1;">⚠️ Could not load data.json. Make sure the file exists at /data.json</div>';
+                debugEl.innerHTML = `❌ Error: ${err.message}`;
+                document.getElementById('errorDisplay').innerHTML = `
+                    <div class="error-box">
+                        <strong>⚠️ Failed to load data.json</strong><br>
+                        Error: ${err.message}<br><br>
+                        <strong>Troubleshooting:</strong><br>
+                        • Make sure <code>data.json</code> exists in the same directory as this page<br>
+                        • Check that the file has valid JSON syntax<br>
+                        • Verify the file is accessible at: <code>/data.json</code><br>
+                        • Try opening <a href="/data.json" target="_blank">/data.json</a> directly to check if it loads
+                    </div>
+                `;
+                document.getElementById('kpiContainer').innerHTML = '<div class="loading">⚠️ Could not load data. Check debug info below.</div>';
                 document.getElementById('tableContainer').innerHTML = '';
             }
         }
 
         function updateCharts() {
-            if (!currentCampaigns.length) return;
+            if (!currentCampaigns.length) {
+                console.log('No campaigns to render charts');
+                return;
+            }
             
-            // Shorten campaign names for charts
             const names = currentCampaigns.map(c => {
-                let name = c.name;
+                let name = c.name || 'Unknown';
                 return name.length > 20 ? name.substring(0, 17) + '...' : name;
             });
             
-            const revenues = currentCampaigns.map(c => c.revenue);
-            const openRates = currentCampaigns.map(c => c.openRate);
-            const clickRates = currentCampaigns.map(c => c.clickRate);
-            const sends = currentCampaigns.map(c => c.sent);
-            const opens = currentCampaigns.map(c => c.opens);
-            const convRates = currentCampaigns.map(c => calculateConversionRate(c.orders, c.sent));
-            const aovs = currentCampaigns.map(c => calculateAOV(c.revenue, c.orders));
-            const rpsValues = currentCampaigns.map(c => calculateRPS(c.revenue, c.sent));
+            const revenues = currentCampaigns.map(c => c.revenue || 0);
+            const openRates = currentCampaigns.map(c => c.openRate || 0);
+            const clickRates = currentCampaigns.map(c => c.clickRate || 0);
+            const sends = currentCampaigns.map(c => c.sent || 0);
+            const opens = currentCampaigns.map(c => c.opens || 0);
+            const convRates = currentCampaigns.map(c => calculateConversionRate(c.orders || 0, c.sent || 0));
+            const aovs = currentCampaigns.map(c => calculateAOV(c.revenue || 0, c.orders || 0));
+            const rpsValues = currentCampaigns.map(c => calculateRPS(c.revenue || 0, c.sent || 0));
 
-            // Chart 1: Revenue by Campaign
+            // Chart 1: Revenue
             if (charts.revenue) charts.revenue.destroy();
-            charts.revenue = new Chart(document.getElementById('revenueChart'), {
+            const ctx1 = document.getElementById('revenueChart').getContext('2d');
+            charts.revenue = new Chart(ctx1, {
                 type: 'bar',
                 data: { labels: names, datasets: [{ label: 'Revenue ($)', data: revenues, backgroundColor: '#b1622c', borderRadius: 6 }] },
                 options: { responsive: true, maintainAspectRatio: true }
             });
 
-            // Chart 2: Open Rate vs Click Rate
+            // Chart 2: Open vs Click Rates
             if (charts.rates) charts.rates.destroy();
-            charts.rates = new Chart(document.getElementById('ratesChart'), {
+            const ctx2 = document.getElementById('ratesChart').getContext('2d');
+            charts.rates = new Chart(ctx2, {
                 type: 'line',
                 data: {
                     labels: names,
@@ -282,7 +334,8 @@
 
             // Chart 3: Sent vs Opens
             if (charts.sentOpens) charts.sentOpens.destroy();
-            charts.sentOpens = new Chart(document.getElementById('sentOpensChart'), {
+            const ctx3 = document.getElementById('sentOpensChart').getContext('2d');
+            charts.sentOpens = new Chart(ctx3, {
                 type: 'bar',
                 data: {
                     labels: names,
@@ -296,26 +349,29 @@
 
             // Chart 4: Click Rate Trend
             if (charts.clickRate) charts.clickRate.destroy();
-            charts.clickRate = new Chart(document.getElementById('clickRateChart'), {
+            const ctx4 = document.getElementById('clickRateChart').getContext('2d');
+            charts.clickRate = new Chart(ctx4, {
                 type: 'line',
                 data: {
                     labels: names,
                     datasets: [{ label: 'Click Rate (%)', data: clickRates, borderColor: '#e67e22', backgroundColor: 'rgba(230, 126, 34, 0.1)', tension: 0.3, fill: true, pointRadius: 5, pointBackgroundColor: '#e67e22' }]
                 },
-                options: { responsive: true, maintainAspectRatio: true, scales: { y: { title: { display: true, text: 'Click Rate (%)' } } } }
+                options: { responsive: true, maintainAspectRatio: true }
             });
 
             // Chart 5: Conversion Rate
             if (charts.conversion) charts.conversion.destroy();
-            charts.conversion = new Chart(document.getElementById('conversionChart'), {
+            const ctx5 = document.getElementById('conversionChart').getContext('2d');
+            charts.conversion = new Chart(ctx5, {
                 type: 'bar',
                 data: { labels: names, datasets: [{ label: 'Conversion Rate (%)', data: convRates, backgroundColor: '#2c6e2c', borderRadius: 6 }] },
-                options: { responsive: true, maintainAspectRatio: true, scales: { y: { title: { display: true, text: 'Conversion Rate (%)' } } } }
+                options: { responsive: true, maintainAspectRatio: true }
             });
 
             // Chart 6: AOV & RPS
             if (charts.aovRps) charts.aovRps.destroy();
-            charts.aovRps = new Chart(document.getElementById('aovRpsChart'), {
+            const ctx6 = document.getElementById('aovRpsChart').getContext('2d');
+            charts.aovRps = new Chart(ctx6, {
                 type: 'bar',
                 data: {
                     labels: names,
@@ -324,72 +380,14 @@
                         { label: 'RPS ($)', data: rpsValues, backgroundColor: '#e0b08a', borderRadius: 6 }
                     ]
                 },
-                options: { responsive: true, maintainAspectRatio: true, scales: { y: { title: { display: true, text: 'Amount ($)' } } } }
+                options: { responsive: true, maintainAspectRatio: true }
             });
         }
 
-        // Initial load + auto-refresh every 5 minutes
+        // Initial load
         loadData();
+        // Auto-refresh every 5 minutes
         setInterval(loadData, 5 * 60 * 1000);
     </script>
- <!-- ── FLOATING HOME BUTTON ── -->
-<style>
-  .home-fab {
-    position: fixed;
-    top: 1.75rem;
-    right: 1.75rem;
-    z-index: 9999;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 5px;
-    text-decoration: none;
-    cursor: pointer;
-  }
-  .home-fab-btn {
-    width: 48px;
-    height: 48px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, #2c1e14, #5c3d28);
-    box-shadow: 0 4px 18px rgba(44,30,20,0.35), 0 1px 4px rgba(44,30,20,0.2);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.15rem;
-    transition: transform 0.22s, box-shadow 0.22s, background 0.22s;
-    border: 1.5px solid rgba(232,221,208,0.15);
-  }
-  .home-fab:hover .home-fab-btn {
-    transform: translateY(-3px) scale(1.07);
-    box-shadow: 0 8px 28px rgba(44,30,20,0.4), 0 2px 6px rgba(44,30,20,0.2);
-    background: linear-gradient(135deg, #3e2718, #7a5236);
-  }
-  .home-fab-label {
-    font-family: 'DM Sans', 'Inter', system-ui, sans-serif;
-    font-size: 0.58rem;
-    font-weight: 700;
-    letter-spacing: 1.2px;
-    text-transform: uppercase;
-    color: #5c3d28;
-    background: rgba(255,252,247,0.92);
-    padding: 0.18rem 0.55rem;
-    border-radius: 100px;
-    border: 1px solid rgba(180,145,115,0.25);
-    box-shadow: 0 2px 8px rgba(44,30,20,0.08);
-    white-space: nowrap;
-    opacity: 0;
-    transform: translateY(4px);
-    transition: opacity 0.2s, transform 0.2s;
-    pointer-events: none;
-  }
-  .home-fab:hover .home-fab-label {
-    opacity: 1;
-    transform: translateY(0);
-  }
-</style>
-<a class="home-fab" href="/reports.html" title="Back to Home">
-  <div class="home-fab-btn">🏚️</div>
-  <span class="home-fab-label">Home</span>
-</a>
 </body>
 </html>
