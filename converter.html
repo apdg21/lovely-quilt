@@ -257,13 +257,6 @@
       color: var(--clay);
     }
 
-    .m-label .calc-hint {
-      font-size: 0.55rem;
-      font-weight: normal;
-      color: var(--gold);
-      margin-left: 0.25rem;
-    }
-
     .m-input {
       border: 1.5px solid var(--border);
       background: var(--warm-white);
@@ -285,11 +278,6 @@
     .m-input.parsed {
       border-color: var(--moss);
       background: #f0faf3;
-    }
-
-    .m-input.calculated {
-      border-color: var(--gold);
-      background: #fff9e8;
     }
 
     .m-input.editable {
@@ -449,7 +437,8 @@
       border-left: 4px solid var(--clay);
       max-height: 480px;
       overflow-y: auto;
-      white-space: pre;
+      white-space: pre-wrap;
+      word-break: break-all;
     }
 
     .json-key {
@@ -569,6 +558,9 @@
         <div class="col-item"><strong>Row 11</strong><span>Revenue ($)</span></div>
         <div class="col-item"><strong>Row 12</strong><span>Orders (number)</span></div>
       </div>
+      <div class="info-note">
+        📅 <strong>Date format:</strong> Output will be in the format <code>"Mar 19, 2026 at 10:00 AM"</code> to match your existing data.json
+      </div>
     </div>
 
     <div class="card">
@@ -597,7 +589,7 @@
 
     <div class="card">
       <div class="output-header">
-        <div class="output-label">JSON Output</div>
+        <div class="output-label">JSON Output (Single line per campaign)</div>
         <div class="output-badge" id="statusBadge">Waiting for input</div>
       </div>
       <pre id="outputJson">// Output will appear here after conversion</pre>
@@ -627,8 +619,8 @@
         <strong>Engaged List</strong> = <span style="color: var(--clay);">✏️ Manually editable</span> — based on your own segment definition
       </div>
       <div class="info-note">
-        💡 <strong>Note:</strong> Only email subscriber data is used for unsubscribe rate calculations (SMS/Push have different unsubscribe behaviors).<br>
-        Engaged list is left editable so you can set it based on your own engagement criteria.
+        💡 <strong>Note:</strong> Only email subscriber data is used for unsubscribe rate calculations.<br>
+        📝 <strong>Output format:</strong> Monthly entries will be a single line (not pretty-printed) to match your data.json style.
       </div>
       
       <div class="card-title" style="margin-bottom: 0.5rem; margin-top: 1rem;">Fields extracted (matches data.json schema)</div>
@@ -678,7 +670,7 @@
 
     <div class="card">
       <div class="output-header">
-        <div class="output-label">JSON Output (Matches data.json historicalData entry)</div>
+        <div class="output-label">JSON Output (Single line per entry)</div>
         <div class="output-badge" id="m_statusBadge">Waiting for input</div>
       </div>
       <pre id="m_outputJson">// Output will appear here after conversion</pre>
@@ -706,27 +698,62 @@
   const cleanNum = str => { if (!str) return null; const c = str.replace(/[^0-9.\-]/g, ''); return c === '' ? null : parseFloat(c); };
   const cleanInt = str => { const n = cleanNum(str); return n === null ? null : Math.round(n); };
 
-  // Engaged list suggestion formula (not auto-applied, just for suggestion)
-  const suggestEngagedValue = (emailSubs, netGrowth) => {
-    if (!emailSubs || emailSubs <= 0) return 0;
-    const calculated = Math.floor(emailSubs * 0.32 + netGrowth * 1.4);
-    return Math.min(emailSubs, Math.max(750, calculated));
+  // Format date to "Mar 19, 2026 at 10:00 AM"
+  const formatDateTime = (dateStr, timeStr) => {
+    if (!dateStr && !timeStr) return '';
+    
+    // Parse the date
+    let date = new Date(dateStr);
+    if (isNaN(date.getTime())) {
+      // Try to parse the original string
+      date = new Date(dateStr);
+      if (isNaN(date.getTime())) return `${dateStr} at ${timeStr}`;
+    }
+    
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const month = months[date.getMonth()];
+    const day = date.getDate();
+    const year = date.getFullYear();
+    
+    // Format time to "10:00 AM"
+    let time = timeStr;
+    if (timeStr && !timeStr.includes('AM') && !timeStr.includes('PM')) {
+      const [hour, minute] = timeStr.split(':');
+      let h = parseInt(hour);
+      const ampm = h >= 12 ? 'PM' : 'AM';
+      h = h % 12 || 12;
+      time = `${h}:${minute} ${ampm}`;
+    }
+    
+    return `${month} ${day}, ${year} at ${time}`;
   };
 
-  const parseDateTime = str => {
-    if (!str) return { date: '', time: '00:00' };
-    const atIdx = str.indexOf(' at ');
-    const datePart = atIdx > -1 ? str.slice(0, atIdx).trim() : str.trim();
-    const timePart = atIdx > -1 ? str.slice(atIdx + 4).trim() : '';
-    let date = '';
-    try { const d = new Date(datePart); if (!isNaN(d.getTime())) date = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); } catch(e) {}
-    let time = '00:00';
-    if (timePart) { const m = timePart.match(/(\d+):(\d+)\s*(AM|PM)?/i); if (m) { let h = parseInt(m[1]); const min = m[2]; const ampm = (m[3] || '').toUpperCase(); if (ampm === 'PM' && h < 12) h += 12; if (ampm === 'AM' && h === 12) h = 0; time = String(h).padStart(2, '0') + ':' + min; } }
-    return { date, time };
+  // Parse date from raw string like "Mar 21, 2026 at 9:00 AM"
+  const parseRawDateTime = (raw) => {
+    if (!raw) return { date: '', time: '' };
+    const atIdx = raw.indexOf(' at ');
+    if (atIdx === -1) return { date: raw, time: '' };
+    const datePart = raw.slice(0, atIdx).trim();
+    const timePart = raw.slice(atIdx + 4).trim();
+    
+    // Parse the date part to a standard format
+    let parsedDate = datePart;
+    try {
+      const d = new Date(datePart);
+      if (!isNaN(d.getTime())) {
+        parsedDate = d.toISOString().split('T')[0];
+      }
+    } catch(e) {}
+    
+    return { date: parsedDate, time: timePart };
   };
 
   const detectChannel = str => { if (!str) return null; const s = str.trim().toLowerCase(); if (s === 'email') return 'Email'; if (s === 'sms') return 'SMS'; return null; };
-  const highlight = json => json.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*")\s*:/g, '<span class="json-key">$1</span>:').replace(/:\s*("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*")/g, ': <span class="json-str">$1</span>').replace(/:\s*(-?\d+\.?\d*)/g, ': <span class="json-num">$1</span>');
+  
+  const highlight = json => json
+    .replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*")\s*:/g, '<span class="json-key">$1</span>:')
+    .replace(/:\s*("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*")/g, ': <span class="json-str">$1</span>')
+    .replace(/:\s*(-?\d+\.?\d*)/g, ': <span class="json-num">$1</span>');
 
   function convertData() {
     const raw = document.getElementById('inputData').value;
@@ -742,7 +769,8 @@
       const name = (sentIdx - 3) >= 0 ? normalize[sentIdx - 3] : '';
       const channel = detectChannel((sentIdx - 1) >= 0 ? normalize[sentIdx - 1] : '') || defaultChannel;
       const isSMS = channel === 'SMS';
-      const { date, time } = parseDateTime(normalize[sentIdx + 1] || '');
+      const rawDateTime = normalize[sentIdx + 1] || '';
+      const { date: parsedDate, time: parsedTime } = parseRawDateTime(rawDateTime);
       const sent = cleanInt(normalize[sentIdx + 2]);
       let revIdx = -1;
       for (let j = sentIdx + 3; j < Math.min(sentIdx + 12, normalize.length); j++) if (/^\$[\d,]+\.?\d*$/.test(normalize[j])) { revIdx = j; break; }
@@ -753,23 +781,52 @@
         if (!isSMS) { openN = cleanInt(normalize[revIdx - 3]); openPct = cleanNum(normalize[revIdx - 4]); }
       }
       if (!name) { i = revIdx > -1 ? revIdx + 2 : sentIdx + 10; continue; }
-      campaigns.push({ name, dateTime: date ? `${date} at ${time}` : '', channel, sent, openRate: openPct, opens: openN, clickRate: clickPct, clicks: clickN, revenue: rev, orders });
+      
+      // Format the dateTime exactly as "Mar 19, 2026 at 10:00 AM"
+      const formattedDateTime = formatDateTime(parsedDate, parsedTime);
+      
+      campaigns.push({ 
+        name, 
+        dateTime: formattedDateTime, 
+        channel, 
+        sent, 
+        openRate: openPct, 
+        opens: openN, 
+        clickRate: clickPct, 
+        clicks: clickN, 
+        revenue: rev, 
+        orders 
+      });
       id++; i = revIdx > -1 ? revIdx + 2 : sentIdx + 10;
     }
     lastConverted = campaigns;
     if (!campaigns.length) { document.getElementById('outputJson').innerHTML = '// No campaigns detected.'; document.getElementById('statusBadge').className = 'output-badge error'; document.getElementById('statusBadge').textContent = '0 campaigns'; showToast('❌ No campaigns detected', 'error'); return; }
-    const lines = campaigns.map(c => '    ' + JSON.stringify(c)); const prettyOutput = '[\n' + lines.join(',\n') + '\n]';
+    
+    // Output as array with each campaign on its own line (single line per campaign)
+    const lines = campaigns.map(c => JSON.stringify(c));
+    const prettyOutput = '[\n  ' + lines.join(',\n  ') + '\n]';
     document.getElementById('outputJson').innerHTML = highlight(prettyOutput);
     document.getElementById('statusBadge').className = 'output-badge success';
     document.getElementById('statusBadge').textContent = `✅ ${campaigns.length} campaign${campaigns.length !== 1 ? 's' : ''} converted`;
     showToast(`✅ ${campaigns.length} campaign${campaigns.length !== 1 ? 's' : ''} converted`, 'success');
   }
 
-  function copyJSON() { if (!lastConverted.length) { showToast('Nothing to copy', 'error'); return; } const lines = lastConverted.map(c => '    ' + JSON.stringify(c)); const out = '[\n' + lines.join(',\n') + '\n]'; navigator.clipboard.writeText(out).then(() => showToast('📋 Campaign objects copied!', 'success')); }
+  function copyJSON() { if (!lastConverted.length) { showToast('Nothing to copy', 'error'); return; } const lines = lastConverted.map(c => JSON.stringify(c)); const out = '[\n  ' + lines.join(',\n  ') + '\n]'; navigator.clipboard.writeText(out).then(() => showToast('📋 Campaign objects copied!', 'success')); }
   function copyFullPatch() { if (!lastConverted.length) { showToast('Nothing to copy', 'error'); return; } const patch = { _meta: { source: 'Lovely Quilt · Omnisend Analytics', version: '1.0', date: new Date().toISOString().slice(0, 10) }, campaigns: lastConverted }; navigator.clipboard.writeText(JSON.stringify(patch, null, 2)).then(() => showToast('⬇ Full patch copied!', 'success')); }
   function clearAll() { document.getElementById('inputData').value = ''; document.getElementById('outputJson').innerHTML = '// Output will appear here after conversion'; document.getElementById('statusBadge').className = 'output-badge'; document.getElementById('statusBadge').textContent = 'Waiting for input'; lastConverted = []; }
-  function loadExample() { document.getElementById('inputData').value = `The National Quilting Day Celebration\nSent to Active & Engaged, VIP\nEmail\nSent\nMar 21, 2026 at 9:00 AM\n2,433\n40.7%\n(991)\n5.1%\n(126)\n$35.80\n(2)\n\nThe National Quilting Day Teaser\nSent to Active & Engaged\nEmail\nSent\nMar 19, 2026 at 10:00 AM\n2,419\n41.7%\n(1,011)\n2.1%\n(52)\n$0.00\n(0)`; document.getElementById('startId').value = '15'; showToast('📋 Example loaded', ''); }
+  function loadExample() { 
+    document.getElementById('inputData').value = `The National Quilting Day Celebration\nSent to Active & Engaged, VIP\nEmail\nSent\nMar 21, 2026 at 9:00 AM\n2,433\n40.7%\n(991)\n5.1%\n(126)\n$35.80\n(2)\n\nThe National Quilting Day Teaser\nSent to Active & Engaged\nEmail\nSent\nMar 19, 2026 at 10:00 AM\n2,419\n41.7%\n(1,011)\n2.1%\n(52)\n$0.00\n(0)`; 
+    document.getElementById('startId').value = '15'; 
+    showToast('📋 Example loaded — date format will be "Mar 21, 2026 at 9:00 AM"', ''); 
+  }
   function switchTab(name, btn) { document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active')); document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active')); document.getElementById('tab-' + name).classList.add('active'); btn.classList.add('active'); }
+
+  // Monthly functions
+  const suggestEngagedValue = (emailSubs, netGrowth) => {
+    if (!emailSubs || emailSubs <= 0) return 0;
+    const calculated = Math.floor(emailSubs * 0.32 + netGrowth * 1.4);
+    return Math.min(emailSubs, Math.max(750, calculated));
+  };
 
   function updateCalculations() {
     const emailSubs = parseInt(document.getElementById('m_emailSubs').value) || 0;
@@ -777,11 +834,8 @@
     const unsubs = parseInt(document.getElementById('m_unsub').value) || 0;
     const netGrowth = newSubs - unsubs;
     document.getElementById('m_netGrowth').value = netGrowth;
-    
-    // Calculate unsubscribe rate using total email subscribers as denominator
     const unsubRate = emailSubs > 0 ? ((unsubs / emailSubs) * 100).toFixed(2) : 0;
     document.getElementById('m_unsubRate').value = unsubRate;
-    
     return { emailSubs, newSubs, unsubs, netGrowth, unsubRate };
   }
   
@@ -803,29 +857,24 @@
     
     const setIfFound = (id, val) => { if (val === null || val === undefined) return; const el = document.getElementById(id); el.value = val; el.classList.add('parsed'); setTimeout(() => el.classList.remove('parsed'), 1500); updateCalculations(); };
     
-    // Extract revenue data
     const omniIdx = lines.findIndex(l => /revenue from omnisend/i.test(l)); if (omniIdx > -1) setIfFound('m_omni', cleanNum(lines[omniIdx + 1]));
     const campIdx = lines.findIndex(l => /^campaigns$/i.test(l)); if (campIdx > -1) setIfFound('m_camp', cleanNum(lines[campIdx + 1]));
     const autoIdx = lines.findIndex(l => /^automation$/i.test(l)); if (autoIdx > -1) setIfFound('m_auto', cleanNum(lines[autoIdx + 1]));
     const storeIdx = lines.findIndex(l => /total store revenue/i.test(l)); if (storeIdx > -1) setIfFound('m_store', cleanNum(lines[storeIdx + 1]));
     
-    // Extract email subscribers ONLY (not SMS or Push)
     const emailIdx = lines.findIndex(l => /^email subscribers$/i.test(l));
     if (emailIdx > -1) {
       const emailCount = cleanInt(lines[emailIdx + 1]);
       if (emailCount) setIfFound('m_emailSubs', emailCount);
       
-      // Extract new subscribers and unsubscribes from email section only
       let emailNewSubs = 0;
       let emailUnsubs = 0;
       
       for (let j = emailIdx + 1; j < Math.min(emailIdx + 8, lines.length); j++) {
         const line = lines[j];
-        // Look for new subscribers (starts with +)
         if (/^\+[\d,]+$/.test(line)) {
           emailNewSubs += cleanInt(line) || 0;
         }
-        // Look for unsubscribes in the email section
         const unsubMatch = line.match(/(\d[\d,]*)\s*unsubscribed/i);
         if (unsubMatch) {
           emailUnsubs += cleanInt(unsubMatch[1]) || 0;
@@ -874,13 +923,15 @@
     };
     
     lastMonthly = obj;
-    document.getElementById('m_outputJson').innerHTML = highlight(JSON.stringify(obj, null, 2));
+    // Output as single line (no pretty printing)
+    const singleLineOutput = JSON.stringify(obj);
+    document.getElementById('m_outputJson').innerHTML = highlight(singleLineOutput);
     document.getElementById('m_statusBadge').className = 'output-badge success';
     document.getElementById('m_statusBadge').textContent = `✅ ${month} ready`;
     showToast(`✅ ${month} converted — Unsubscribe rate: ${unsubRate}% (based on ${emailSubs.toLocaleString()} email subscribers)`, 'success');
   }
 
-  function copyMonthlyObj() { if (!lastMonthly) { showToast('Nothing to copy', 'error'); return; } navigator.clipboard.writeText(JSON.stringify(lastMonthly, null, 2)).then(() => showToast('📋 Monthly object copied!', 'success')); }
+  function copyMonthlyObj() { if (!lastMonthly) { showToast('Nothing to copy', 'error'); return; } navigator.clipboard.writeText(JSON.stringify(lastMonthly)).then(() => showToast('📋 Monthly object copied!', 'success')); }
   function copyMonthlyPatch() { if (!lastMonthly) { showToast('Nothing to copy', 'error'); return; } const patch = { _meta: { source: 'Lovely Quilt · Omnisend Analytics', version: '1.0', date: new Date().toISOString().slice(0, 10) }, monthly_entry: lastMonthly }; navigator.clipboard.writeText(JSON.stringify(patch, null, 2)).then(() => showToast('⬇ Monthly patch copied!', 'success')); }
   
   function clearMonthly() { 
@@ -896,19 +947,17 @@
   }
   
   function loadMonthlyExample() { 
-    document.getElementById('m_rawInput').value = `Revenue from Omnisend\n$14,073.31\n-9.51%\n780 orders\nCampaigns\n$6,133.66\n352 orders\nAutomation\n$7,939.65\n428 orders\nTotal store revenue\n$50,885.36\n3,073 orders\n\nEmail subscribers\n33,089\n+1,607\n2,342 subscribed|735 unsubscribed\nSMS subscribers\n4,761\n+529\n536 subscribed|7 unsubscribed\nPush subscribers\n2,410\n+340\n342 subscribed|2 unsubscribed`; 
+    document.getElementById('m_rawInput').value = `Revenue from Omnisend\n$14,073.31\n-9.51%\n780 orders\nCampaigns\n$6,133.66\n352 orders\nAutomation\n$7,939.65\n428 orders\nTotal store revenue\n$50,885.36\n3,073 orders\n\nEmail subscribers\n33,089\n+1,607\n2,342 subscribed|735 unsubscribed`; 
     parseMonthlyLive(); 
     document.getElementById('m_month').value = 'Mar 2026'; 
-    // Auto-suggest engaged value
     const emailSubs = parseInt(document.getElementById('m_emailSubs').value) || 0;
     const netGrowth = parseInt(document.getElementById('m_netGrowth').value) || 0;
     const suggested = suggestEngagedValue(emailSubs, netGrowth);
     if (suggested > 0) document.getElementById('m_engaged').value = suggested;
     updateCalculations();
-    showToast(`📋 Example loaded — using ONLY email subscriber data (${emailSubs.toLocaleString()}) for unsubscribe rate`, ''); 
+    showToast(`📋 Example loaded — output will be a single line like your data.json`, ''); 
   }
   
-  // Add event listeners for real-time calculation
   document.getElementById('m_emailSubs').addEventListener('input', updateCalculations);
   document.getElementById('m_newSubs').addEventListener('input', updateCalculations);
   document.getElementById('m_unsub').addEventListener('input', updateCalculations);
