@@ -351,57 +351,96 @@
     }
 
     function findTopCampaign(campaigns) {
-        if (!campaigns || campaigns.length === 0) return "N/A";
+        if (!campaigns || campaigns.length === 0) return "No campaigns";
         let top = campaigns[0];
-        for (const campaign of campaigns) {
-            if (campaign.revenue > top.revenue) top = campaign;
+        for (const c of campaigns) {
+            if ((c.revenue || 0) > (top.revenue || 0)) top = c;
         }
-        return top.name.length > 35 ? top.name.substring(0, 32) + "..." : top.name;
+        return top.name.length > 38 ? top.name.substring(0, 35) + "..." : top.name;
     }
 
     function updateDashboard(data) {
         if (!data) {
-            document.getElementById('monthlyPreview').innerHTML = '<div class="error-placeholder">⚠️ Could not load data.json. Ensure file exists at /data.json</div>';
-            document.getElementById('dailyPreview').innerHTML = '<div class="error-placeholder">⚠️ Could not load data.json</div>';
+            document.getElementById('monthlyPreview').innerHTML = `<div style="color:#c33; padding:1rem;">⚠️ Could not load data.json</div>`;
+            document.getElementById('dailyPreview').innerHTML = `<div style="color:#c33; padding:1rem;">⚠️ Could not load data.json</div>`;
             return;
         }
 
-        const monthly = data.monthly;
-        const daily = data.daily;
+        const monthly = data.monthly || {};
+        const daily = data.daily || {};
+        const historical = monthly.historicalData || [];
+        const campaigns = daily.campaigns || [];
 
-        // Update Monthly Preview
+        // ====================== MONTHLY CALCULATIONS ======================
+        const latestMonth = historical.length ? historical[historical.length - 1] : {};
+        const prevMonth = historical.length >= 2 ? historical[historical.length - 2] : {};
+
+        const avg3mNewSubs = historical.length >= 3 
+            ? Math.round(historical.slice(-3).reduce((sum, r) => sum + (r.newSubs || 0), 0) / 3)
+            : (latestMonth.newSubs || 0);
+
+        const omnisendMoM = prevMonth.omnisendRevenue 
+            ? ((latestMonth.omnisendRevenue - prevMonth.omnisendRevenue) / prevMonth.omnisendRevenue * 100).toFixed(1)
+            : "—";
+
+        // ====================== DAILY CALCULATIONS ======================
+        let totalSends = 0, totalRevenue = 0, totalOpens = 0, totalClicks = 0;
+
+        campaigns.forEach(c => {
+            totalSends += Number(c.sent) || 0;
+            totalRevenue += Number(c.revenue) || 0;
+            totalOpens += Number(c.opens) || 0;
+            totalClicks += Number(c.clicks) || 0;
+        });
+
+        const avgOpenRate = totalSends > 0 ? (totalOpens / totalSends * 100).toFixed(1) : 0;
+        const avgClickRate = totalSends > 0 ? (totalClicks / totalSends * 100).toFixed(1) : 0;
+        const topCampaignName = findTopCampaign(campaigns);
+
+        // ====================== UPDATE MONTHLY PREVIEW ======================
         document.getElementById('monthlyPreview').innerHTML = `
-            <div class="stat-row"><span class="stat-label">📬 Omnisend revenue</span><span class="stat-value highlight">$${monthly.latestOmnisend.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span></div>
-            <div class="stat-row"><span class="stat-label">🆕 New subscribers</span><span class="stat-value">${monthly.newSubscribers.toLocaleString()}</span></div>
-            <div class="stat-row"><span class="stat-label">🚫 Unsub rate</span><span class="stat-value ${monthly.unsubRate > 1.8 ? 'highlight' : ''}">${monthly.unsubRate}%</span></div>
-            <div class="stat-row"><span class="stat-label">👥 Engaged list</span><span class="stat-value">${monthly.engagedList.toLocaleString()} / ${monthly.targetEngaged.toLocaleString()}</span></div>
-            <div class="stat-row"><span class="stat-label">📈 Net growth</span><span class="stat-value">${monthly.netGrowth >= 0 ? '+' : ''}${monthly.netGrowth}</span></div>
-            <div class="stat-row"><span class="stat-label">⚠️ Latest month</span><span class="stat-value">${monthly.latestMonth}</span></div>
+            <div class="stat-row"><span class="stat-label">📬 Omnisend revenue</span><span class="stat-value highlight">$${latestMonth.omnisendRevenue?.toLocaleString() || '—'}</span></div>
+            <div class="stat-row"><span class="stat-label">🆕 New subscribers</span><span class="stat-value">${latestMonth.newSubs?.toLocaleString() || '—'}</span></div>
+            <div class="stat-row"><span class="stat-label">🚫 Unsub rate</span><span class="stat-value ${latestMonth.unsubRate > 1.8 ? 'highlight' : ''}">${latestMonth.unsubRate || '—'}%</span></div>
+            <div class="stat-row"><span class="stat-label">👥 Engaged list</span><span class="stat-value">${latestMonth.engaged?.toLocaleString() || '—'} / ${monthly.targetEngaged?.toLocaleString() || '5000'}</span></div>
+            <div class="stat-row"><span class="stat-label">📈 Net growth</span><span class="stat-value">${latestMonth.netGrowth >= 0 ? '+' : ''}${latestMonth.netGrowth || '—'}</span></div>
+            <div class="stat-row"><span class="stat-label">⚠️ Latest month</span><span class="stat-value">${latestMonth.month || monthly.latestMonth || '—'}</span></div>
         `;
 
-        // Update Daily Preview
-        const topCampaign = findTopCampaign(daily.campaigns);
+        // ====================== UPDATE DAILY PREVIEW ======================
         document.getElementById('dailyPreview').innerHTML = `
-            <div class="stat-row"><span class="stat-label">📧 Total sends</span><span class="stat-value">${daily.totalSends.toLocaleString()}</span></div>
-            <div class="stat-row"><span class="stat-label">💰 Total revenue</span><span class="stat-value highlight">$${daily.totalRevenue.toFixed(2)}</span></div>
-            <div class="stat-row"><span class="stat-label">📈 Avg open rate</span><span class="stat-value">${daily.avgOpenRate}%</span></div>
-            <div class="stat-row"><span class="stat-label">🎯 Avg click rate</span><span class="stat-value">${daily.avgClickRate}%</span></div>
-            <div class="stat-row"><span class="stat-label">🏆 Top campaign</span><span class="stat-value">${topCampaign}</span></div>
-            <div class="stat-row"><span class="stat-label">📅 Data period</span><span class="stat-value">${daily.period}</span></div>
+            <div class="stat-row"><span class="stat-label">📧 Total sends</span><span class="stat-value">${totalSends.toLocaleString()}</span></div>
+            <div class="stat-row"><span class="stat-label">💰 Total revenue</span><span class="stat-value highlight">$${totalRevenue.toFixed(2)}</span></div>
+            <div class="stat-row"><span class="stat-label">📈 Avg open rate</span><span class="stat-value">${avgOpenRate}%</span></div>
+            <div class="stat-row"><span class="stat-label">🎯 Avg click rate</span><span class="stat-value">${avgClickRate}%</span></div>
+            <div class="stat-row"><span class="stat-label">🏆 Top campaign</span><span class="stat-value">${topCampaignName}</span></div>
+            <div class="stat-row"><span class="stat-label">📅 Data period</span><span class="stat-value">${daily.period || '—'}</span></div>
         `;
 
-        // Update KPI Grid
+        // ====================== KPI SNAPSHOT ======================
         document.getElementById('kpiGrid').innerHTML = `
-            <div class="metric-block"><div class="metric-number">$${Math.round(monthly.latestOmnisend)}</div><div class="metric-label">Latest Omnisend</div></div>
-            <div class="metric-block"><div class="metric-number">${monthly.newSubscribers.toLocaleString()}</div><div class="metric-label">New Subs (latest)</div></div>
-            <div class="metric-block"><div class="metric-number">${monthly.unsubRate}%</div><div class="metric-label">Unsub Rate</div></div>
-            <div class="metric-block"><div class="metric-number">$${Math.round(daily.totalRevenue)}</div><div class="metric-label">Campaign Revenue</div></div>
+            <div class="metric-block">
+                <div class="metric-number">$${Math.round(latestMonth.omnisendRevenue || 0)}</div>
+                <div class="metric-label">Latest Omnisend</div>
+            </div>
+            <div class="metric-block">
+                <div class="metric-number">${latestMonth.newSubs?.toLocaleString() || '—'}</div>
+                <div class="metric-label">New Subs (latest)</div>
+            </div>
+            <div class="metric-block">
+                <div class="metric-number">${latestMonth.unsubRate || '—'}%</div>
+                <div class="metric-label">Unsub Rate</div>
+            </div>
+            <div class="metric-block">
+                <div class="metric-number">$${Math.round(totalRevenue)}</div>
+                <div class="metric-label">Daily Revenue</div>
+            </div>
         `;
 
         // Update timestamp
         const now = new Date();
-        document.getElementById('lastUpdatedText').innerHTML = `✅ updated: ${now.toLocaleTimeString()} · data from data.json`;
-        document.getElementById('dataNote').innerHTML = `📡 Monthly: $${monthly.latestOmnisend} Omnisend · Daily: ${daily.totalSends.toLocaleString()} sends`;
+        document.getElementById('lastUpdatedText').innerHTML = 
+            `✅ updated: ${now.toLocaleTimeString()} · fully auto-calculated`;
     }
 
     async function refreshAll() {
@@ -414,10 +453,11 @@
         }
     }
 
-    // Initial load + auto-refresh every 5 minutes
+    // Initial load + auto refresh
     refreshAll();
     setInterval(refreshAll, 5 * 60 * 1000);
+
+    // Manual refresh button
     document.getElementById('refreshBtn').addEventListener('click', refreshAll);
-</script>
-</body>
+</script></body>
 </html>
