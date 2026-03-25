@@ -6,360 +6,81 @@
     <title>🧵 Lovely Quilt · daily campaign pulse</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
-            font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
             background: linear-gradient(135deg, #faf7f2 0%, #f0e9e0 100%);
             color: #2c2418;
             min-height: 100vh;
         }
-        
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 1.5rem;
-        }
-        
-        /* Header */
-        .header {
-            text-align: center;
-            margin-bottom: 2rem;
-            padding: 1rem;
-        }
-        
-        h1 {
-            font-size: clamp(1.5rem, 5vw, 2rem);
-            color: #4a3729;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.5rem;
-            flex-wrap: wrap;
-        }
-        
-        .subhead {
-            color: #6b4f32;
-            font-size: clamp(0.8rem, 3vw, 0.9rem);
-            margin-top: 0.5rem;
-        }
-        
-        /* KPI Grid - Expanded for new metrics */
-        .kpi-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-            gap: 1rem;
-            margin: 2rem 0;
-        }
-        
-        .kpi-card {
-            background: white;
-            padding: 1.2rem;
-            border-radius: 1rem;
-            text-align: center;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-            border: 1px solid rgba(239, 227, 210, 0.5);
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
-        
-        .kpi-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
-        }
-        
-        .kpi-value {
-            font-size: clamp(1.1rem, 4vw, 1.6rem);
-            font-weight: bold;
-            color: #b1622c;
-        }
-        
-        .kpi-label {
-            font-size: 0.65rem;
-            color: #6b4f32;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-top: 0.25rem;
-        }
-        
-        .kpi-sub {
-            font-size: 0.6rem;
-            color: #9b846b;
-            margin-top: 0.2rem;
-        }
-        
-        /* Charts */
-        .charts-row {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-            gap: 1.5rem;
-            margin: 1.5rem 0;
-        }
-        
-        .chart-container {
-            background: white;
-            padding: 1.2rem;
-            border-radius: 1rem;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-            transition: transform 0.2s;
-        }
-        
-        .chart-container:hover {
-            transform: translateY(-2px);
-        }
-        
-        .chart-container h3 {
-            margin-bottom: 1rem;
-            color: #4a3729;
-            font-size: clamp(0.9rem, 3vw, 1rem);
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-        
-        canvas {
-            max-height: 280px;
-            width: 100% !important;
-        }
-        
-        /* Table Container - Mobile Friendly with Horizontal Scroll */
-        .table-wrapper {
-            background: white;
-            border-radius: 1rem;
-            overflow-x: auto;
-            margin: 1.5rem 0;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-            -webkit-overflow-scrolling: touch;
-        }
-        
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 0.75rem;
-            min-width: 1100px;
-        }
-        
-        th, td {
-            padding: 0.85rem 1rem;
-            text-align: right;
-            border-bottom: 1px solid #f0e5da;
-        }
-        
-        /* Date column - first column, sticky for mobile */
-        th:first-child, td:first-child {
-            text-align: left;
-            position: sticky;
-            left: 0;
-            background: white;
-            font-weight: 600;
-            z-index: 1;
-            min-width: 130px;
-        }
-        
-        /* Campaign name column - second column, also sticky for better context */
-        th:nth-child(2), td:nth-child(2) {
-            text-align: left;
-            position: sticky;
-            left: 130px;
-            background: white;
-            z-index: 1;
-            min-width: 200px;
-        }
-        
-        /* Shadow effect for sticky columns */
-        td:first-child::after,
-        th:first-child::after {
-            content: '';
-            position: absolute;
-            right: -5px;
-            top: 0;
-            height: 100%;
-            width: 5px;
-            box-shadow: inset -5px 0 5px -5px rgba(0,0,0,0.1);
-        }
-        
-        th {
-            background: #f5ede3;
-            color: #4a3729;
-            font-weight: 600;
-            position: sticky;
-            top: 0;
-            z-index: 2;
-        }
-        
-        th:first-child, th:nth-child(2) {
-            z-index: 3;
-        }
-        
-        tr:hover {
-            background: #fefaf5;
-        }
-        
-        /* Highlight top campaign */
-        .top-campaign {
-            background: linear-gradient(90deg, #fff3e0, transparent);
-        }
-        
-        /* New metric highlights */
-        .metric-highlight {
-            font-weight: 700;
-            color: #b1622c;
-        }
-        
-        /* Last Updated */
-        .last-updated {
-            font-size: 0.7rem;
-            color: #9b846b;
-            text-align: right;
-            margin-top: 1.5rem;
-            padding-top: 1rem;
-            border-top: 1px solid #e5d5bf;
-        }
-        
-        .home-link {
-            text-align: center;
-            margin-top: 2rem;
-        }
-        
-        .home-link a {
-            color: #b1622c;
-            text-decoration: none;
-            font-weight: 500;
-            transition: color 0.2s;
-        }
-        
-        .home-link a:hover {
-            color: #8b4a1e;
-            text-decoration: underline;
-        }
-        
-        /* Loading State */
-        .loading {
-            text-align: center;
-            padding: 2rem;
-            color: #9b846b;
-        }
-        
-        /* Tooltip for column headers */
-        .col-tooltip {
-            cursor: help;
-            border-bottom: 1px dotted #b1622c;
-        }
-        
-        /* Mobile Adjustments */
+        .container { max-width: 1400px; margin: 0 auto; padding: 1.5rem; }
+        .header { text-align: center; margin-bottom: 2rem; padding: 1rem; }
+        h1 { font-size: clamp(1.5rem, 5vw, 2rem); color: #4a3729; display: flex; align-items: center; justify-content: center; gap: 0.5rem; flex-wrap: wrap; }
+        .subhead { color: #6b4f32; font-size: clamp(0.8rem, 3vw, 0.9rem); margin-top: 0.5rem; }
+        .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; margin: 2rem 0; }
+        .kpi-card { background: white; padding: 1.2rem; border-radius: 1rem; text-align: center; box-shadow: 0 4px 12px rgba(0,0,0,0.05); border: 1px solid rgba(239, 227, 210, 0.5); transition: transform 0.2s; }
+        .kpi-card:hover { transform: translateY(-2px); }
+        .kpi-value { font-size: clamp(1.1rem, 4vw, 1.6rem); font-weight: bold; color: #b1622c; }
+        .kpi-label { font-size: 0.65rem; color: #6b4f32; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 0.25rem; }
+        .kpi-sub { font-size: 0.6rem; color: #9b846b; margin-top: 0.2rem; }
+        .charts-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 1.5rem; margin: 1.5rem 0; }
+        .chart-container { background: white; padding: 1.2rem; border-radius: 1rem; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+        .chart-container h3 { margin-bottom: 1rem; color: #4a3729; font-size: clamp(0.9rem, 3vw, 1rem); display: flex; align-items: center; gap: 0.5rem; }
+        canvas { max-height: 280px; width: 100% !important; }
+        .table-wrapper { background: white; border-radius: 1rem; overflow-x: auto; margin: 1.5rem 0; box-shadow: 0 4px 12px rgba(0,0,0,0.05); -webkit-overflow-scrolling: touch; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.75rem; min-width: 1100px; }
+        th, td { padding: 0.85rem 1rem; text-align: right; border-bottom: 1px solid #f0e5da; }
+        th:first-child, td:first-child { text-align: left; position: sticky; left: 0; background: white; font-weight: 600; z-index: 1; min-width: 100px; }
+        th:nth-child(2), td:nth-child(2) { text-align: left; position: sticky; left: 100px; background: white; z-index: 1; min-width: 200px; }
+        th { background: #f5ede3; color: #4a3729; position: sticky; top: 0; z-index: 2; }
+        th:first-child, th:nth-child(2) { z-index: 3; }
+        tr:hover { background: #fefaf5; }
+        .top-campaign { background: linear-gradient(90deg, #fff3e0, transparent); }
+        .metric-highlight { font-weight: 700; color: #b1622c; }
+        .last-updated { font-size: 0.7rem; color: #9b846b; text-align: right; margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid #e5d5bf; }
+        .home-link { text-align: center; margin-top: 2rem; }
+        .home-link a { color: #b1622c; text-decoration: none; font-weight: 500; }
+        .home-link a:hover { color: #8b4a1e; text-decoration: underline; }
+        .loading { text-align: center; padding: 2rem; color: #9b846b; }
         @media (max-width: 768px) {
-            .container {
-                padding: 1rem;
-            }
-            
-            .charts-row {
-                grid-template-columns: 1fr;
-                gap: 1rem;
-            }
-            
-            .chart-container {
-                padding: 1rem;
-            }
-            
-            .kpi-card {
-                padding: 0.8rem;
-            }
-            
-            th, td {
-                padding: 0.6rem 0.8rem;
-                font-size: 0.65rem;
-            }
-            
-            th:first-child, td:first-child {
-                min-width: 100px;
-            }
-            
-            th:nth-child(2), td:nth-child(2) {
-                left: 100px;
-                min-width: 160px;
-            }
+            .container { padding: 1rem; }
+            .charts-row { grid-template-columns: 1fr; gap: 1rem; }
+            .kpi-card { padding: 0.8rem; }
+            th, td { padding: 0.6rem 0.8rem; font-size: 0.65rem; }
+            th:first-child, td:first-child { min-width: 85px; }
+            th:nth-child(2), td:nth-child(2) { left: 85px; min-width: 160px; }
         }
-        
         @media (max-width: 480px) {
-            .kpi-grid {
-                grid-template-columns: repeat(2, 1fr);
-                gap: 0.75rem;
-            }
-            
-            .kpi-value {
-                font-size: 1rem;
-            }
-            
-            th:first-child, td:first-child {
-                min-width: 85px;
-                font-size: 0.6rem;
-            }
-            
-            th:nth-child(2), td:nth-child(2) {
-                left: 85px;
-                min-width: 140px;
-            }
+            .kpi-grid { grid-template-columns: repeat(2, 1fr); gap: 0.75rem; }
+            .kpi-value { font-size: 1rem; }
         }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <h1>
-                <span>🧵</span>
-                Lovely Quilt · Daily Campaign Pulse
-            </h1>
+            <h1><span>🧵</span> Lovely Quilt · Daily Campaign Pulse</h1>
             <div class="subhead" id="periodDisplay">Loading...</div>
         </div>
 
-        <div id="kpiContainer" class="kpi-grid">
-            <div class="loading">Loading data...</div>
-        </div>
+        <div id="kpiContainer" class="kpi-grid"><div class="loading">Loading data...</div></div>
 
-        <!-- Charts Row 1 -->
         <div class="charts-row">
-            <div class="chart-container">
-                <h3>📊 Revenue by Campaign</h3>
-                <canvas id="revenueChart"></canvas>
-            </div>
-            <div class="chart-container">
-                <h3>📈 Open Rate vs Click Rate</h3>
-                <canvas id="ratesChart"></canvas>
-            </div>
+            <div class="chart-container"><h3>📊 Revenue by Campaign</h3><canvas id="revenueChart"></canvas></div>
+            <div class="chart-container"><h3>📈 Open Rate vs Click Rate</h3><canvas id="ratesChart"></canvas></div>
         </div>
 
-        <!-- Charts Row 2 -->
         <div class="charts-row">
-            <div class="chart-container">
-                <h3>📧 Sent vs Opens</h3>
-                <canvas id="sentOpensChart"></canvas>
-            </div>
-            <div class="chart-container">
-                <h3>🎯 Click Rate Trend</h3>
-                <canvas id="clickRateChart"></canvas>
-            </div>
+            <div class="chart-container"><h3>📧 Sent vs Opens</h3><canvas id="sentOpensChart"></canvas></div>
+            <div class="chart-container"><h3>🎯 Click Rate Trend</h3><canvas id="clickRateChart"></canvas></div>
         </div>
 
-        <!-- Charts Row 3 - New metrics -->
         <div class="charts-row">
-            <div class="chart-container">
-                <h3>💰 Conversion Rate by Campaign</h3>
-                <canvas id="conversionChart"></canvas>
-            </div>
-            <div class="chart-container">
-                <h3>📊 AOV & Revenue per Subscriber</h3>
-                <canvas id="aovRpsChart"></canvas>
-            </div>
+            <div class="chart-container"><h3>💰 Conversion Rate by Campaign</h3><canvas id="conversionChart"></canvas></div>
+            <div class="chart-container"><h3>📊 AOV & Revenue per Subscriber</h3><canvas id="aovRpsChart"></canvas></div>
         </div>
 
-        <!-- Campaign Table with new columns -->
-        <div class="table-wrapper" id="tableWrapper">
-            <div id="tableContainer" class="loading">Loading campaigns...</div>
-        </div>
-
+        <div class="table-wrapper"><div id="tableContainer" class="loading">Loading campaigns...</div></div>
         <div class="last-updated" id="lastUpdated"></div>
         
     </div>
@@ -368,22 +89,27 @@
         let currentCampaigns = [];
         let charts = {};
 
-        // Helper function to calculate conversion rate
-        function calculateConversionRate(orders, sent) {
-            if (!sent || sent === 0) return 0;
-            return (orders / sent) * 100;
+        // Helper functions
+        function formatDate(dateTimeStr) {
+            if (!dateTimeStr) return 'Unknown';
+            // Handle both "Mar 19, 2026 at 10:00 AM" and "2026-03-23 at 09: 00" formats
+            const atIndex = dateTimeStr.indexOf(' at ');
+            if (atIndex > -1) {
+                return dateTimeStr.substring(0, atIndex);
+            }
+            return dateTimeStr;
         }
 
-        // Helper function to calculate AOV (Average Order Value)
-        function calculateAOV(revenue, orders) {
-            if (!orders || orders === 0) return 0;
-            return revenue / orders;
+        function calculateConversionRate(orders, sent) { 
+            return sent && sent > 0 ? (orders / sent) * 100 : 0; 
         }
-
-        // Helper function to calculate Revenue per Subscriber (RPS)
-        function calculateRPS(revenue, sent) {
-            if (!sent || sent === 0) return 0;
-            return revenue / sent;
+        
+        function calculateAOV(revenue, orders) { 
+            return orders && orders > 0 ? revenue / orders : 0; 
+        }
+        
+        function calculateRPS(revenue, sent) { 
+            return sent && sent > 0 ? revenue / sent : 0; 
         }
 
         async function loadData() {
@@ -396,16 +122,13 @@
 
                 document.getElementById('periodDisplay').innerHTML = `📅 ${daily.period} · daily breakdown`;
 
-                // Calculate summary metrics for KPI cards
+                // Calculate summary metrics from campaigns
                 let totalOrders = 0;
                 let totalRevenueWithOrders = 0;
-                let totalSentWithOrders = 0;
-                
-                for (const campaign of currentCampaigns) {
-                    totalOrders += campaign.orders;
-                    if (campaign.orders > 0) {
-                        totalRevenueWithOrders += campaign.revenue;
-                        totalSentWithOrders += campaign.sent;
+                for (const c of currentCampaigns) {
+                    totalOrders += c.orders;
+                    if (c.orders > 0) {
+                        totalRevenueWithOrders += c.revenue;
                     }
                 }
                 
@@ -413,7 +136,7 @@
                 const overallAOV = totalOrders > 0 ? totalRevenueWithOrders / totalOrders : 0;
                 const overallRPS = daily.totalRevenue / daily.totalSends;
 
-                // Update KPIs with new metrics
+                // KPI Cards - ALL DYNAMIC from data.json
                 document.getElementById('kpiContainer').innerHTML = `
                     <div class="kpi-card">
                         <div class="kpi-value">${daily.totalSends.toLocaleString()}</div>
@@ -434,289 +157,182 @@
                     <div class="kpi-card">
                         <div class="kpi-value">${overallConversionRate.toFixed(2)}%</div>
                         <div class="kpi-label">Conversion rate</div>
-                        <div class="kpi-sub">${totalOrders} total orders</div>
+                        <div class="kpi-sub">${totalOrders} orders</div>
                     </div>
                     <div class="kpi-card">
                         <div class="kpi-value">$${overallAOV.toFixed(2)}</div>
                         <div class="kpi-label">Avg order value</div>
-                        <div class="kpi-sub">per purchasing customer</div>
                     </div>
                     <div class="kpi-card">
                         <div class="kpi-value">$${overallRPS.toFixed(2)}</div>
                         <div class="kpi-label">Revenue per sub</div>
-                        <div class="kpi-sub">per email sent</div>
                     </div>
                 `;
 
-                // Update all charts
                 updateCharts();
 
-                // Find top campaign for highlighting
-                let topRevenue = 0;
-                let topRevenueName = '';
-                for (const campaign of currentCampaigns) {
-                    if (campaign.revenue > topRevenue) {
-                        topRevenue = campaign.revenue;
-                        topRevenueName = campaign.name;
+                // Find top campaign by revenue
+                let topRevenue = 0, topRevenueName = '';
+                for (const c of currentCampaigns) {
+                    if (c.revenue > topRevenue) {
+                        topRevenue = c.revenue;
+                        topRevenueName = c.name;
                     }
                 }
 
-                // Build campaign table with new columns
-                let tableHtml = `
-                    <table>
-                        <thead>
-                            <tr>
-                                <th title="Campaign send date">📅 Date</th>
-                                <th title="Campaign name">📧 Campaign name</th>
-                                <th title="Number of emails sent">📤 Sent</th>
-                                <th title="Percentage of recipients who opened">📈 Open rate</th>
-                                <th title="Number of unique opens">👁️ Opens</th>
-                                <th title="Percentage of recipients who clicked">🎯 Click rate</th>
-                                <th title="Number of unique clicks">🖱️ Clicks</th>
-                                <th title="Percentage of recipients who purchased">💰 Conv. rate</th>
-                                <th title="Number of orders">📦 Orders</th>
-                                <th title="Total revenue from campaign">💵 Revenue</th>
-                                <th title="Average order value = Revenue / Orders">📊 AOV</th>
-                                <th title="Revenue per subscriber = Revenue / Sent">💎 RPS</th>
-                            </tr>
-                        </thead>
-                        <tbody>
+                // Build campaign table with all metrics
+                let tableHtml = ``
+                    <thead>
+                        <tr>
+                            <th>📅 Date</th>
+                            <th>📧 Campaign name</th>
+                            <th>📤 Sent</th>
+                            <th>📈 Open rate</th>
+                            <th>👁️ Opens</th>
+                            <th>🎯 Click rate</th>
+                            <th>🖱️ Clicks</th>
+                            <th>💰 Conv. rate</th>
+                            <th>📦 Orders</th>
+                            <th>💵 Revenue</th>
+                            <th>📊 AOV</th>
+                            <th>💎 RPS</th>
+                        </tr>
+                    </thead>
+                    <tbody>
                 `;
 
-                for (const campaign of currentCampaigns) {
-                    const isTop = campaign.name === topRevenueName && topRevenue > 0;
-                    const conversionRate = calculateConversionRate(campaign.orders, campaign.sent);
-                    const aov = calculateAOV(campaign.revenue, campaign.orders);
-                    const rps = calculateRPS(campaign.revenue, campaign.sent);
-                    
-                    // Extract just the date part from dateTime (Mar 21, 2026)
-                    const datePart = campaign.dateTime.split(' at ')[0];
+                for (const c of currentCampaigns) {
+                    const isTop = c.name === topRevenueName && topRevenue > 0;
+                    const conversionRate = calculateConversionRate(c.orders, c.sent);
+                    const aov = calculateAOV(c.revenue, c.orders);
+                    const rps = calculateRPS(c.revenue, c.sent);
+                    const datePart = formatDate(c.dateTime);
                     
                     tableHtml += `
                         <tr class="${isTop ? 'top-campaign' : ''}">
                             <td><strong>${datePart}</strong></td>
-                            <td><strong>${campaign.name}</strong></td>
-                            <td>${campaign.sent.toLocaleString()}</td>
-                            <td>${campaign.openRate}%</td>
-                            <td>${campaign.opens.toLocaleString()}</td>
-                            <td>${campaign.clickRate}%</td>
-                            <td>${campaign.clicks.toLocaleString()}</td>
+                            <td><strong>${c.name}</strong></td>
+                            <td>${c.sent.toLocaleString()}</td>
+                            <td>${c.openRate}%</td>
+                            <td>${c.opens.toLocaleString()}</td>
+                            <td>${c.clickRate}%</td>
+                            <td>${c.clicks.toLocaleString()}</td>
                             <td class="metric-highlight">${conversionRate.toFixed(2)}%</td>
-                            <td>${campaign.orders}</td>
-                            <td><strong>$${campaign.revenue.toFixed(2)}</strong></td>
+                            <td>${c.orders}</td>
+                            <td><strong>$${c.revenue.toFixed(2)}</strong></td>
                             <td>$${aov.toFixed(2)}</td>
                             <td>$${rps.toFixed(2)}</td>
                         </tr>
                     `;
                 }
-
-                tableHtml += `</tbody></table>`;
+                tableHtml += `</tbody>${'`'};
                 document.getElementById('tableContainer').innerHTML = tableHtml;
 
                 const now = new Date();
                 document.getElementById('lastUpdated').innerHTML = `📅 Last updated: ${now.toLocaleString()} · Data from data.json · ${daily.period}`;
-
+                
+                console.log('✅ Daily data loaded:', currentCampaigns.length, 'campaigns');
+                
             } catch (err) {
                 console.error('Error loading data:', err);
-                document.getElementById('kpiContainer').innerHTML = '<div class="loading" style="grid-column:1/-1; background:#fff0e6; border-radius:1rem;">⚠️ Could not load data.json. Make sure the file exists at /data.json</div>';
+                document.getElementById('kpiContainer').innerHTML = '<div class="loading" style="grid-column:1/-1;">⚠️ Could not load data.json. Make sure the file exists at /data.json</div>';
                 document.getElementById('tableContainer').innerHTML = '';
             }
         }
 
         function updateCharts() {
             if (!currentCampaigns.length) return;
-
+            
             // Shorten campaign names for charts
-            const campaignNames = currentCampaigns.map(c => {
+            const names = currentCampaigns.map(c => {
                 let name = c.name;
                 return name.length > 20 ? name.substring(0, 17) + '...' : name;
             });
+            
             const revenues = currentCampaigns.map(c => c.revenue);
             const openRates = currentCampaigns.map(c => c.openRate);
             const clickRates = currentCampaigns.map(c => c.clickRate);
             const sends = currentCampaigns.map(c => c.sent);
             const opens = currentCampaigns.map(c => c.opens);
-            const conversionRates = currentCampaigns.map(c => calculateConversionRate(c.orders, c.sent));
+            const convRates = currentCampaigns.map(c => calculateConversionRate(c.orders, c.sent));
             const aovs = currentCampaigns.map(c => calculateAOV(c.revenue, c.orders));
             const rpsValues = currentCampaigns.map(c => calculateRPS(c.revenue, c.sent));
 
-            // Chart 1: Revenue by Campaign (Bar)
+            // Chart 1: Revenue by Campaign
             if (charts.revenue) charts.revenue.destroy();
-            const ctx1 = document.getElementById('revenueChart').getContext('2d');
-            charts.revenue = new Chart(ctx1, {
+            charts.revenue = new Chart(document.getElementById('revenueChart'), {
                 type: 'bar',
-                data: {
-                    labels: campaignNames,
-                    datasets: [{
-                        label: 'Revenue ($)',
-                        data: revenues,
-                        backgroundColor: '#b1622c',
-                        borderRadius: 6
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: true,
-                    plugins: {
-                        legend: { position: 'top' }
-                    }
-                }
+                data: { labels: names, datasets: [{ label: 'Revenue ($)', data: revenues, backgroundColor: '#b1622c', borderRadius: 6 }] },
+                options: { responsive: true, maintainAspectRatio: true }
             });
 
-            // Chart 2: Open Rate vs Click Rate (Line)
+            // Chart 2: Open Rate vs Click Rate
             if (charts.rates) charts.rates.destroy();
-            const ctx2 = document.getElementById('ratesChart').getContext('2d');
-            charts.rates = new Chart(ctx2, {
+            charts.rates = new Chart(document.getElementById('ratesChart'), {
                 type: 'line',
                 data: {
-                    labels: campaignNames,
+                    labels: names,
                     datasets: [
-                        {
-                            label: 'Open Rate (%)',
-                            data: openRates,
-                            borderColor: '#4a3729',
-                            backgroundColor: 'rgba(74, 55, 41, 0.1)',
-                            tension: 0.3,
-                            fill: true
-                        },
-                        {
-                            label: 'Click Rate (%)',
-                            data: clickRates,
-                            borderColor: '#b1622c',
-                            backgroundColor: 'rgba(177, 98, 44, 0.1)',
-                            tension: 0.3,
-                            fill: true
-                        }
+                        { label: 'Open Rate (%)', data: openRates, borderColor: '#4a3729', backgroundColor: 'rgba(74, 55, 41, 0.1)', tension: 0.3, fill: true },
+                        { label: 'Click Rate (%)', data: clickRates, borderColor: '#b1622c', backgroundColor: 'rgba(177, 98, 44, 0.1)', tension: 0.3, fill: true }
                     ]
                 },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: true
-                }
+                options: { responsive: true, maintainAspectRatio: true }
             });
 
-            // Chart 3: Sent vs Opens (Bar)
+            // Chart 3: Sent vs Opens
             if (charts.sentOpens) charts.sentOpens.destroy();
-            const ctx3 = document.getElementById('sentOpensChart').getContext('2d');
-            charts.sentOpens = new Chart(ctx3, {
+            charts.sentOpens = new Chart(document.getElementById('sentOpensChart'), {
                 type: 'bar',
                 data: {
-                    labels: campaignNames,
+                    labels: names,
                     datasets: [
-                        {
-                            label: 'Sent',
-                            data: sends,
-                            backgroundColor: '#9b846b',
-                            borderRadius: 6
-                        },
-                        {
-                            label: 'Opens',
-                            data: opens,
-                            backgroundColor: '#b1622c',
-                            borderRadius: 6
-                        }
+                        { label: 'Sent', data: sends, backgroundColor: '#9b846b', borderRadius: 6 },
+                        { label: 'Opens', data: opens, backgroundColor: '#b1622c', borderRadius: 6 }
                     ]
                 },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: true
-                }
+                options: { responsive: true, maintainAspectRatio: true }
             });
 
-            // Chart 4: Click Rate Trend (Line with markers)
+            // Chart 4: Click Rate Trend
             if (charts.clickRate) charts.clickRate.destroy();
-            const ctx4 = document.getElementById('clickRateChart').getContext('2d');
-            charts.clickRate = new Chart(ctx4, {
+            charts.clickRate = new Chart(document.getElementById('clickRateChart'), {
                 type: 'line',
                 data: {
-                    labels: campaignNames,
-                    datasets: [{
-                        label: 'Click Rate (%)',
-                        data: clickRates,
-                        borderColor: '#e67e22',
-                        backgroundColor: 'rgba(230, 126, 34, 0.1)',
-                        tension: 0.3,
-                        fill: true,
-                        pointRadius: 5,
-                        pointBackgroundColor: '#e67e22',
-                        pointBorderColor: '#fff',
-                        pointBorderWidth: 2
-                    }]
+                    labels: names,
+                    datasets: [{ label: 'Click Rate (%)', data: clickRates, borderColor: '#e67e22', backgroundColor: 'rgba(230, 126, 34, 0.1)', tension: 0.3, fill: true, pointRadius: 5, pointBackgroundColor: '#e67e22' }]
                 },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: true,
-                    scales: {
-                        y: {
-                            title: { display: true, text: 'Click Rate (%)' }
-                        }
-                    }
-                }
+                options: { responsive: true, maintainAspectRatio: true, scales: { y: { title: { display: true, text: 'Click Rate (%)' } } } }
             });
 
-            // Chart 5: Conversion Rate by Campaign (New)
+            // Chart 5: Conversion Rate
             if (charts.conversion) charts.conversion.destroy();
-            const ctx5 = document.getElementById('conversionChart').getContext('2d');
-            charts.conversion = new Chart(ctx5, {
+            charts.conversion = new Chart(document.getElementById('conversionChart'), {
                 type: 'bar',
-                data: {
-                    labels: campaignNames,
-                    datasets: [{
-                        label: 'Conversion Rate (%)',
-                        data: conversionRates,
-                        backgroundColor: '#2c6e2c',
-                        borderRadius: 6
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: true,
-                    scales: {
-                        y: {
-                            title: { display: true, text: 'Conversion Rate (%)' }
-                        }
-                    }
-                }
+                data: { labels: names, datasets: [{ label: 'Conversion Rate (%)', data: convRates, backgroundColor: '#2c6e2c', borderRadius: 6 }] },
+                options: { responsive: true, maintainAspectRatio: true, scales: { y: { title: { display: true, text: 'Conversion Rate (%)' } } } }
             });
 
-            // Chart 6: AOV & Revenue per Subscriber (New)
+            // Chart 6: AOV & RPS
             if (charts.aovRps) charts.aovRps.destroy();
-            const ctx6 = document.getElementById('aovRpsChart').getContext('2d');
-            charts.aovRps = new Chart(ctx6, {
+            charts.aovRps = new Chart(document.getElementById('aovRpsChart'), {
                 type: 'bar',
                 data: {
-                    labels: campaignNames,
+                    labels: names,
                     datasets: [
-                        {
-                            label: 'AOV ($)',
-                            data: aovs,
-                            backgroundColor: '#b1622c',
-                            borderRadius: 6
-                        },
-                        {
-                            label: 'RPS ($)',
-                            data: rpsValues,
-                            backgroundColor: '#e0b08a',
-                            borderRadius: 6
-                        }
+                        { label: 'AOV ($)', data: aovs, backgroundColor: '#b1622c', borderRadius: 6 },
+                        { label: 'RPS ($)', data: rpsValues, backgroundColor: '#e0b08a', borderRadius: 6 }
                     ]
                 },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: true,
-                    scales: {
-                        y: {
-                            title: { display: true, text: 'Amount ($)' }
-                        }
-                    }
-                }
+                options: { responsive: true, maintainAspectRatio: true, scales: { y: { title: { display: true, text: 'Amount ($)' } } } }
             });
         }
 
+        // Initial load + auto-refresh every 5 minutes
         loadData();
         setInterval(loadData, 5 * 60 * 1000);
     </script>
-     <!-- ── FLOATING HOME BUTTON ── -->
+ <!-- ── FLOATING HOME BUTTON ── -->
 <style>
   .home-fab {
     position: fixed;
