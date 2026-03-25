@@ -281,7 +281,7 @@
 
         <div id="insightNote" class="insight-note"></div>
         <div class="last-updated" id="lastUpdated"></div>
-        <div class="home-link">🏚️ <a href="/">Home</a></div>
+        
     </div>
 
     <script>
@@ -490,5 +490,65 @@
         loadData();
         setInterval(loadData, 5 * 60 * 1000);
     </script>
+
+     <!-- ── FLOATING HOME BUTTON ── -->
+<style>
+  .home-fab {
+    position: fixed;
+    top: 1.75rem;
+    right: 1.75rem;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+    text-decoration: none;
+    cursor: pointer;
+  }
+  .home-fab-btn {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #2c1e14, #5c3d28);
+    box-shadow: 0 4px 18px rgba(44,30,20,0.35), 0 1px 4px rgba(44,30,20,0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.15rem;
+    transition: transform 0.22s, box-shadow 0.22s, background 0.22s;
+    border: 1.5px solid rgba(232,221,208,0.15);
+  }
+  .home-fab:hover .home-fab-btn {
+    transform: translateY(-3px) scale(1.07);
+    box-shadow: 0 8px 28px rgba(44,30,20,0.4), 0 2px 6px rgba(44,30,20,0.2);
+    background: linear-gradient(135deg, #3e2718, #7a5236);
+  }
+  .home-fab-label {
+    font-family: 'DM Sans', 'Inter', system-ui, sans-serif;
+    font-size: 0.58rem;
+    font-weight: 700;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    color: #5c3d28;
+    background: rgba(255,252,247,0.92);
+    padding: 0.18rem 0.55rem;
+    border-radius: 100px;
+    border: 1px solid rgba(180,145,115,0.25);
+    box-shadow: 0 2px 8px rgba(44,30,20,0.08);
+    white-space: nowrap;
+    opacity: 0;
+    transform: translateY(4px);
+    transition: opacity 0.2s, transform 0.2s;
+    pointer-events: none;
+  }
+  .home-fab:hover .home-fab-label {
+    opacity: 1;
+    transform: translateY(0);
+  }
+</style>
+<a class="home-fab" href="/reports.html" title="Back to Home">
+  <div class="home-fab-btn">🏚️</div>
+  <span class="home-fab-label">Home</span>
+</a>
 </body>
 </html>
