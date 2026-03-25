@@ -612,7 +612,7 @@
   <div class="tab-panel" id="tab-monthly">
     <div class="card">
       <div class="card-title">How to use — Monthly</div>
-      <div class="card-sub">Paste your full Omnisend monthly summary block below. The converter will auto-detect all values. <strong>Engaged list is editable</strong> so you can manually correct it if needed.</div>
+      <div class="card-sub">Paste your full Omnisend monthly summary block below. The converter extracts data from the <strong>Email subscribers</strong> section only (not SMS/Push).</div>
       <div class="steps">
         <div class="step"><div class="step-num">1</div><span>In Omnisend, open the monthly overview for the month you want to add and copy all the text.</span></div>
         <div class="step"><div class="step-num">2</div><span>Paste into the text area below — the converter reads the raw block and fills all fields automatically.</span></div>
@@ -622,13 +622,13 @@
       
       <div class="card-title" style="margin-bottom: 0.5rem">📊 Calculation Formulas</div>
       <div class="formula-box">
-        <strong>Unsubscribe Rate</strong> = (Unsubscribes ÷ Total Email Subscribers) × 100<br>
-        <strong>Net Growth</strong> = New Subscribers − Unsubscribes<br>
-        <strong>Engaged List</strong> = <span style="color: var(--clay);">✏️ Manually editable</span> — suggested formula: (emailSubs × 0.32) + (netGrowth × 1.4), capped between 750 and emailSubs
+        <strong>Unsubscribe Rate</strong> = (Email Unsubscribes ÷ Total Email Subscribers) × 100<br>
+        <strong>Net Growth</strong> = New Email Subscribers − Email Unsubscribes<br>
+        <strong>Engaged List</strong> = <span style="color: var(--clay);">✏️ Manually editable</span> — based on your own segment definition
       </div>
       <div class="info-note">
-        💡 <strong>Note:</strong> Unsubscribe rate is calculated using total email subscribers as the denominator (standard industry practice).<br>
-        Engaged list is left editable so you can adjust it based on your own segment definitions.
+        💡 <strong>Note:</strong> Only email subscriber data is used for unsubscribe rate calculations (SMS/Push have different unsubscribe behaviors).<br>
+        Engaged list is left editable so you can set it based on your own engagement criteria.
       </div>
       
       <div class="card-title" style="margin-bottom: 0.5rem; margin-top: 1rem;">Fields extracted (matches data.json schema)</div>
@@ -639,16 +639,16 @@
         <div class="col-item"><strong>autoRevenue</strong><span>Automation revenue ($)</span></div>
         <div class="col-item"><strong>storeRevenue</strong><span>Total store revenue ($)</span></div>
         <div class="col-item"><strong>engaged</strong><span><strong>✏️ Editable</strong> — engaged list size</span></div>
-        <div class="col-item"><strong>newSubs</strong><span>New subscribers (gross)</span></div>
-        <div class="col-item"><strong>unsubs</strong><span>Unsubscribes</span></div>
+        <div class="col-item"><strong>newSubs</strong><span>New email subscribers (gross)</span></div>
+        <div class="col-item"><strong>unsubs</strong><span>Email unsubscribes</span></div>
         <div class="col-item"><strong>netGrowth</strong><span>Net growth (newSubs - unsubs)</span></div>
-        <div class="col-item"><strong>unsubRate</strong><span>Unsubscribe rate (%) — calculated from email subscribers</span></div>
+        <div class="col-item"><strong>unsubRate</strong><span>Unsubscribe rate (%) — calculated from email subscribers only</span></div>
       </div>
     </div>
 
     <div class="card">
       <div class="card-title">Paste Monthly Data</div>
-      <div class="card-sub">Paste the raw Omnisend monthly block — values will be auto-detected and shown below for review.</div>
+      <div class="card-sub">Paste the raw Omnisend monthly block — only the <strong>Email subscribers</strong> section will be used for subscriber metrics.</div>
       <textarea id="m_rawInput" placeholder="Paste your Omnisend monthly data here..." oninput="parseMonthlyLive()"></textarea>
 
       <div style="margin-top: 1rem; margin-bottom: 0.4rem">
@@ -659,12 +659,12 @@
           <div class="m-group"><label class="m-label">Campaigns Revenue ($)</label><input class="m-input" id="m_camp" type="number" step="0.01" placeholder="e.g. 6133.66"></div>
           <div class="m-group"><label class="m-label">Automation Revenue ($)</label><input class="m-input" id="m_auto" type="number" step="0.01" placeholder="e.g. 7939.65"></div>
           <div class="m-group"><label class="m-label">Store Revenue ($)</label><input class="m-input" id="m_store" type="number" step="0.01" placeholder="e.g. 50885.36"></div>
-          <div class="m-group"><label class="m-label">Email Subscribers <span class="req">*</span></label><input class="m-input" id="m_emailSubs" type="number" placeholder="Total email list size"></div>
-          <div class="m-group"><label class="m-label">New Subscribers</label><input class="m-input" id="m_newSubs" type="number" placeholder="Gross new subscribers"></div>
-          <div class="m-group"><label class="m-label">Unsubscribes</label><input class="m-input" id="m_unsub" type="number" placeholder="Unsubscribes"></div>
+          <div class="m-group"><label class="m-label">📧 Email Subscribers <span class="req">*</span></label><input class="m-input" id="m_emailSubs" type="number" placeholder="Total email list size"></div>
+          <div class="m-group"><label class="m-label">📧 New Email Subscribers</label><input class="m-input" id="m_newSubs" type="number" placeholder="Gross new email subscribers"></div>
+          <div class="m-group"><label class="m-label">📧 Email Unsubscribes</label><input class="m-input" id="m_unsub" type="number" placeholder="Email unsubscribes"></div>
           <div class="m-group"><label class="m-label">Net Growth (auto)</label><input class="m-input" id="m_netGrowth" type="number" readonly placeholder="Auto-calculated" style="background:#f5efe8;"></div>
           <div class="m-group"><label class="m-label">Unsubscribe Rate (%)</label><input class="m-input" id="m_unsubRate" type="number" step="0.01" readonly placeholder="Auto-calculated" style="background:#f5efe8;"></div>
-          <div class="m-group"><label class="m-label">✏️ Engaged List</label><input class="m-input editable" id="m_engaged" type="number" placeholder="Manually enter or auto-suggest"></div>
+          <div class="m-group"><label class="m-label">✏️ Engaged List</label><input class="m-input editable" id="m_engaged" type="number" placeholder="Manually enter"></div>
         </div>
       </div>
 
@@ -809,32 +809,32 @@
     const autoIdx = lines.findIndex(l => /^automation$/i.test(l)); if (autoIdx > -1) setIfFound('m_auto', cleanNum(lines[autoIdx + 1]));
     const storeIdx = lines.findIndex(l => /total store revenue/i.test(l)); if (storeIdx > -1) setIfFound('m_store', cleanNum(lines[storeIdx + 1]));
     
-    // Extract email subscribers
+    // Extract email subscribers ONLY (not SMS or Push)
     const emailIdx = lines.findIndex(l => /^email subscribers$/i.test(l));
     if (emailIdx > -1) {
       const emailCount = cleanInt(lines[emailIdx + 1]);
       if (emailCount) setIfFound('m_emailSubs', emailCount);
-    }
-    
-    // Extract new subscribers and unsubscribes
-    let totalNewSubs = 0;
-    let totalUnsubs = 0;
-    
-    for (let i = 0; i < lines.length; i++) {
-      const line = lines[i];
-      if (line.includes('subscribed') && line.includes('unsubscribed')) {
-        const subMatch = line.match(/(\d[\d,]*)\s*subscribed/i);
+      
+      // Extract new subscribers and unsubscribes from email section only
+      let emailNewSubs = 0;
+      let emailUnsubs = 0;
+      
+      for (let j = emailIdx + 1; j < Math.min(emailIdx + 8, lines.length); j++) {
+        const line = lines[j];
+        // Look for new subscribers (starts with +)
+        if (/^\+[\d,]+$/.test(line)) {
+          emailNewSubs += cleanInt(line) || 0;
+        }
+        // Look for unsubscribes in the email section
         const unsubMatch = line.match(/(\d[\d,]*)\s*unsubscribed/i);
-        if (subMatch) totalNewSubs += cleanInt(subMatch[1]) || 0;
-        if (unsubMatch) totalUnsubs += cleanInt(unsubMatch[1]) || 0;
+        if (unsubMatch) {
+          emailUnsubs += cleanInt(unsubMatch[1]) || 0;
+        }
       }
-      if (/^\+[\d,]+$/.test(line)) {
-        totalNewSubs += cleanInt(line) || 0;
-      }
+      
+      if (emailNewSubs > 0) setIfFound('m_newSubs', emailNewSubs);
+      if (emailUnsubs > 0) setIfFound('m_unsub', emailUnsubs);
     }
-    
-    if (totalNewSubs > 0) setIfFound('m_newSubs', totalNewSubs);
-    if (totalUnsubs > 0) setIfFound('m_unsub', totalUnsubs);
     
     updateCalculations();
   }
@@ -877,7 +877,7 @@
     document.getElementById('m_outputJson').innerHTML = highlight(JSON.stringify(obj, null, 2));
     document.getElementById('m_statusBadge').className = 'output-badge success';
     document.getElementById('m_statusBadge').textContent = `✅ ${month} ready`;
-    showToast(`✅ ${month} converted — Unsubscribe rate: ${unsubRate}%`, 'success');
+    showToast(`✅ ${month} converted — Unsubscribe rate: ${unsubRate}% (based on ${emailSubs.toLocaleString()} email subscribers)`, 'success');
   }
 
   function copyMonthlyObj() { if (!lastMonthly) { showToast('Nothing to copy', 'error'); return; } navigator.clipboard.writeText(JSON.stringify(lastMonthly, null, 2)).then(() => showToast('📋 Monthly object copied!', 'success')); }
@@ -896,7 +896,7 @@
   }
   
   function loadMonthlyExample() { 
-    document.getElementById('m_rawInput').value = `Revenue from Omnisend\n$14,073.31\n-9.51%\n780 orders\nCampaigns\n$6,133.66\n352 orders\nAutomation\n$7,939.65\n428 orders\nTotal store revenue\n$50,885.36\n3,073 orders\n\nEmail subscribers\n33,089\n+1,607\n2,342 subscribed|735 unsubscribed`; 
+    document.getElementById('m_rawInput').value = `Revenue from Omnisend\n$14,073.31\n-9.51%\n780 orders\nCampaigns\n$6,133.66\n352 orders\nAutomation\n$7,939.65\n428 orders\nTotal store revenue\n$50,885.36\n3,073 orders\n\nEmail subscribers\n33,089\n+1,607\n2,342 subscribed|735 unsubscribed\nSMS subscribers\n4,761\n+529\n536 subscribed|7 unsubscribed\nPush subscribers\n2,410\n+340\n342 subscribed|2 unsubscribed`; 
     parseMonthlyLive(); 
     document.getElementById('m_month').value = 'Mar 2026'; 
     // Auto-suggest engaged value
@@ -905,7 +905,7 @@
     const suggested = suggestEngagedValue(emailSubs, netGrowth);
     if (suggested > 0) document.getElementById('m_engaged').value = suggested;
     updateCalculations();
-    showToast(`📋 Example loaded — unsubscribe rate: ${document.getElementById('m_unsubRate').value}%`, ''); 
+    showToast(`📋 Example loaded — using ONLY email subscriber data (${emailSubs.toLocaleString()}) for unsubscribe rate`, ''); 
   }
   
   // Add event listeners for real-time calculation
