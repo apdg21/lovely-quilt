@@ -285,211 +285,228 @@
     </div>
 
     <script>
-        let historicalData = [];
-        let charts = {};
+    let historicalData = [];
+    let charts = {};
 
-        // Helper to calculate 3-month average
-        function calculate3MonthAvg(data, index, field) {
-            if (index < 2) return null;
-            const sum = data[index-2][field] + data[index-1][field] + data[index][field];
-            return Math.round(sum / 3);
-        }
+    async function loadData() {
+        try {
+            const response = await fetch('/data.json?t=' + Date.now());
+            if (!response.ok) throw new Error('Failed to load data.json');
 
-        async function loadData() {
-            try {
-                const response = await fetch('/data.json?t=' + Date.now());
-                if (!response.ok) throw new Error('Network response was not ok');
-                const data = await response.json();
-                const monthly = data.monthly;
-                historicalData = monthly.historicalData;
-                
-                // Get latest month data
-                const latest = historicalData[historicalData.length - 1];
-                const prevMonth = historicalData[historicalData.length - 2];
-                const twoMonthsAgo = historicalData[historicalData.length - 3];
-                
-                // Calculate 3-month averages
-                const avg3mNewSubs = Math.round((historicalData.slice(-3).reduce((sum, row) => sum + row.newSubs, 0)) / 3);
-                const avg3mUnsubRate = (historicalData.slice(-3).reduce((sum, row) => sum + row.unsubRate, 0) / 3).toFixed(2);
-                
-                // Calculate MoM for Omnisend
-                let omnisendMoM = 0;
-                if (prevMonth && prevMonth.omnisendRevenue > 0) {
-                    omnisendMoM = ((latest.omnisendRevenue - prevMonth.omnisendRevenue) / prevMonth.omnisendRevenue * 100).toFixed(1);
-                }
+            const data = await response.json();
+            const monthly = data.monthly || {};
+            historicalData = monthly.historicalData || [];
 
-                // Update KPIs dynamically from latest data
-                document.getElementById('kpiContainer').innerHTML = `
-                    <div class="kpi-card">
-                        <div class="kpi-value">$${latest.omnisendRevenue.toLocaleString()}</div>
-                        <div class="kpi-label">Latest Omnisend</div>
-                        <div class="kpi-sub">${omnisendMoM}% MoM</div>
-                    </div>
-                    <div class="kpi-card">
-                        <div class="kpi-value">${latest.newSubs.toLocaleString()}</div>
-                        <div class="kpi-label">New Subs (latest)</div>
-                        <div class="kpi-sub">Avg 3m: ${avg3mNewSubs}</div>
-                    </div>
-                    <div class="kpi-card">
-                        <div class="kpi-value">${latest.unsubRate}%</div>
-                        <div class="kpi-label">Unsub Rate (latest)</div>
-                        <div class="kpi-sub">Avg 3m: ${avg3mUnsubRate}%</div>
-                    </div>
-                    <div class="kpi-card">
-                        <div class="kpi-value">${latest.engaged.toLocaleString()}</div>
-                        <div class="kpi-label">Engaged List</div>
-                        <div class="kpi-sub">Target: ${monthly.targetEngaged.toLocaleString()}</div>
-                    </div>
-                `;
-
-                // Warning if unsub rate is elevated
-                if (latest.unsubRate > 1.5) {
-                    document.getElementById('warningContainer').innerHTML = `
-                        <div class="warning-box">
-                            <span>⚠️</span>
-                            <span><strong>Elevated Unsubscribes:</strong> ${latest.unsubRate}% unsub rate. Monitor content quality and send frequency.</span>
-                        </div>
-                    `;
-                } else {
-                    document.getElementById('warningContainer').innerHTML = '';
-                }
-
-                // Update all charts
-                updateCharts();
-
-                // Build historical table
-                let tableHtml = `
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>📅 Month</th>
-                                <th>🆕 New Subs</th>
-                                <th>🚫 Unsubs</th>
-                                <th>📈 Net Growth</th>
-                                <th>👥 Engaged</th>
-                                <th>📧 Campaigns $</th>
-                                <th>⚙️ Auto $</th>
-                                <th>📬 Omnisend $</th>
-                                <th>🏪 Store $</th>
-                                <th>⚠️ Unsub Rate</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                `;
-
-                for (const row of historicalData) {
-                    const growthClass = row.netGrowth < 0 ? 'negative-growth' : 'positive-growth';
-                    tableHtml += `
-                        <tr>
-                            <td>${row.month}</td>
-                            <td>${row.newSubs.toLocaleString()}</td>
-                            <td>${row.unsubs.toLocaleString()}</td>
-                            <td class="${growthClass}">${row.netGrowth >= 0 ? '+' : ''}${row.netGrowth}</td>
-                            <td>${row.engaged.toLocaleString()}</td>
-                            <td>$${row.campaignsRevenue.toFixed(2)}</td>
-                            <td>$${row.autoRevenue.toFixed(2)}</td>
-                            <td>$${row.omnisendRevenue.toFixed(2)}</td>
-                            <td>$${row.storeRevenue.toFixed(2)}</td>
-                            <td>${row.unsubRate}%</td>
-                        </tr>
-                    `;
-                }
-
-                tableHtml += `</tbody></table>`;
-                document.getElementById('tableContainer').innerHTML = tableHtml;
-
-                // Insight note about spikes
-                const spikes = historicalData.filter(r => r.unsubRate > 2);
-                if (spikes.length > 0) {
-                    const spikeMonths = spikes.map(s => `${s.month} (${s.unsubRate}%)`).join(', ');
-                    document.getElementById('insightNote').innerHTML = `
-                        ✨ <strong>Unsubscribes insight:</strong> High unsubscribe rates (>2%) signal fatigue. ${spikeMonths} show campaign fatigue after periods of low new subscriber acquisition.
-                    `;
-                } else {
-                    document.getElementById('insightNote').innerHTML = `✨ <strong>Unsubscribe rates</strong> are within healthy range. Continue monitoring for spikes.`;
-                }
-
-                const now = new Date();
-                document.getElementById('lastUpdated').innerHTML = `📅 Last updated: ${now.toLocaleString()} · Data from data.json`;
-
-            } catch (err) {
-                console.error('Error loading data:', err);
-                document.getElementById('kpiContainer').innerHTML = '<div class="warning-box" style="grid-column:1/-1">⚠️ Could not load data.json. Make sure the file exists at /data.json</div>';
+            if (historicalData.length === 0) {
+                throw new Error('No historical data found');
             }
+
+            // Get latest month
+            const latest = historicalData[historicalData.length - 1];
+            const prevMonth = historicalData[historicalData.length - 2] || {};
+
+            // === FULL AUTO CALCULATIONS ===
+            const avg3mNewSubs = historicalData.length >= 3 
+                ? Math.round(historicalData.slice(-3).reduce((sum, r) => sum + r.newSubs, 0) / 3) 
+                : latest.newSubs;
+
+            const avg3mUnsubRate = historicalData.length >= 3 
+                ? (historicalData.slice(-3).reduce((sum, r) => sum + r.unsubRate, 0) / 3).toFixed(2) 
+                : latest.unsubRate.toFixed(2);
+
+            const omnisendMoM = prevMonth.omnisendRevenue 
+                ? ((latest.omnisendRevenue - prevMonth.omnisendRevenue) / prevMonth.omnisendRevenue * 100).toFixed(1) 
+                : 0;
+
+            const netGrowth = latest.newSubs - latest.unsubs;
+
+            // Update KPI Cards (fully dynamic)
+            document.getElementById('kpiContainer').innerHTML = `
+                <div class="kpi-card">
+                    <div class="kpi-value">$${latest.omnisendRevenue.toLocaleString()}</div>
+                    <div class="kpi-label">Latest Omnisend Revenue</div>
+                    <div class="kpi-sub">${omnisendMoM > 0 ? '+' : ''}${omnisendMoM}% MoM</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-value">${latest.newSubs.toLocaleString()}</div>
+                    <div class="kpi-label">New Subscribers</div>
+                    <div class="kpi-sub">3m avg: ${avg3mNewSubs}</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-value">${latest.unsubRate}%</div>
+                    <div class="kpi-label">Unsubscribe Rate</div>
+                    <div class="kpi-sub">3m avg: ${avg3mUnsubRate}%</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-value">${latest.engaged.toLocaleString()}</div>
+                    <div class="kpi-label">Engaged List</div>
+                    <div class="kpi-sub">Target: ${monthly.targetEngaged?.toLocaleString() || '5,000'}</div>
+                </div>
+            `;
+
+            // Warning Box
+            const warningContainer = document.getElementById('warningContainer');
+            if (latest.unsubRate > 1.5) {
+                warningContainer.innerHTML = `
+                    <div class="warning-box">
+                        <span>⚠️</span>
+                        <span><strong>Elevated Unsubscribes:</strong> ${latest.unsubRate}% this month. Consider reducing send frequency or improving content relevance.</span>
+                    </div>
+                `;
+            } else {
+                warningContainer.innerHTML = '';
+            }
+
+            // Build Historical Table
+            let tableHtml = `
+                <table>
+                    <thead>
+                        <tr>
+                            <th>📅 Month</th>
+                            <th>🆕 New Subs</th>
+                            <th>🚫 Unsubs</th>
+                            <th>📈 Net Growth</th>
+                            <th>👥 Engaged</th>
+                            <th>📧 Campaigns $</th>
+                            <th>⚙️ Auto $</th>
+                            <th>📬 Omnisend $</th>
+                            <th>🏪 Store $</th>
+                            <th>⚠️ Unsub Rate</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            historicalData.forEach(row => {
+                const growthClass = row.netGrowth < 0 ? 'negative-growth' : 'positive-growth';
+                tableHtml += `
+                    <tr>
+                        <td>${row.month}</td>
+                        <td>${row.newSubs.toLocaleString()}</td>
+                        <td>${row.unsubs.toLocaleString()}</td>
+                        <td class="${growthClass}">${row.netGrowth >= 0 ? '+' : ''}${row.netGrowth}</td>
+                        <td>${row.engaged.toLocaleString()}</td>
+                        <td>$${row.campaignsRevenue.toFixed(2)}</td>
+                        <td>$${row.autoRevenue.toFixed(2)}</td>
+                        <td>$${row.omnisendRevenue.toFixed(2)}</td>
+                        <td>$${row.storeRevenue.toFixed(2)}</td>
+                        <td>${row.unsubRate}%</td>
+                    </tr>
+                `;
+            });
+
+            tableHtml += `</tbody></table>`;
+            document.getElementById('tableContainer').innerHTML = tableHtml;
+
+            // Insight Note
+            const highUnsub = historicalData.filter(r => r.unsubRate > 2.0);
+            if (highUnsub.length > 0) {
+                const monthsList = highUnsub.map(r => `${r.month} (${r.unsubRate}%)`).join(', ');
+                document.getElementById('insightNote').innerHTML = `
+                    🚨 <strong>Content fatigue detected:</strong> Unsubscribe rate exceeded 2% in ${highUnsub.length} month(s): ${monthsList}.<br>
+                    Consider list cleaning or reducing promotional frequency.
+                `;
+            } else {
+                document.getElementById('insightNote').innerHTML = `
+                    ✅ Unsubscribe rates are healthy across all months. Great job maintaining list quality!
+                `;
+            }
+
+            // Update charts
+            updateCharts();
+
+            // Last updated
+            document.getElementById('lastUpdated').innerHTML = 
+                `📅 Last updated: ${new Date().toLocaleString()} · Fully auto-calculated from historicalData`;
+
+        } catch (err) {
+            console.error(err);
+            document.getElementById('kpiContainer').innerHTML = `
+                <div class="warning-box" style="grid-column:1/-1">
+                    ⚠️ Could not load data.json. Make sure the file exists and has "monthly.historicalData" array.
+                </div>`;
         }
+    }
 
-        function updateCharts() {
-            if (!historicalData.length) return;
-            
-            const months = historicalData.map(row => row.month);
-            const newSubs = historicalData.map(row => row.newSubs);
-            const engaged = historicalData.map(row => row.engaged);
-            const campaignsRevenue = historicalData.map(row => row.campaignsRevenue);
-            const autoRevenue = historicalData.map(row => row.autoRevenue);
-            const unsubRate = historicalData.map(row => row.unsubRate);
-            const targetLine = new Array(historicalData.length).fill(5000);
+    function updateCharts() {
+        if (!historicalData.length) return;
 
-            // Chart 1: New Subs vs Engaged List
-            if (charts.subsEngaged) charts.subsEngaged.destroy();
-            const ctx1 = document.getElementById('subsEngagedChart').getContext('2d');
-            charts.subsEngaged = new Chart(ctx1, {
-                type: 'line',
-                data: {
-                    labels: months,
-                    datasets: [
-                        { label: 'New Subscribers', data: newSubs, borderColor: '#b1622c', backgroundColor: 'rgba(177, 98, 44, 0.1)', tension: 0.3, fill: true },
-                        { label: 'Engaged List', data: engaged, borderColor: '#4a3729', backgroundColor: 'rgba(74, 55, 41, 0.1)', tension: 0.3, fill: true }
-                    ]
-                },
-                options: { responsive: true, maintainAspectRatio: true }
-            });
+        const months = historicalData.map(row => row.month);
+        const newSubs = historicalData.map(row => row.newSubs);
+        const engaged = historicalData.map(row => row.engaged);
+        const campaignsRev = historicalData.map(row => row.campaignsRevenue);
+        const autoRev = historicalData.map(row => row.autoRevenue);
+        const unsubRate = historicalData.map(row => row.unsubRate);
+        const targetLine = new Array(months.length).fill(5000);
 
-            // Chart 2: Campaigns vs Automation Revenue
-            if (charts.revenue) charts.revenue.destroy();
-            const ctx2 = document.getElementById('revenueChart').getContext('2d');
-            charts.revenue = new Chart(ctx2, {
-                type: 'bar',
-                data: {
-                    labels: months,
-                    datasets: [
-                        { label: 'Campaigns Revenue', data: campaignsRevenue, backgroundColor: '#b1622c', borderRadius: 6 },
-                        { label: 'Automation Revenue', data: autoRevenue, backgroundColor: '#e0b08a', borderRadius: 6 }
-                    ]
-                },
-                options: { responsive: true, maintainAspectRatio: true }
-            });
+        // Destroy old charts
+        Object.keys(charts).forEach(key => charts[key] && charts[key].destroy());
 
-            // Chart 3: Unsubscribe Rate Trend
-            if (charts.unsubRate) charts.unsubRate.destroy();
-            const ctx3 = document.getElementById('unsubRateChart').getContext('2d');
-            charts.unsubRate = new Chart(ctx3, {
-                type: 'line',
-                data: {
-                    labels: months,
-                    datasets: [{ label: 'Unsubscribe Rate (%)', data: unsubRate, borderColor: '#e67e22', backgroundColor: 'rgba(230, 126, 34, 0.1)', tension: 0.3, fill: true, pointRadius: 4, pointBackgroundColor: '#e67e22' }]
-                },
-                options: { responsive: true, maintainAspectRatio: true, scales: { y: { title: { display: true, text: 'Unsubscribe Rate (%)' } } } }
-            });
+        // Chart 1: New Subs vs Engaged
+        charts.subsEngaged = new Chart(document.getElementById('subsEngagedChart'), {
+            type: 'line',
+            data: {
+                labels: months,
+                datasets: [
+                    { label: 'New Subscribers', data: newSubs, borderColor: '#b1622c', tension: 0.3, fill: true },
+                    { label: 'Engaged List', data: engaged, borderColor: '#4a3729', tension: 0.3, fill: true }
+                ]
+            },
+            options: { responsive: true, maintainAspectRatio: false }
+        });
 
-            // Chart 4: Engaged List with Target
-            if (charts.engagedList) charts.engagedList.destroy();
-            const ctx4 = document.getElementById('engagedListChart').getContext('2d');
-            charts.engagedList = new Chart(ctx4, {
-                type: 'line',
-                data: {
-                    labels: months,
-                    datasets: [
-                        { label: 'Engaged List', data: engaged, borderColor: '#4a3729', backgroundColor: 'rgba(74, 55, 41, 0.1)', tension: 0.3, fill: true, borderWidth: 2 },
-                        { label: 'Target: 5,000', data: targetLine, borderColor: '#b1622c', borderDash: [5, 5], borderWidth: 2, pointRadius: 0, fill: false }
-                    ]
-                },
-                options: { responsive: true, maintainAspectRatio: true }
-            });
-        }
+        // Chart 2: Revenue split
+        charts.revenue = new Chart(document.getElementById('revenueChart'), {
+            type: 'bar',
+            data: {
+                labels: months,
+                datasets: [
+                    { label: 'Campaigns Revenue', data: campaignsRev, backgroundColor: '#b1622c' },
+                    { label: 'Automation Revenue', data: autoRev, backgroundColor: '#e0b08a' }
+                ]
+            },
+            options: { responsive: true, maintainAspectRatio: false }
+        });
 
-        loadData();
-        setInterval(loadData, 5 * 60 * 1000);
-    </script>
+        // Chart 3: Unsub Rate Trend
+        charts.unsubRate = new Chart(document.getElementById('unsubRateChart'), {
+            type: 'line',
+            data: {
+                labels: months,
+                datasets: [{ 
+                    label: 'Unsubscribe Rate (%)', 
+                    data: unsubRate, 
+                    borderColor: '#e67e22', 
+                    tension: 0.3, 
+                    fill: true,
+                    pointRadius: 5 
+                }]
+            },
+            options: { 
+                responsive: true, 
+                maintainAspectRatio: false,
+                scales: { y: { min: 0 } }
+            }
+        });
+
+        // Chart 4: Engaged List with Target
+        charts.engagedList = new Chart(document.getElementById('engagedListChart'), {
+            type: 'line',
+            data: {
+                labels: months,
+                datasets: [
+                    { label: 'Engaged List', data: engaged, borderColor: '#4a3729', tension: 0.3, fill: true },
+                    { label: 'Target 5,000', data: targetLine, borderColor: '#b1622c', borderDash: [6, 4], pointRadius: 0 }
+                ]
+            },
+            options: { responsive: true, maintainAspectRatio: false }
+        });
+    }
+
+    // Initial load + auto refresh
+    loadData();
+    setInterval(loadData, 5 * 60 * 1000);
+</script>
 
      <!-- ── FLOATING HOME BUTTON ── -->
 <style>
