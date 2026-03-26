@@ -25,7 +25,7 @@
       {"month": "Dec 2025", "newSubs": 33, "unsubs": 93, "netGrowth": -60, "engaged": 1500, "campaignsRevenue": 603.24, "autoRevenue": 68.04, "omnisendRevenue": 671.28, "storeRevenue": 1100.88, "unsubRate": 1.43},
       {"month": "Jan 2026", "newSubs": 53, "unsubs": 91, "netGrowth": -38, "engaged": 1300, "campaignsRevenue": 163.34, "autoRevenue": 115.46, "omnisendRevenue": 278.80, "storeRevenue": 987.64, "unsubRate": 1.41},
       {"month": "Feb 2026", "newSubs": 768, "unsubs": 114, "netGrowth": 654, "engaged": 2500, "campaignsRevenue": 421.68, "autoRevenue": 1630.45, "omnisendRevenue": 2052.13, "storeRevenue": 12823.50, "unsubRate": 1.60},
-      {"month": "Mar 2026", "omnisendRevenue": 1662.27, "campaignsRevenue": 315.04, "autoRevenue": 1347.23, "storeRevenue": 14313.2, "engaged": 2400, "newSubs": 925, "unsubs": 255, "netGrowth": 670, "unsubRate": 3.17}
+      {"month": "Mar 2026","omnisendRevenue": 1698.07,"campaignsRevenue": 332.94,"autoRevenue": 1365.13,"storeRevenue": 14501.15,"engaged": 2400,"newSubs": 921,"unsubs": 269,"netGrowth": 652,"unsubRate": 3.34}
     ]
   },
   "daily": {
@@ -35,18 +35,19 @@
     "avgOpenRate": 49.3,
     "avgClickRate": 2.8,
     "campaigns": [
-      {"name": "The Rainy Day Sewing Room","dateTime": "Mar 22, 2026 at 9: 00 AM","channel": "Email","sent": 2101,"openRate": 48,"opens": 1009,"clickRate": 1,"clicks": 23,"revenue": 26.85,"orders": 1},
-      {"name": "The National Quilting Day Celebration","dateTime": "Mar 20, 2026 at 9: 00 AM","channel": "Email","sent": 2433,"openRate": 42.2,"opens": 1028,"clickRate": 5.7,"clicks": 139,"revenue": 35.8,"orders": 2},
-      {"name": "The National Quilting Day Teaser", "dateTime": "Mar 19, 2026 at 10:00 AM", "channel": "Email", "sent": 2419, "openRate": 41.7, "opens": 1011, "clickRate": 2.1, "clicks": 52, "revenue": 0.00, "orders": 0},
-      {"name": "Tools of the Trade - The Maker's Toolkit", "dateTime": "Mar 18, 2026 at 10:00 AM", "channel": "Email", "sent": 1736, "openRate": 59.3, "opens": 1031, "clickRate": 1.9, "clicks": 33, "revenue": 35.80, "orders": 1},
-      {"name": "Surprise Bloom Gift - Less Engaged", "dateTime": "Mar 16, 2026 at 10:00 AM", "channel": "Email", "sent": 5575, "openRate": 2.7, "opens": 154, "clickRate": 0.7, "clicks": 41, "revenue": 17.90, "orders": 1},
-      {"name": "Spring Garden Collection (Final Call)", "dateTime": "Mar 14, 2026 at 12:00 PM", "channel": "Email", "sent": 1615, "openRate": 61.3, "opens": 991, "clickRate": 3.6, "clicks": 59, "revenue": 17.90, "orders": 2},
-      {"name": "The Spring Garden Collection Launch", "dateTime": "Mar 12, 2026 at 10:00 AM", "channel": "Email", "sent": 1601, "openRate": 63.4, "opens": 1016, "clickRate": 5.5, "clicks": 89, "revenue": 53.70, "orders": 3},
-      {"name": "Behind the Seams (The Art of Texture)", "dateTime": "Mar 10, 2026 at 8:00 AM", "channel": "Email", "sent": 3965, "openRate": 5.5, "opens": 219, "clickRate": 0.2, "clicks": 8, "revenue": 0.00, "orders": 0},
-      {"name": "International Women's Day (Final Call)", "dateTime": "Mar 8, 2026 at 12:00 PM", "channel": "Email", "sent": 1384, "openRate": 64.3, "opens": 891, "clickRate": 3.1, "clicks": 44, "revenue": 35.80, "orders": 1},
-      {"name": "International Women's Day VIP Access", "dateTime": "Mar 6, 2026 at 10:00 AM", "channel": "Email", "sent": 1388, "openRate": 66.2, "opens": 919, "clickRate": 2.0, "clicks": 29, "revenue": 0.00, "orders": 0},
-      {"name": "Spring Petals Tutorial", "dateTime": "Mar 4, 2026 at 10:00 AM", "channel": "Email", "sent": 1384, "openRate": 68.4, "opens": 948, "clickRate": 4.6, "clicks": 64, "revenue": 17.90, "orders": 2},
-      {"name": "National Craft Month Kickoff (The Creative Spark)", "dateTime": "Mar 2, 2026 at 10:00 AM", "channel": "Email", "sent": 1382, "openRate": 69.3, "opens": 958, "clickRate": 2.4, "clicks": 34, "revenue": 73.39, "orders": 4}
+      {"name": "The Art of Negative Space","dateTime": "Mar 24, 2026 at 8: 00 AM","channel": "Email","sent": 2407,"openRate": 38,"opens": 917,"clickRate": 1.4,"clicks": 36,"revenue": 17.9,"orders": 1},
+      {"name": "The Rainy Day Sewing Room","dateTime": "Mar 22, 2026 at 9: 00 AM","channel": "Email","sent": 2101,"openRate": 48.7,"opens": 1024,"clickRate": 1,"clicks": 23,"revenue": 26.85,"orders": 1},
+  {"name": "The National Quilting Day Celebration","dateTime": "Mar 20, 2026 at 9: 00 AM","channel": "Email","sent": 2433,"openRate": 42.4,"opens": 1032,"clickRate": 5.7,"clicks": 139,"revenue": 35.8,"orders": 2},
+  {"name": "The National Quilting Day Teaser","dateTime": "Mar 18, 2026 at 10: 00 AM","channel": "Email","sent": 2419,"openRate": 42.3,"opens": 1024,"clickRate": 2.1,"clicks": 53,"revenue": 0,"orders": 0},
+  {"name": "Tools of the Trade - The Maker’s Toolkit","dateTime": "Mar 17, 2026 at 10: 00 AM","channel": "Email","sent": 1736,"openRate": 59.7,"opens": 1038,"clickRate": 1.9,"clicks": 33,"revenue": 35.8,"orders": 1},
+  {"name": "Surprise Bloom Gift - Less Engaged","dateTime": "Mar 15, 2026 at 10: 00 AM","channel": "Email","sent": 5575,"openRate": 2.8,"opens": 157,"clickRate": 0.75,"clicks": 42,"revenue": 17.9,"orders": 1},
+  {"name": "Spring Garden Collection (Final Call)","dateTime": "Mar 13, 2026 at 12: 00 PM","channel": "Email","sent": 1615,"openRate": 61.3,"opens": 991,"clickRate": 3.6,"clicks": 59,"revenue": 17.9,"orders": 2},
+  {"name": "The Spring Garden Collection Launch","dateTime": "Mar 11, 2026 at 10: 00 AM","channel": "Email","sent": 1601,"openRate": 63.5,"opens": 1017,"clickRate": 5.6,"clicks": 90,"revenue": 53.7,"orders": 3},
+  {"name": "Behind the Seams (The Art of Texture)","dateTime": "Mar 9, 2026 at 8: 00 AM","channel": "Email","sent": 3965,"openRate": 5.5,"opens": 221,"clickRate": 0.22,"clicks": 9,"revenue": 0,"orders": 0},
+  {"name": "International Women’s Day (Final Call)","dateTime": "Mar 7, 2026 at 12: 00 PM","channel": "Email","sent": 1384,"openRate": 64.5,"opens": 893,"clickRate": 3.1,"clicks": 44,"revenue": 35.8,"orders": 1},
+  {"name": "International Women’s Day VIP Access","dateTime": "Mar 5, 2026 at 10: 00 AM","channel": "Email","sent": 1388,"openRate": 66.3,"opens": 921,"clickRate": 2,"clicks": 29,"revenue": 0,"orders": 0},
+  {"name": "Spring Petals Tutorial","dateTime": "Mar 3, 2026 at 10: 00 AM","channel": "Email","sent": 1384,"openRate": 68.6,"opens": 950,"clickRate": 4.6,"clicks": 64,"revenue": 17.9,"orders": 2},
+  {"name": "National Craft Month Kickoff (The Creative Spark)","dateTime": "Mar 1, 2026 at 10: 00 AM","channel": "Email","sent": 1382,"openRate": 69.3,"opens": 959,"clickRate": 2.4,"clicks": 34,"revenue": 73.39,"orders": 4}
     ]
   }
 }
