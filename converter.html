@@ -698,24 +698,15 @@
   const cleanNum = str => { if (!str) return null; const c = str.replace(/[^0-9.\-]/g, ''); return c === '' ? null : parseFloat(c); };
   const cleanInt = str => { const n = cleanNum(str); return n === null ? null : Math.round(n); };
 
-  // Format date to "Mar 19, 2026 at 10:00 AM"
   const formatDateTime = (dateStr, timeStr) => {
     if (!dateStr && !timeStr) return '';
-    
-    // Parse the date
     let date = new Date(dateStr);
-    if (isNaN(date.getTime())) {
-      // Try to parse the original string
-      date = new Date(dateStr);
-      if (isNaN(date.getTime())) return `${dateStr} at ${timeStr}`;
-    }
-    
+    if (isNaN(date.getTime())) date = new Date(dateStr);
+    if (isNaN(date.getTime())) return `${dateStr} at ${timeStr}`;
     const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
     const month = months[date.getMonth()];
     const day = date.getDate();
     const year = date.getFullYear();
-    
-    // Format time to "10:00 AM"
     let time = timeStr;
     if (timeStr && !timeStr.includes('AM') && !timeStr.includes('PM')) {
       const [hour, minute] = timeStr.split(':');
@@ -724,27 +715,20 @@
       h = h % 12 || 12;
       time = `${h}:${minute} ${ampm}`;
     }
-    
     return `${month} ${day}, ${year} at ${time}`;
   };
 
-  // Parse date from raw string like "Mar 21, 2026 at 9:00 AM"
   const parseRawDateTime = (raw) => {
     if (!raw) return { date: '', time: '' };
     const atIdx = raw.indexOf(' at ');
     if (atIdx === -1) return { date: raw, time: '' };
     const datePart = raw.slice(0, atIdx).trim();
     const timePart = raw.slice(atIdx + 4).trim();
-    
-    // Parse the date part to a standard format
     let parsedDate = datePart;
     try {
       const d = new Date(datePart);
-      if (!isNaN(d.getTime())) {
-        parsedDate = d.toISOString().split('T')[0];
-      }
+      if (!isNaN(d.getTime())) parsedDate = d.toISOString().split('T')[0];
     } catch(e) {}
-    
     return { date: parsedDate, time: timePart };
   };
 
@@ -781,28 +765,12 @@
         if (!isSMS) { openN = cleanInt(normalize[revIdx - 3]); openPct = cleanNum(normalize[revIdx - 4]); }
       }
       if (!name) { i = revIdx > -1 ? revIdx + 2 : sentIdx + 10; continue; }
-      
-      // Format the dateTime exactly as "Mar 19, 2026 at 10:00 AM"
       const formattedDateTime = formatDateTime(parsedDate, parsedTime);
-      
-      campaigns.push({ 
-        name, 
-        dateTime: formattedDateTime, 
-        channel, 
-        sent, 
-        openRate: openPct, 
-        opens: openN, 
-        clickRate: clickPct, 
-        clicks: clickN, 
-        revenue: rev, 
-        orders 
-      });
+      campaigns.push({ name, dateTime: formattedDateTime, channel, sent, openRate: openPct, opens: openN, clickRate: clickPct, clicks: clickN, revenue: rev, orders });
       id++; i = revIdx > -1 ? revIdx + 2 : sentIdx + 10;
     }
     lastConverted = campaigns;
     if (!campaigns.length) { document.getElementById('outputJson').innerHTML = '// No campaigns detected.'; document.getElementById('statusBadge').className = 'output-badge error'; document.getElementById('statusBadge').textContent = '0 campaigns'; showToast('❌ No campaigns detected', 'error'); return; }
-    
-    // Output as array with each campaign on its own line (single line per campaign)
     const lines = campaigns.map(c => JSON.stringify(c));
     const prettyOutput = '[\n  ' + lines.join(',\n  ') + '\n]';
     document.getElementById('outputJson').innerHTML = highlight(prettyOutput);
@@ -851,6 +819,7 @@
     }
   }
 
+  // FIXED: parseMonthlyLive now correctly extracts new subscribers and unsubscribes from the "email subscribers" block
   function parseMonthlyLive() {
     const raw = document.getElementById('m_rawInput').value;
     const lines = raw.split('\n').map(l => l.trim()).filter(l => l !== '');
@@ -869,22 +838,29 @@
       
       let emailNewSubs = 0;
       let emailUnsubs = 0;
-      
-      for (let j = emailIdx + 1; j < Math.min(emailIdx + 8, lines.length); j++) {
+      // scan the next 5-6 lines after the total number to find +X and Y unsubscribed
+      for (let j = emailIdx + 2; j < Math.min(emailIdx + 8, lines.length); j++) {
         const line = lines[j];
-        if (/^\+[\d,]+$/.test(line)) {
-          emailNewSubs += cleanInt(line) || 0;
+        // match gross new subscribers: +1,195   or   +1195
+        const newMatch = line.match(/^\+([\d,]+)$/);
+        if (newMatch) {
+          emailNewSubs += cleanInt(newMatch[1]) || 0;
         }
-        const unsubMatch = line.match(/(\d[\d,]*)\s*unsubscribed/i);
+        // match line containing "| X unsubscribed"   OR   "X unsubscribed"
+        const unsubMatch = line.match(/([\d,]+)\s*unsubscribed/i);
         if (unsubMatch) {
           emailUnsubs += cleanInt(unsubMatch[1]) || 0;
         }
+        // also handle split like "1,195 subscribed | 271 unsubscribed"
+        const pipeMatch = line.match(/([\d,]+)\s*subscribed\s*\|\s*([\d,]+)\s*unsubscribed/i);
+        if (pipeMatch) {
+          emailNewSubs = cleanInt(pipeMatch[1]) || 0;
+          emailUnsubs = cleanInt(pipeMatch[2]) || 0;
+        }
       }
-      
       if (emailNewSubs > 0) setIfFound('m_newSubs', emailNewSubs);
       if (emailUnsubs > 0) setIfFound('m_unsub', emailUnsubs);
     }
-    
     updateCalculations();
   }
 
@@ -923,7 +899,6 @@
     };
     
     lastMonthly = obj;
-    // Output as single line (no pretty printing)
     const singleLineOutput = JSON.stringify(obj);
     document.getElementById('m_outputJson').innerHTML = highlight(singleLineOutput);
     document.getElementById('m_statusBadge').className = 'output-badge success';
@@ -947,7 +922,32 @@
   }
   
   function loadMonthlyExample() { 
-    document.getElementById('m_rawInput').value = `Revenue from Omnisend\n$14,073.31\n-9.51%\n780 orders\nCampaigns\n$6,133.66\n352 orders\nAutomation\n$7,939.65\n428 orders\nTotal store revenue\n$50,885.36\n3,073 orders\n\nEmail subscribers\n33,089\n+1,607\n2,342 subscribed|735 unsubscribed`; 
+    document.getElementById('m_rawInput').value = `Revenue from Omnisend
+$1,715.97
+-4.3%
+131 orders
+Campaigns
+$332.94
+18 orders
+Automation
+$1,383.03
+113 orders
+Total store revenue
+$14,563.80
+1,224 orders
+
+Email subscribers
+8,054
++1,195
+1,195 subscribed | 271 unsubscribed
+SMS subscribers
+4,767
++535
+543 subscribed | 8 unsubscribed
+Push subscribers
+2,412
++342
+344 subscribed | 2 unsubscribed`; 
     parseMonthlyLive(); 
     document.getElementById('m_month').value = 'Mar 2026'; 
     const emailSubs = parseInt(document.getElementById('m_emailSubs').value) || 0;
@@ -955,7 +955,7 @@
     const suggested = suggestEngagedValue(emailSubs, netGrowth);
     if (suggested > 0) document.getElementById('m_engaged').value = suggested;
     updateCalculations();
-    showToast(`📋 Example loaded — output will be a single line like your data.json`, ''); 
+    showToast(`📋 Example loaded — New subscribers: 1,195, Unsubs: 271, Net growth: 924`, ''); 
   }
   
   document.getElementById('m_emailSubs').addEventListener('input', updateCalculations);
