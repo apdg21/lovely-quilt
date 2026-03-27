@@ -846,7 +846,7 @@
   const storeIdx = lines.findIndex(l => /total store revenue/i.test(l)); 
   if (storeIdx > -1) setIfFound('m_store', cleanNum(lines[storeIdx + 1]));
 
-  // === EMAIL SUBSCRIBERS SECTION - FIXED LOGIC ===
+  // === EMAIL SUBSCRIBERS SECTION - IMPROVED LOGIC ===
   const emailIdx = lines.findIndex(l => /^email subscribers$/i.test(l));
   if (emailIdx > -1) {
     const emailCount = cleanInt(lines[emailIdx + 1]);
@@ -854,39 +854,41 @@
 
     let emailNewSubs = 0;
     let emailUnsubs = 0;
-    let netGrowthFound = 0;
 
-    for (let j = emailIdx + 1; j < Math.min(emailIdx + 12, lines.length); j++) {
+    // Look only within the Email subscribers block (next ~12 lines)
+    for (let j = emailIdx + 1; j < Math.min(emailIdx + 15, lines.length); j++) {
       const line = lines[j];
 
-      // Detect net growth: +924
+      // Skip if we hit the SMS section
+      if (/^sms subscribers$/i.test(line)) break;
+
+      // Net growth: +924
       if (/^\+[\d,]+$/.test(line)) {
-        netGrowthFound = cleanInt(line) || 0;
+        // We can store it but we won't use it as newSubs anymore
       }
 
-      // Detect gross new subscribers: "1,195 subscribed"
+      // Gross new subscribers: "1,195 subscribed"  ← This is what we want for EMAIL
       const subscribedMatch = line.match(/([\d,]+)\s*subscribed/i);
       if (subscribedMatch) {
-        emailNewSubs = cleanInt(subscribedMatch[1]) || 0;
+        const num = cleanInt(subscribedMatch[1]);
+        // Only take it if we're still in the Email section (before SMS appears)
+        emailNewSubs = num;
       }
 
-      // Detect unsubscribes: "271 unsubscribed"
+      // Unsubscribes: "271 unsubscribed"
       const unsubMatch = line.match(/([\d,]+)\s*unsubscribed/i);
       if (unsubMatch) {
         emailUnsubs = cleanInt(unsubMatch[1]) || 0;
       }
     }
 
-    // Priority: Use "X subscribed" as newSubs (gross) if found
+    // Set the values
     if (emailNewSubs > 0) {
-      setIfFound('m_newSubs', emailNewSubs);
-    } 
-    // Fallback to old behavior (if only +XXX is present)
-    else if (netGrowthFound > 0) {
-      setIfFound('m_newSubs', netGrowthFound);
+      setIfFound('m_newSubs', emailNewSubs);   // ← Now correctly gets 1195
     }
-
-    if (emailUnsubs > 0) setIfFound('m_unsub', emailUnsubs);
+    if (emailUnsubs > 0) {
+      setIfFound('m_unsub', emailUnsubs);
+    }
   }
 
   updateCalculations();
