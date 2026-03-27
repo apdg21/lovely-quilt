@@ -821,48 +821,76 @@
 
   // FIXED: parseMonthlyLive now correctly extracts new subscribers and unsubscribes from the "email subscribers" block
   function parseMonthlyLive() {
-    const raw = document.getElementById('m_rawInput').value;
-    const lines = raw.split('\n').map(l => l.trim()).filter(l => l !== '');
-    
-    const setIfFound = (id, val) => { if (val === null || val === undefined) return; const el = document.getElementById(id); el.value = val; el.classList.add('parsed'); setTimeout(() => el.classList.remove('parsed'), 1500); updateCalculations(); };
-    
-    const omniIdx = lines.findIndex(l => /revenue from omnisend/i.test(l)); if (omniIdx > -1) setIfFound('m_omni', cleanNum(lines[omniIdx + 1]));
-    const campIdx = lines.findIndex(l => /^campaigns$/i.test(l)); if (campIdx > -1) setIfFound('m_camp', cleanNum(lines[campIdx + 1]));
-    const autoIdx = lines.findIndex(l => /^automation$/i.test(l)); if (autoIdx > -1) setIfFound('m_auto', cleanNum(lines[autoIdx + 1]));
-    const storeIdx = lines.findIndex(l => /total store revenue/i.test(l)); if (storeIdx > -1) setIfFound('m_store', cleanNum(lines[storeIdx + 1]));
-    
-    const emailIdx = lines.findIndex(l => /^email subscribers$/i.test(l));
-    if (emailIdx > -1) {
-      const emailCount = cleanInt(lines[emailIdx + 1]);
-      if (emailCount) setIfFound('m_emailSubs', emailCount);
-      
-      let emailNewSubs = 0;
-      let emailUnsubs = 0;
-      // scan the next 5-6 lines after the total number to find +X and Y unsubscribed
-      for (let j = emailIdx + 2; j < Math.min(emailIdx + 8, lines.length); j++) {
-        const line = lines[j];
-        // match gross new subscribers: +1,195   or   +1195
-        const newMatch = line.match(/^\+([\d,]+)$/);
-        if (newMatch) {
-          emailNewSubs += cleanInt(newMatch[1]) || 0;
-        }
-        // match line containing "| X unsubscribed"   OR   "X unsubscribed"
-        const unsubMatch = line.match(/([\d,]+)\s*unsubscribed/i);
-        if (unsubMatch) {
-          emailUnsubs += cleanInt(unsubMatch[1]) || 0;
-        }
-        // also handle split like "1,195 subscribed | 271 unsubscribed"
-        const pipeMatch = line.match(/([\d,]+)\s*subscribed\s*\|\s*([\d,]+)\s*unsubscribed/i);
-        if (pipeMatch) {
-          emailNewSubs = cleanInt(pipeMatch[1]) || 0;
-          emailUnsubs = cleanInt(pipeMatch[2]) || 0;
-        }
+  const raw = document.getElementById('m_rawInput').value;
+  const lines = raw.split('\n').map(l => l.trim()).filter(l => l !== '');
+
+  const setIfFound = (id, val) => { 
+    if (val === null || val === undefined) return; 
+    const el = document.getElementById(id); 
+    el.value = val; 
+    el.classList.add('parsed'); 
+    setTimeout(() => el.classList.remove('parsed'), 1500); 
+    updateCalculations(); 
+  };
+
+  // Revenue parsing (unchanged)
+  const omniIdx = lines.findIndex(l => /revenue from omnisend/i.test(l)); 
+  if (omniIdx > -1) setIfFound('m_omni', cleanNum(lines[omniIdx + 1]));
+
+  const campIdx = lines.findIndex(l => /^campaigns$/i.test(l)); 
+  if (campIdx > -1) setIfFound('m_camp', cleanNum(lines[campIdx + 1]));
+
+  const autoIdx = lines.findIndex(l => /^automation$/i.test(l)); 
+  if (autoIdx > -1) setIfFound('m_auto', cleanNum(lines[autoIdx + 1]));
+
+  const storeIdx = lines.findIndex(l => /total store revenue/i.test(l)); 
+  if (storeIdx > -1) setIfFound('m_store', cleanNum(lines[storeIdx + 1]));
+
+  // === EMAIL SUBSCRIBERS SECTION - FIXED LOGIC ===
+  const emailIdx = lines.findIndex(l => /^email subscribers$/i.test(l));
+  if (emailIdx > -1) {
+    const emailCount = cleanInt(lines[emailIdx + 1]);
+    if (emailCount) setIfFound('m_emailSubs', emailCount);
+
+    let emailNewSubs = 0;
+    let emailUnsubs = 0;
+    let netGrowthFound = 0;
+
+    for (let j = emailIdx + 1; j < Math.min(emailIdx + 12, lines.length); j++) {
+      const line = lines[j];
+
+      // Detect net growth: +924
+      if (/^\+[\d,]+$/.test(line)) {
+        netGrowthFound = cleanInt(line) || 0;
       }
-      if (emailNewSubs > 0) setIfFound('m_newSubs', emailNewSubs);
-      if (emailUnsubs > 0) setIfFound('m_unsub', emailUnsubs);
+
+      // Detect gross new subscribers: "1,195 subscribed"
+      const subscribedMatch = line.match(/([\d,]+)\s*subscribed/i);
+      if (subscribedMatch) {
+        emailNewSubs = cleanInt(subscribedMatch[1]) || 0;
+      }
+
+      // Detect unsubscribes: "271 unsubscribed"
+      const unsubMatch = line.match(/([\d,]+)\s*unsubscribed/i);
+      if (unsubMatch) {
+        emailUnsubs = cleanInt(unsubMatch[1]) || 0;
+      }
     }
-    updateCalculations();
+
+    // Priority: Use "X subscribed" as newSubs (gross) if found
+    if (emailNewSubs > 0) {
+      setIfFound('m_newSubs', emailNewSubs);
+    } 
+    // Fallback to old behavior (if only +XXX is present)
+    else if (netGrowthFound > 0) {
+      setIfFound('m_newSubs', netGrowthFound);
+    }
+
+    if (emailUnsubs > 0) setIfFound('m_unsub', emailUnsubs);
   }
+
+  updateCalculations();
+}
 
   function convertMonthly() {
     const month = document.getElementById('m_month').value.trim();
@@ -938,7 +966,7 @@ $14,563.80
 
 Email subscribers
 8,054
-+1,195
++924
 1,195 subscribed | 271 unsubscribed
 SMS subscribers
 4,767
