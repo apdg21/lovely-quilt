@@ -25,7 +25,7 @@
       {"month": "Dec 2025", "newSubs": 33, "unsubs": 93, "netGrowth": -60, "engaged": 1500, "campaignsRevenue": 603.24, "autoRevenue": 68.04, "omnisendRevenue": 671.28, "storeRevenue": 1100.88, "unsubRate": 1.43},
       {"month": "Jan 2026", "newSubs": 53, "unsubs": 91, "netGrowth": -38, "engaged": 1300, "campaignsRevenue": 163.34, "autoRevenue": 115.46, "omnisendRevenue": 278.80, "storeRevenue": 987.64, "unsubRate": 1.41},
       {"month": "Feb 2026", "newSubs": 768, "unsubs": 114, "netGrowth": 654, "engaged": 2500, "campaignsRevenue": 421.68, "autoRevenue": 1630.45, "omnisendRevenue": 2052.13, "storeRevenue": 12823.50, "unsubRate": 1.60},
-      {"month": "Mar 2026","omnisendRevenue": 1715.97,"campaignsRevenue": 332.94,"autoRevenue": 1383.03,"storeRevenue": 14563.8,"engaged": 2400,"newSubs": 924,"unsubs": 271,"netGrowth": 653,"unsubRate": 3.36}
+      {"month": "Mar 2026","omnisendRevenue": 1715.97,"campaignsRevenue": 332.94,"autoRevenue": 1383.03,"storeRevenue": 14563.8,"engaged": 2400,"newSubs": 1195,"unsubs": 271,"netGrowth": 924,"unsubRate": 3.36}
     ]
   },
   "daily": {
