@@ -36,16 +36,20 @@
     "avgOpenRate": 49.3,
     "avgClickRate": 2.8,
     "campaigns": [
-  {"name": "You’ll Be Glad You Started","dateTime": "Apr 19, 2026 at 10: 00 AM","channel": "Email","sent": 1349,"openRate": 61.3,"opens": 827,"clickRate": 2.6,"clicks": 36,"revenue": 0,"orders": 0},
-  {"name": "Start Something Small","dateTime": "Apr 17, 2026 at 9: 00 AM","channel": "Email","sent": 1359,"openRate": 62.9,"opens": 855,"clickRate": 1.4,"clicks": 20,"revenue": 0,"orders": 0},
-  {"name": "Patterns We Keep Coming Back To","dateTime": "Apr 15, 2026 at 10: 00 AM","channel": "Email","sent": 1380,"openRate": 63.3,"opens": 874,"clickRate": 6,"clicks": 84,"revenue": 26.85,"orders": 2},
-  {"name": "Post-sale Moment","dateTime": "Apr 13, 2026 at 10: 00 AM","channel": "Email","sent": 1394,"openRate": 63.3,"opens": 883,"clickRate": 0.86,"clicks": 12,"revenue": 8.95,"orders": 1},
-  {"name": "FINAL - Easter Sale Last Day","dateTime": "Apr 11, 2026 at 12: 00 PM","channel": "Email","sent": 1401,"openRate": 60.4,"opens": 847,"clickRate": 1.4,"clicks": 20,"revenue": 43.41,"orders": 3},
-  {"name": "Quick Easter Projects (Finish in Time)","dateTime": "Apr 9, 2026 at 11: 00 AM","channel": "Email","sent": 1424,"openRate": 62.8,"opens": 895,"clickRate": 2.4,"clicks": 35,"revenue": 8.95,"orders": 1},
-  {"name": "The Easter Head Start (15% Soft Sale)","dateTime": "Apr 7, 2026 at 10: 00 AM","channel": "Email","sent": 1451,"openRate": 54.4,"opens": 790,"clickRate": 1.3,"clicks": 20,"revenue": 15.22,"orders": 1},
-  {"name": "Your Easter Quilt, Chosen","dateTime": "Apr 5, 2026 at 10: 00 AM","channel": "Email","sent": 1491,"openRate": 57.8,"opens": 862,"clickRate": 1,"clicks": 16,"revenue": 8.95,"orders": 1},
-  {"name": "Easter Inspiration Drop","dateTime": "Apr 3, 2026 at 10: 00 AM","channel": "Email","sent": 2127,"openRate": 43.3,"opens": 921,"clickRate": 1.3,"clicks": 29,"revenue": 0,"orders": 0},
-  {"name": "The Sun-Drenched Series Debut","dateTime": "Apr 1, 2026 at 10: 00 AM","channel": "Email","sent": 1522,"openRate": 60.6,"opens": 923,"clickRate": 1.1,"clicks": 18,"revenue": 0,"orders": 0}
+  {"name": "April End-of-Month Sitewide Sale (25% OFF)","dateTime": "Apr 27, 2026 at 10: 00 AM","channel": "Email","sent": 1311,"openRate": 58.3,"opens": 765,"clickRate": 2.8,"clicks": 38,"revenue": 49.01,"orders": 3},
+  {"name": "What People Are Downloading Right Now","dateTime": "Apr 25, 2026 at 10: 00 AM","channel": "Email","sent": 1318,"openRate": 65.8,"opens": 868,"clickRate": 2.4,"clicks": 32,"revenue": 28.64,"orders": 2},
+  {"name": "If You’ve Been Meaning To Start","dateTime": "Apr 23, 2026 at 9: 00 AM","channel": "Email","sent": 1329,"openRate": 63.1,"opens": 839,"clickRate": 1,"clicks": 14,"revenue": 17.9,"orders": 1},
+  {"name": "The One to Start With","dateTime": "Apr 21, 2026 at 9: 00 AM","channel": "Email","sent": 1336,"openRate": 64.5,"opens": 863,"clickRate": 2.8,"clicks": 38,"revenue": 8.95,"orders": 1},
+  {"name": "You’ll Be Glad You Started","dateTime": "Apr 19, 2026 at 10: 00 AM","channel": "Email","sent": 1349,"openRate": 65.1,"opens": 879,"clickRate": 2.7,"clicks": 37,"revenue": 0,"orders": 0},
+  {"name": "Start Something Small","dateTime": "Apr 17, 2026 at 9: 00 AM","channel": "Email","sent": 1359,"openRate": 64.2,"opens": 873,"clickRate": 1.4,"clicks": 20,"revenue": 0,"orders": 0},
+  {"name": "Patterns We Keep Coming Back To","dateTime": "Apr 15, 2026 at 10: 00 AM","channel": "Email","sent": 1380,"openRate": 64.1,"opens": 885,"clickRate": 6.1,"clicks": 85,"revenue": 26.85,"orders": 2},
+  {"name": "Post-sale Moment","dateTime": "Apr 13, 2026 at 10: 00 AM","channel": "Email","sent": 1394,"openRate": 63.7,"opens": 888,"clickRate": 0.86,"clicks": 12,"revenue": 8.95,"orders": 1},
+  {"name": "FINAL - Easter Sale Last Day","dateTime": "Apr 11, 2026 at 12: 00 PM","channel": "Email","sent": 1401,"openRate": 60.8,"opens": 852,"clickRate": 1.4,"clicks": 20,"revenue": 43.41,"orders": 3},
+  {"name": "Quick Easter Projects (Finish in Time)","dateTime": "Apr 9, 2026 at 11: 00 AM","channel": "Email","sent": 1424,"openRate": 63.3,"opens": 902,"clickRate": 2.4,"clicks": 35,"revenue": 8.95,"orders": 1},
+  {"name": "The Easter Head Start (15% Soft Sale)","dateTime": "Apr 7, 2026 at 10: 00 AM","channel": "Email","sent": 1451,"openRate": 54.6,"opens": 793,"clickRate": 1.3,"clicks": 20,"revenue": 15.22,"orders": 1},
+  {"name": "Your Easter Quilt, Chosen","dateTime": "Apr 5, 2026 at 10: 00 AM","channel": "Email","sent": 1491,"openRate": 58.1,"opens": 867,"clickRate": 1.1,"clicks": 17,"revenue": 8.95,"orders": 1},
+  {"name": "Easter Inspiration Drop","dateTime": "Apr 3, 2026 at 10: 00 AM","channel": "Email","sent": 2127,"openRate": 43.4,"opens": 924,"clickRate": 1.4,"clicks": 30,"revenue": 0,"orders": 0},
+  {"name": "The Sun-Drenched Series Debut","dateTime": "Apr 1, 2026 at 10: 00 AM","channel": "Email","sent": 1522,"openRate": 60.7,"opens": 925,"clickRate": 1.1,"clicks": 18,"revenue": 0,"orders": 0}
     ]
   }
 }
